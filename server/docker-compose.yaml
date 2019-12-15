@@ -1,0 +1,19 @@
+# This compose file is for development purposes!
+
+version: "3.7"
+
+services:
+  db:
+    image: postgres:12-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pcrdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pcrdb:/var/lib/postgresql/data
+
+volumes:
+  pcrdb:

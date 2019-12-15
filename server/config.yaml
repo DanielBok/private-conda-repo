@@ -1,0 +1,22 @@
+admin:
+  username: "admin"
+  password: "password"
+
+conda:
+  image_name: danielbok/conda-repo-mgr
+  mount_folder:  # leave empty for the application to automatically set path based on OS
+
+db:
+  host: postgres
+  port: 5432
+  user: user
+  password: password
+  dbname: pcrdb
+
+repository:
+  port: 5050
+
+application:
+  port: 5060
+
+salt: "It is best to set this from the environment variable (PCR_SALT=)"

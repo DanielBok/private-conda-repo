@@ -16,7 +16,7 @@ func (s *Store) Migrate() error {
 	}
 
 	username := "danielbok"
-	publicRepoReadonlyToken := "258c18256df7f3e77aff672c61cf33a36cc64546"
+	publicRepoReadonlyToken := ""
 	repo := "private-conda-repo"
 	folderPath := "server/store/migrations"
 	sourceUrl := fmt.Sprintf("github://%s:%s@%s/%s/%s", username, publicRepoReadonlyToken, username, repo, folderPath)

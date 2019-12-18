@@ -9,9 +9,9 @@ import (
 )
 
 type User struct {
-	Id       int
-	Name     string // this will be the channel name as well
-	Password string
+	Id       int    `json:"-"`
+	Name     string `json:"name"` // this will be the channel name as well
+	Password string `json:"password,omitempty"`
 }
 
 func (s *Store) AddUser(name, password string) (*User, error) {

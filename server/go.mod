@@ -4,7 +4,6 @@ go 1.13
 
 require (
 	github.com/dhui/dktest v0.3.0
-	github.com/docker/go-connections v0.4.0
 	github.com/emirpasic/gods v1.12.0
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/golang-migrate/migrate/v4 v4.7.0

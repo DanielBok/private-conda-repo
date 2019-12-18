@@ -5,6 +5,7 @@ admin:
 conda:
   image_name: danielbok/conda-repo-mgr
   mount_folder:  # leave empty for the application to automatically set path based on OS
+  type: volume
 
 db:
   host: postgres

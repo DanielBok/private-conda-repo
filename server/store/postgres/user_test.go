@@ -1,4 +1,4 @@
-package store
+package postgres
 
 import (
 	"testing"
@@ -6,6 +6,8 @@ import (
 	"github.com/dhui/dktest"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
+
+	"private-conda-repo/store/models"
 )
 
 func TestStore_UserOperations(t *testing.T) {
@@ -22,7 +24,7 @@ func TestStore_UserOperations(t *testing.T) {
 
 		user, err = store.AddUser(name, password)
 		if assert.NoError(err) {
-			assert.IsType(*user, User{})
+			assert.IsType(*user, models.User{})
 		}
 		assert.Equal(user.Name, name)
 		assert.NotEqual(user.Password, password)

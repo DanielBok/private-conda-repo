@@ -1,4 +1,4 @@
-package store
+package postgres
 
 import "github.com/hashicorp/go-multierror"
 

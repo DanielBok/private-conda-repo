@@ -1,29 +1,42 @@
 package store
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"strings"
+
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 
 	"private-conda-repo/config"
+	"private-conda-repo/store/models"
+	"private-conda-repo/store/postgres"
 )
 
-type Store struct {
-	db   *gorm.DB
-	conf *config.AppConfig
+type Store interface {
+	Migrate() error
+
+	AddUser(name, password string) (*models.User, error)
+	GetUser(name string) (*models.User, error)
+	RemoveUser(name, password string) error
 }
 
-func New() (*Store, error) {
+var stores = make(map[string]func() (Store, error))
+
+func Register(name string, creator func() (Store, error)) {
+	if _, dup := stores[name]; dup {
+		log.Fatalf("%s store type called twice.", name)
+	}
+	stores[name] = creator
+}
+
+func New() (Store, error) {
 	conf, err := config.New()
 	if err != nil {
 		return nil, err
 	}
-
-	cs := conf.DB.ConnectionString()
-	db, err := gorm.Open("postgres", cs)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not connect to database with '%s'", cs)
+	switch strings.ToLower(conf.DB.Type) {
+	case "postgres":
+		return postgres.New()
+	default:
+		return nil, errors.Errorf("Unknown store type: '%s'", conf.DB.Type)
 	}
-
-	return &Store{db: db, conf: conf}, nil
 }

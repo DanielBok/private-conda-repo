@@ -35,6 +35,7 @@ type database struct {
 	User     string `mapstructure:"user"`
 	Password string `mapstructure:"password"`
 	DbName   string `mapstructure:"dbname"`
+	Type     string `mapstructure:"type"`
 }
 
 type server struct {

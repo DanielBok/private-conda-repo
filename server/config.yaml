@@ -12,6 +12,7 @@ db:
   user: user
   password: password
   dbname: pcrdb
+  type: postgres
 
 repository:
   port: 5050

@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var defaultKeyValueMap = map[string]map[string]string{
+var defaultKeyValueMap = map[string]map[string]interface{}{
 	"CONDA.MOUNT_FOLDER": {
 		"WIN": "C:/temp/condapkg",
 		"LIN": "/var/condapkg",

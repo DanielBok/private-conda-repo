@@ -3,7 +3,7 @@ package condamocks
 import (
 	"io"
 
-	"private-conda-repo/conda/types"
+	"private-conda-repo/conda/condatypes"
 )
 
 type MockChannel struct {
@@ -17,8 +17,8 @@ func (m MockChannel) Index() error {
 	return nil
 }
 
-func (m MockChannel) GetMetaInfo() (*types.ChannelMetaInfo, error) {
-	return &types.ChannelMetaInfo{
+func (m MockChannel) GetMetaInfo() (*condatypes.ChannelMetaInfo, error) {
+	return &condatypes.ChannelMetaInfo{
 		ChannelVersion: 0,
 		Packages: map[string]struct {
 			Subdirs []string `json:"subdirs"`

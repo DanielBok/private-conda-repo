@@ -1,21 +1,28 @@
 package condamocks
 
 import (
-	"private-conda-repo/conda/types"
+	"github.com/stretchr/testify/mock"
+
+	"private-conda-repo/conda"
 )
 
-func New() (types.Conda, error) {
+func init() {
+	conda.Register("test", &MockConda{})
+}
+
+func New() (conda.Conda, error) {
 	return &MockConda{}, nil
 }
 
 type MockConda struct {
+	mock.Mock
 }
 
-func (m MockConda) CreateChannel(_ string) (types.Channel, error) {
+func (m MockConda) CreateChannel(_ string) (conda.Channel, error) {
 	return &MockChannel{}, nil
 }
 
-func (m MockConda) GetChannel(_ string) (types.Channel, error) {
+func (m MockConda) GetChannel(_ string) (conda.Channel, error) {
 	return &MockChannel{}, nil
 }
 
@@ -23,6 +30,6 @@ func (m MockConda) RemoveChannel(_ string) error {
 	return nil
 }
 
-func (m MockConda) ChangeChannelName(_, _ string) (types.Channel, error) {
+func (m MockConda) ChangeChannelName(_, _ string) (conda.Channel, error) {
 	return &MockChannel{}, nil
 }

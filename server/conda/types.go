@@ -1,7 +1,9 @@
-package types
+package conda
 
 import (
 	"io"
+
+	"private-conda-repo/conda/condatypes"
 )
 
 type Conda interface {
@@ -19,7 +21,7 @@ type Conda interface {
 }
 
 type Channel interface {
-	// Returns the file location of the channel's volume
+	// Returns the file location of the channel's filesys
 	Dir() string
 
 	// Indexes the channel. This should be done whenever a package is uploaded or removed from the channel.
@@ -28,7 +30,7 @@ type Channel interface {
 	Index() error
 
 	// Gets the channel's meta information
-	GetMetaInfo() (*ChannelMetaInfo, error)
+	GetMetaInfo() (*condatypes.ChannelMetaInfo, error)
 
 	// Adds a package into the channel
 	AddPackage(file io.Reader, platform, packageName string) error

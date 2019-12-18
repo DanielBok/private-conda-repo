@@ -1,4 +1,4 @@
-package volume
+package filesys
 
 import (
 	"strings"

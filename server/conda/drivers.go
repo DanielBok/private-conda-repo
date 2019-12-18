@@ -3,26 +3,31 @@ package conda
 import (
 	"strings"
 
-	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 
-	"private-conda-repo/conda/condamocks"
-	"private-conda-repo/conda/types"
-	"private-conda-repo/conda/volume"
 	"private-conda-repo/config"
 )
 
-func New() (types.Conda, error) {
+var drivers = make(map[string]Conda)
+
+func New() (Conda, error) {
 	conf, err := config.New()
 	if err != nil {
 		return nil, err
 	}
 
-	switch strings.ToLower(strings.TrimSpace(conf.Conda.Type)) {
-	case "volume":
-		return volume.New()
-	case "test":
-		return condamocks.New()
-	default:
-		return nil, errors.Errorf("Unknown conda repository type: '%s'", conf.Conda.Type)
+	name := strings.ToLower(strings.TrimSpace(conf.Conda.Type))
+	return drivers[name], nil
+}
+
+func Register(name string, c Conda) {
+	name = strings.ToLower(strings.TrimSpace(name))
+
+	if name == "" {
+		log.Fatalln("cannot register empty name in conda drivers")
+	} else if _, duplicated := drivers[name]; duplicated {
+		log.Fatalf("%s already registered in conda drivers\n", name)
 	}
+
+	drivers[name] = c
 }

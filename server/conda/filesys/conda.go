@@ -1,4 +1,4 @@
-package volume
+package filesys
 
 import (
 	"os"
@@ -6,8 +6,9 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 
-	"private-conda-repo/conda/types"
+	"private-conda-repo/conda"
 	"private-conda-repo/config"
 )
 
@@ -16,16 +17,16 @@ type Conda struct {
 	image string
 }
 
-func New() (*Conda, error) {
+func init() {
 	conf, err := config.New()
 	if err != nil {
-		return nil, err
+		log.Fatalln(err)
 	}
 
-	return &Conda{
+	conda.Register("filesys", &Conda{
 		dir:   conf.Conda.MountFolder,
 		image: conf.Conda.ImageName,
-	}, nil
+	})
 }
 
 func (c *Conda) getChannelPath(channel string) (string, error) {
@@ -37,8 +38,8 @@ func (c *Conda) getChannelPath(channel string) (string, error) {
 	return filepath.Join(c.dir, channel), nil
 }
 
-func (c Conda) CreateChannel(channel string) (types.Channel, error) {
-	chn, err := NewChannel(channel, c.dir, c.image)
+func (c Conda) CreateChannel(channel string) (conda.Channel, error) {
+	chn, err := newChannel(channel, c.dir, c.image)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +57,7 @@ func (c Conda) CreateChannel(channel string) (types.Channel, error) {
 	return chn, nil
 }
 
-func (c *Conda) GetChannel(channel string) (types.Channel, error) {
+func (c *Conda) GetChannel(channel string) (conda.Channel, error) {
 	path, err := c.getChannelPath(channel)
 	if err != nil {
 		return nil, err
@@ -65,7 +66,7 @@ func (c *Conda) GetChannel(channel string) (types.Channel, error) {
 		return nil, errors.Errorf("Channel '%s' does not exist", path)
 	}
 
-	return NewChannel(channel, c.dir, c.image)
+	return newChannel(channel, c.dir, c.image)
 }
 
 func (c *Conda) RemoveChannel(channel string) error {
@@ -82,7 +83,7 @@ func (c *Conda) RemoveChannel(channel string) error {
 	return nil
 }
 
-func (c *Conda) ChangeChannelName(oldChannel, newChannel string) (types.Channel, error) {
+func (c *Conda) ChangeChannelName(oldChannel, newChannel string) (conda.Channel, error) {
 	var _errors error
 
 	oldChn, err := c.GetChannel(oldChannel)

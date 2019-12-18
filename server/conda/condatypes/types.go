@@ -1,4 +1,4 @@
-package types
+package condatypes
 
 type ChannelMetaInfo struct {
 	ChannelVersion int `json:"channel_version"`

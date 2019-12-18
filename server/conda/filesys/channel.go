@@ -1,4 +1,4 @@
-package volume
+package filesys
 
 import (
 	"encoding/json"
@@ -13,7 +13,8 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	"private-conda-repo/conda/types"
+	"private-conda-repo/conda"
+	"private-conda-repo/conda/condatypes"
 )
 
 type Channel struct {
@@ -22,7 +23,7 @@ type Channel struct {
 	image string
 }
 
-func NewChannel(name, dir, image string) (types.Channel, error) {
+func newChannel(name, dir, image string) (conda.Channel, error) {
 	name, err := formatChannel(name)
 	if err != nil {
 		return nil, err
@@ -51,7 +52,7 @@ func (c *Channel) Index() error {
 	return nil
 }
 
-func (c *Channel) GetMetaInfo() (*types.ChannelMetaInfo, error) {
+func (c *Channel) GetMetaInfo() (*condatypes.ChannelMetaInfo, error) {
 	file := filepath.Join(c.dir, "channeldata.json")
 
 	jsonFile, err := os.Open(file)
@@ -59,7 +60,7 @@ func (c *Channel) GetMetaInfo() (*types.ChannelMetaInfo, error) {
 		return nil, nil
 	}
 
-	var data types.ChannelMetaInfo
+	var data condatypes.ChannelMetaInfo
 	if err = json.NewDecoder(jsonFile).Decode(&data); err != nil {
 		return nil, errors.Wrapf(err, "error decoding '%s' meta info", c.name)
 	}

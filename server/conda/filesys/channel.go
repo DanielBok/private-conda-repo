@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -41,11 +39,17 @@ func (c *Channel) Dir() string {
 }
 
 func (c *Channel) Index() error {
-	cmd := fmt.Sprintf("docker container run --rm "+
-		"--mount type=bind,src=%s,dst=/var/condapkg "+
-		"%s index", c.dir, c.image)
+	cmd := []string{
+		"container",
+		"run",
+		"--rm",
+		"--mount",
+		fmt.Sprintf("type=bind,src=%s,dst=/var/condapkg", c.dir),
+		c.image,
+		"index",
+	}
 
-	if _, err := exec.Command("/bin/sh", "-c", cmd).Output(); err != nil {
+	if _, err := exec.Command("docker", cmd...).Output(); err != nil {
 		return errors.Wrapf(err, "could not index channel '%s'", c.name)
 	}
 
@@ -59,6 +63,7 @@ func (c *Channel) GetMetaInfo() (*condatypes.ChannelMetaInfo, error) {
 	if os.IsNotExist(err) {
 		return nil, nil
 	}
+	defer jsonFile.Close()
 
 	var data condatypes.ChannelMetaInfo
 	if err = json.NewDecoder(jsonFile).Decode(&data); err != nil {
@@ -67,16 +72,24 @@ func (c *Channel) GetMetaInfo() (*condatypes.ChannelMetaInfo, error) {
 	return &data, nil
 }
 
-func (c *Channel) AddPackage(file io.Reader, platform, packageName string) error {
-	filePath, err := c.getPackagePath(platform, packageName)
+func (c *Channel) AddPackage(file io.Reader, platform string, name string) (*condatypes.Package, error) {
+	pkg, err := condatypes.PackageFromFileName(name, platform)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	newFile, err := os.Create(filePath)
-	if err != nil {
-		return errors.Wrapf(err, "error creating package '%s' in channel '%s' for platform '%s'", packageName, c.name, platform)
+	if c.packageExists(pkg) {
+		err := c.RemoveSinglePackage(pkg)
+		if err != nil {
+			return nil, errors.New("could not remove existing package")
+		}
 	}
+
+	newFile, err := os.Create(c.packagePath(pkg))
+	if err != nil {
+		return nil, errors.Wrapf(err, "error creating package '%s' in channel '%s' for platform '%s'", pkg.Name, c.name, platform)
+	}
+
 	defer func() {
 		err = newFile.Close()
 		log.Printf("Could not close created file: %v\n", err)
@@ -84,80 +97,48 @@ func (c *Channel) AddPackage(file io.Reader, platform, packageName string) error
 
 	_, err = io.Copy(newFile, file)
 	if err != nil && err != io.EOF {
-		return errors.Wrapf(err, "error saving package '%s' in channel '%s' for platform '%s' to disk", packageName, c.name, platform)
+		return nil, errors.Wrapf(err, "error saving package '%s' in channel '%s' for platform '%s' to disk", pkg.Name, c.name, platform)
 	}
 
 	err = c.Index()
 	if err != nil {
+		return nil, err
+	}
+
+	return pkg, nil
+}
+
+func (c *Channel) RemoveSinglePackage(pkg *condatypes.Package) error {
+	if !c.packageExists(pkg) {
+		return errors.New("package specified does not exist")
+	}
+
+	if err := os.Remove(c.packagePath(pkg)); err != nil {
+		return errors.Wrapf(err, "error removing package '%+v'", pkg)
+	}
+
+	if err := os.Remove(filepath.Join(c.dir, "channeldata.json")); err != nil {
+		return errors.Wrap(err, "could not replace channeldata and refresh index")
+	}
+
+	if err := c.Index(); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (c *Channel) RemovePackage(platform, packageName string) error {
-	platform = strings.TrimSpace(platform)
-	if platform == "" {
-		for _, p := range platforms.Values() {
-			err := c.removeSinglePackage(p.(string), packageName)
-			if err != nil {
-				return err
-			}
-		}
-
-	} else {
-		err := c.removeSinglePackage(platform, packageName)
-		if err != nil {
-			return err
-		}
-	}
-
-	err := c.Index()
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (c *Channel) RemovePackageAllVersions(name string) error {
+	panic("Implement me")
 }
 
-func (c *Channel) removeSinglePackage(platform, packageName string) error {
-	platformFolder, err := c.getPackagePath(platform, packageName)
-	if err != nil {
-		return err
-	}
-
-	files, err := ioutil.ReadDir(platformFolder)
-	if err != nil {
-		return errors.Errorf("error reading conda directory. Channel: '%s', platform: '%s'", c.name, platform)
-	}
-
-	for _, f := range files {
-		fileName := strings.ToLower(f.Name())
-		parts := strings.Split(fileName, "-")
-
-		if strings.EqualFold(parts[0], packageName) &&
-			strings.HasSuffix(packageName, ".tar.bz2") {
-			err := os.Remove(filepath.Join(platformFolder, f.Name()))
-			if err != nil {
-				return errors.Wrapf(err, "error removing package '%s'", f.Name())
-			}
-			return nil
-		}
-	}
-
-	return nil
+func (c *Channel) packagePath(pkg *condatypes.Package) string {
+	return filepath.Join(c.dir, pkg.Platform, pkg.Filename())
 }
 
-func (c *Channel) getPackagePath(platform, packageName string) (string, error) {
-	packageName, err := formatPackageName(packageName)
-	if err != nil {
-		return "", err
+func (c *Channel) packageExists(pkg *condatypes.Package) bool {
+	if _, err := os.Stat(c.packagePath(pkg)); os.IsNotExist(err) {
+		return false
 	}
-
-	platform, err = formatPlatform(platform)
-	if err != nil {
-		return "", err
-	}
-
-	return filepath.Join(c.dir, platform, packageName), nil
+	return true
 }

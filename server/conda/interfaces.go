@@ -33,8 +33,11 @@ type Channel interface {
 	GetMetaInfo() (*condatypes.ChannelMetaInfo, error)
 
 	// Adds a package into the channel
-	AddPackage(file io.Reader, platform, packageName string) error
+	AddPackage(file io.Reader, platform string, name string) (*condatypes.Package, error)
 
 	// Removes a package from the channel
-	RemovePackage(platform, packageName string) error
+	RemoveSinglePackage(pkg *condatypes.Package) error
+
+	// Removes all versions of package specified by name
+	RemovePackageAllVersions(name string) error
 }

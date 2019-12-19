@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"private-conda-repo/conda"
+	"private-conda-repo/conda/condatypes"
 	"private-conda-repo/config"
 )
 
@@ -45,7 +46,7 @@ func (c Conda) CreateChannel(channel string) (conda.Channel, error) {
 	}
 
 	for _, p := range platforms.Values() {
-		path := filepath.Join(chn.Dir(), p.(string))
+		path := filepath.Join(chn.Dir(), string(p.(condatypes.Platform)))
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			err = os.MkdirAll(path, os.ModePerm)
 			if err != nil {
@@ -75,8 +76,11 @@ func (c *Conda) RemoveChannel(channel string) error {
 		return err
 	}
 
-	err = os.RemoveAll(chn.Dir())
-	if err != nil {
+	if _, err := os.Stat(chn.Dir()); os.IsNotExist(err) {
+		return errors.Errorf("channel '%s' does not exist", channel)
+	}
+
+	if err := os.RemoveAll(chn.Dir()); err != nil {
 		return errors.Wrapf(err, "error removing channel '%s'", channel)
 	}
 
@@ -94,7 +98,7 @@ func (c *Conda) ChangeChannelName(oldChannel, newChannel string) (conda.Channel,
 	newFolder, err := c.getChannelPath(newChannel)
 	if err != nil {
 		_errors = multierror.Append(_errors, errors.Wrapf(err, "Invalid channel '%s'", newChannel))
-	} else if _, err := os.Stat(newFolder); os.IsExist(err) {
+	} else if _, err := os.Stat(newFolder); !os.IsNotExist(err) {
 		_errors = multierror.Append(_errors, errors.Wrapf(err, "Channel '%s' already exists", newChannel))
 	}
 

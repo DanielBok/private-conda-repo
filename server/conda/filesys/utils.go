@@ -5,18 +5,11 @@ import (
 
 	"github.com/emirpasic/gods/sets/linkedhashset"
 	"github.com/pkg/errors"
+
+	"private-conda-repo/conda/condatypes"
 )
 
-var platforms = linkedhashset.New("linux-64", "linux-32", "osx-64", "win-64", "win-32", "noarch")
-
-func formatPlatform(platform string) (string, error) {
-	platform = strings.TrimSpace(strings.ToLower(platform))
-	if platforms.Contains(platform) {
-		return platform, nil
-	}
-
-	return "", errors.Errorf("Unknown platform: %s", platform)
-}
+var platforms = linkedhashset.New(condatypes.LINUX32, condatypes.LINUX64, condatypes.WIN32, condatypes.WIN64, condatypes.OSX64, condatypes.NOARCH)
 
 func formatChannel(channel string) (string, error) {
 	channel = strings.TrimSpace(channel)
@@ -25,13 +18,4 @@ func formatChannel(channel string) (string, error) {
 	}
 
 	return channel, nil
-}
-
-func formatPackageName(name string) (string, error) {
-	name = strings.TrimSpace(name)
-	if name == "" {
-		return "", errors.New("package name cannot be empty")
-	}
-
-	return name, nil
 }

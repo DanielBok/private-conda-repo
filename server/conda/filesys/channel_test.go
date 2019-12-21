@@ -2,7 +2,6 @@ package filesys
 
 import (
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,7 +19,9 @@ func TestConda_CRUDPackage(t *testing.T) {
 	chn, err := repo.CreateChannel("test-channel")
 	assert.NoError(err)
 
-	file, err := os.Open(perfana)
+	testPkg := testPackages["perfana-0.0.6-py_0.tar.bz2"]
+
+	file, err := os.Open(testPkg.Path)
 	assert.NoError(err)
 	defer func() { _ = file.Close() }()
 
@@ -28,7 +29,7 @@ func TestConda_CRUDPackage(t *testing.T) {
 	pkg, err := chn.AddPackage(file, platform, "perfana")
 	assert.Error(err)
 
-	pkg, err = chn.AddPackage(file, platform, filepath.Base(perfana))
+	pkg, err = chn.AddPackage(file, platform, testPkg.Filename)
 	assert.NoError(err)
 
 	meta, err := chn.GetMetaInfo()

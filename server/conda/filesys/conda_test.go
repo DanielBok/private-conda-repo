@@ -1,24 +1,98 @@
 package filesys
 
 import (
+	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
+	"sync"
 	"testing"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+
+	"private-conda-repo/conda/condatypes"
 )
 
-var perfana = testPackagePath("perfana-0.0.6-py_0.tar.bz2")
+type testPackage struct {
+	Filename string
+	Path     string
+	Platform condatypes.Platform
+}
 
-func testPackagePath(pkg string) string {
+var (
+	urls = [8]string{
+		"https://anaconda.org/danielbok/perfana/0.0.6/download/noarch/perfana-0.0.6-py_0.tar.bz2",
+		"https://anaconda.org/danielbok/perfana/0.0.5/download/noarch/perfana-0.0.5-py_0.tar.bz2",
+		"https://anaconda.org/conda-forge/copulae/0.4.3/download/win-64/copulae-0.4.3-py38hfa6e2cd_1.tar.bz2",
+		"https://anaconda.org/conda-forge/copulae/0.4.3/download/osx-64/copulae-0.4.3-py38h0b31af3_1.tar.bz2",
+		"https://anaconda.org/conda-forge/copulae/0.4.3/download/linux-64/copulae-0.4.3-py38h516909a_1.tar.bz2",
+		"https://anaconda.org/conda-forge/copulae/0.4.2/download/osx-64/copulae-0.4.2-py36h01d97ff_1.tar.bz2",
+		"https://anaconda.org/conda-forge/copulae/0.4.2/download/linux-64/copulae-0.4.2-py37h516909a_1.tar.bz2",
+		"https://anaconda.org/conda-forge/copulae/0.4.2/download/win-64/copulae-0.4.2-py36hfa6e2cd_1.tar.bz2",
+	}
+	testPackages = make(map[string]testPackage)
+)
+
+func packageFolder() string {
 	_, filename, _, _ := runtime.Caller(1)
-	path, _ := filepath.Abs(filepath.Join(filepath.Dir(filename), "testpackages", pkg))
+	pkgDir, _ := filepath.Abs(filepath.Join(filepath.Dir(filename), "tmp"))
 
-	return path
+	return pkgDir
+}
+
+func appendTestPackage(url string, wg *sync.WaitGroup) {
+	parts := strings.Split(url, "/")
+	filename := parts[len(parts)-1]
+	platform, err := condatypes.MapPlatform(parts[len(parts)-2])
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	pkgPath := filepath.Join(packageFolder(), filename)
+	if _, err := os.Stat(pkgPath); os.IsNotExist(err) {
+		resp, err := http.Get(url)
+		if err != nil {
+			log.Fatalln(errors.Wrapf(err, "could not download '%s' from '%s'", filename, url))
+		}
+		defer func() { _ = resp.Body.Close() }()
+
+		file, err := os.Create(pkgPath)
+		if err != nil {
+			log.Fatalln(errors.Wrapf(err, "could not create '%s' to path '%s'", filename, pkgPath))
+		}
+		defer func() { _ = file.Close() }()
+
+		_, err = io.Copy(file, resp.Body)
+		if err != nil {
+			log.Fatalln(errors.Wrapf(err, "could not write (copy) '%s' to path '%s'", filename, pkgPath))
+		}
+	}
+
+	if filename != "" {
+		testPackages[filename] = testPackage{
+			Filename: filename,
+			Path:     pkgPath,
+			Platform: platform,
+		}
+	}
+
+	wg.Done()
+}
+
+func init() {
+	var wg sync.WaitGroup
+
+	for _, url := range urls {
+		wg.Add(1)
+		go appendTestPackage(url, &wg)
+	}
+
+	wg.Wait()
 }
 
 func newTestConda() (*Conda, func()) {

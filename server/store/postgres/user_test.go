@@ -28,8 +28,8 @@ func TestStore_UserOperations(t *testing.T) {
 		}
 		assert.Equal(user.Name, name)
 		assert.NotEqual(user.Password, password)
-		assert.True(user.IsValid(password))
-		assert.False(user.IsValid(password + "abc"))
+		assert.True(user.HasValidPassword(password))
+		assert.False(user.HasValidPassword(password + "abc"))
 
 		user2, err := store.GetUser(name)
 		if assert.NoError(err) {

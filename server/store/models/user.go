@@ -2,8 +2,12 @@ package models
 
 import (
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"log"
+	"strings"
+
+	"github.com/hashicorp/go-multierror"
 
 	"private-conda-repo/config"
 )
@@ -14,13 +18,27 @@ type User struct {
 	Password string `json:"password,omitempty"`
 }
 
-func (u *User) IsValid(password string) bool {
+func (u *User) HasValidPassword(password string) bool {
 	conf, err := config.New()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	return hashPassword(password, conf.Salt) == u.Password
+}
+
+func (u *User) IsValid() (err error) {
+	u.Name = strings.TrimSpace(u.Name)
+	u.Password = strings.TrimSpace(u.Password)
+
+	if len(u.Name) < 4 {
+		err = multierror.Append(err, errors.New("username must be >= 4 characters"))
+	}
+	if len(u.Password) < 4 {
+		err = multierror.Append(err, errors.New("password must be >= 4 characters"))
+	}
+
+	return
 }
 
 func NewUser(name, password string) (*User, error) {

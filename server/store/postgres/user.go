@@ -37,7 +37,7 @@ func (s *Store) RemoveUser(name, password string) error {
 		return joinErrors(errs)
 	}
 
-	if !user.IsValid(password) {
+	if !user.HasValidPassword(password) {
 		return errors.New("incorrect credentials supplied to delete user")
 	}
 

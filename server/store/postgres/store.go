@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 
 	"private-conda-repo/config"
+	"private-conda-repo/store"
 )
 
 type Store struct {
@@ -13,7 +14,11 @@ type Store struct {
 	conf *config.AppConfig
 }
 
-func New() (*Store, error) {
+func init() {
+	store.Register("postgres", New)
+}
+
+func New() (store.Store, error) {
 	conf, err := config.New()
 	if err != nil {
 		return nil, err

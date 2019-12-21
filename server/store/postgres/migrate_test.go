@@ -14,16 +14,3 @@ func TestStore_Migrate(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
-
-func newTestDb() (*Store, error) {
-	store, err := New()
-	if err != nil {
-		return nil, err
-	}
-
-	err = store.Migrate()
-	if err != nil {
-		return nil, err
-	}
-	return store, nil
-}

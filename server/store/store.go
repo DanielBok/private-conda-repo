@@ -8,7 +8,6 @@ import (
 
 	"private-conda-repo/config"
 	"private-conda-repo/store/models"
-	"private-conda-repo/store/postgres"
 )
 
 type Store interface {
@@ -33,10 +32,11 @@ func New() (Store, error) {
 	if err != nil {
 		return nil, err
 	}
-	switch strings.ToLower(conf.DB.Type) {
-	case "postgres":
-		return postgres.New()
-	default:
-		return nil, errors.Errorf("Unknown store type: '%s'", conf.DB.Type)
+
+	name := strings.ToLower(strings.TrimSpace(conf.DB.Type))
+	if createStore, ok := stores[name]; !ok {
+		return nil, errors.Errorf("Unknown database driver: '%s'", conf.DB.Type)
+	} else {
+		return createStore()
 	}
 }

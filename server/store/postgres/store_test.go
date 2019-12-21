@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/dhui/dktest"
+	"github.com/jinzhu/gorm"
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 
 	"private-conda-repo/config"
@@ -59,4 +61,25 @@ func setupConfig(c dktest.ContainerInfo) error {
 	}
 
 	return nil
+}
+
+func newTestDb() (*Store, error) {
+	conf, err := config.New()
+	if err != nil {
+		return nil, err
+	}
+
+	cs := conf.DB.ConnectionString()
+	db, err := gorm.Open("postgres", cs)
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not connect to database with '%s'", cs)
+	}
+
+	store := &Store{db: db, conf: conf}
+
+	if err = store.Migrate(); err != nil {
+		return nil, err
+	}
+
+	return store, nil
 }

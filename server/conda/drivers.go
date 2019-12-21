@@ -3,6 +3,7 @@ package conda
 import (
 	"strings"
 
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	"private-conda-repo/config"
@@ -17,7 +18,11 @@ func New() (Conda, error) {
 	}
 
 	name := strings.ToLower(strings.TrimSpace(conf.Conda.Type))
-	return drivers[name], nil
+	if drv, ok := drivers[name]; !ok {
+		return nil, errors.Errorf("Unknown conda repository driver: '%s'", conf.Conda.Type)
+	} else {
+		return drv, nil
+	}
 }
 
 func Register(name string, c Conda) {

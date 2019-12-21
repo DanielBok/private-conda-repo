@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	conda.Register("test", &MockConda{})
+	conda.Register("mock", &MockConda{})
 }
 
 func New() (conda.Conda, error) {

@@ -85,14 +85,16 @@ func (c *Channel) AddPackage(file io.Reader, platform string, name string) (*con
 		}
 	}
 
-	newFile, err := os.Create(c.packagePath(pkg))
+	destPath := c.packagePath(pkg)
+	newFile, err := os.Create(destPath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error creating package '%s' in channel '%s' for platform '%s'", pkg.Name, c.name, platform)
 	}
 
 	defer func() {
-		err = newFile.Close()
-		log.Printf("Could not close created file: %v\n", err)
+		if err := newFile.Close(); err != nil {
+			log.Println(errors.Wrapf(err, "Could not close created file: %v\n", destPath))
+		}
 	}()
 
 	_, err = io.Copy(newFile, file)

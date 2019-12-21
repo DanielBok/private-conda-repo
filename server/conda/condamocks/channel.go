@@ -59,7 +59,7 @@ func (m MockChannel) GetMetaInfo() (*condatypes.ChannelMetaInfo, error) {
 			SourceUrl:    nil,
 			Summary:      nil,
 			Tags:         nil,
-			TextPrefix:   nil,
+			TextPrefix:   false,
 			Timestamp:    0,
 		}},
 		Subdirs: []string{"dir1", "dir2"},

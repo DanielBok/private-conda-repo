@@ -4,7 +4,6 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
-	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -43,43 +42,32 @@ type server struct {
 	Port int `mapstructure:"port"`
 }
 
-var (
-	once        sync.Once
-	config      AppConfig
-	configError error
-)
-
 const prefix = "PCR"
 
 func New() (*AppConfig, error) {
-	once.Do(func() {
-		if err := setConfigDirectory(); err != nil {
-			configError = err
-			return
-		}
+	if err := setConfigDirectory(); err != nil {
+		return nil, err
+	}
 
-		viper.SetConfigName("config")
-		viper.SetConfigType("yaml")
-		viper.SetEnvPrefix(prefix)
-		viper.AutomaticEnv()
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.SetEnvPrefix(prefix)
+	viper.AutomaticEnv()
 
-		if err := viper.ReadInConfig(); err != nil {
-			configError = errors.Wrap(err, "could not read in configuration")
-			return
-		}
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, errors.Wrap(err, "could not read in configuration")
+	}
 
-		if err := setDefaults(); err != nil {
-			configError = err
-			return
-		}
+	if err := setDefaults(); err != nil {
+		return nil, err
+	}
 
-		if err := viper.Unmarshal(&config); err != nil {
-			configError = errors.Wrap(err, "could not unmarshal config")
-			return
-		}
-	})
+	var config AppConfig
+	if err := viper.Unmarshal(&config); err != nil {
+		return nil, errors.Wrap(err, "could not unmarshal config")
+	}
 
-	return &config, configError
+	return &config, nil
 }
 
 func setConfigDirectory() error {

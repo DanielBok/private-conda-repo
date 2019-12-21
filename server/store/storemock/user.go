@@ -3,8 +3,8 @@ package storemock
 import "private-conda-repo/store/models"
 
 func (m MockStore) AddUser(name, password string) (*models.User, error) {
-	args := m.Called(name, password)
-	return args.Get(0).(*models.User), args.Error(1)
+	m.Called(name, password)
+	return models.NewUser(name, password)
 }
 
 func (m MockStore) GetUser(name string) (*models.User, error) {
@@ -12,5 +12,6 @@ func (m MockStore) GetUser(name string) (*models.User, error) {
 }
 
 func (m MockStore) RemoveUser(name, password string) error {
-	panic("implement me")
+	m.Called(name, password)
+	return nil
 }

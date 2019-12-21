@@ -15,5 +15,11 @@ func init() {
 }
 
 func New() (store.Store, error) {
-	return &MockStore{}, nil
+	store := &MockStore{}
+
+	// Returns are matched by the actual method
+	store.On("AddUser", mock.AnythingOfType("string"), mock.AnythingOfType("string"))
+	store.On("RemoveUser", mock.AnythingOfType("string"), mock.AnythingOfType("string"))
+
+	return store, nil
 }

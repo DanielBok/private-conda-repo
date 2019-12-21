@@ -11,7 +11,6 @@ type MockStore struct {
 }
 
 func init() {
-
 	store.Register("mock", New)
 }
 

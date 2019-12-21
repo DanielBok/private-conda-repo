@@ -35,7 +35,7 @@ func New() (Store, error) {
 
 	name := strings.ToLower(strings.TrimSpace(conf.DB.Type))
 	if createStore, ok := stores[name]; !ok {
-		return nil, errors.Errorf("Unknown database driver: '%s'", conf.DB.Type)
+		return nil, errors.Errorf("Unknown database driver: '%s'. Did you forget to '_ import'?", conf.DB.Type)
 	} else {
 		return createStore()
 	}

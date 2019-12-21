@@ -19,6 +19,14 @@ func (s *Store) AddUser(name, password string) (*models.User, error) {
 	return user, nil
 }
 
+func (s *Store) GetAllUsers() ([]*models.User, error) {
+	var users []*models.User
+	if errs := s.db.Find(&users).GetErrors(); len(errs) > 0 {
+		return nil, joinErrors(errs)
+	}
+	return users, nil
+}
+
 func (s *Store) GetUser(name string) (*models.User, error) {
 	var user models.User
 	if errs := s.db.Where("name = ?", name).First(&user).GetErrors(); len(errs) > 0 {

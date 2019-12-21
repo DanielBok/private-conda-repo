@@ -6,6 +6,16 @@ import (
 	"private-conda-repo/store/models"
 )
 
+func ListUsers(w http.ResponseWriter, _ *http.Request) {
+	users, err := db.GetAllUsers()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	toJson(w, &users)
+}
+
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var u *models.User
 	if err := readJson(r, &u); err != nil {

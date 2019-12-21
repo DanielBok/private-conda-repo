@@ -30,10 +30,28 @@ func TestCreateUser(t *testing.T) {
 	var u *models.User
 	err = json.NewDecoder(resp.Body).Decode(&u)
 	assert.NoError(err)
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	assert.EqualValues(u.Name, "daniel")
 	assert.Empty(u.Password)
+}
+
+func TestListUsers(t *testing.T) {
+	assert := assert.New(t)
+
+	ts := newTestServer(ListUsers)
+	defer ts.Close()
+
+	resp, err := http.Get(ts.URL)
+	assert.NoError(err)
+	assert.EqualValues(resp.StatusCode, 200)
+
+	var users []*models.User
+	err = json.NewDecoder(resp.Body).Decode(&users)
+	assert.NoError(err)
+	defer func() { _ = resp.Body.Close() }()
+
+	assert.Len(users, 2) // hard-coded from the mock interface
 }
 
 func TestRemoveUser(t *testing.T) {

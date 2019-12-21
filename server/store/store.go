@@ -16,6 +16,7 @@ type Store interface {
 	AddUser(name, password string) (*models.User, error)
 	GetUser(name string) (*models.User, error)
 	RemoveUser(name, password string) error
+	GetAllUsers() ([]*models.User, error)
 }
 
 var stores = make(map[string]func() (Store, error))

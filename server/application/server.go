@@ -77,6 +77,7 @@ func (r *router) registerRoutes() {
 
 	// user routes
 	r.Route("/user", func(r chi.Router) {
+		r.Get("/", ListUsers)
 		r.Post("/", CreateUser)
 		r.Delete("/", RemoveUser)
 	})

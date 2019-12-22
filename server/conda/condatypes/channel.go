@@ -41,6 +41,11 @@ type ChannelMetaInfo struct {
 	Subdirs            []string                          `json:"subdirs"`
 }
 
+type ChannelMetaPackageOutput struct {
+	ChannelMetaPackageInfo
+	Name string `json:"name"`
+}
+
 func (m *ChannelMetaInfo) Write(path string) error {
 	data, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
@@ -53,4 +58,17 @@ func (m *ChannelMetaInfo) Write(path string) error {
 	}
 
 	return nil
+}
+
+// Returns the ChannelMetaInfo as an array of normalized data
+func (m *ChannelMetaInfo) NormalizedPackagesOutput() []*ChannelMetaPackageOutput {
+	var output []*ChannelMetaPackageOutput
+	for name, p := range m.Packages {
+		output = append(output, &ChannelMetaPackageOutput{
+			ChannelMetaPackageInfo: p,
+			Name:                   name,
+		})
+	}
+
+	return output
 }

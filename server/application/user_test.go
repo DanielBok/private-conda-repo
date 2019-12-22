@@ -12,6 +12,7 @@ import (
 )
 
 func TestCreateUser(t *testing.T) {
+	t.Parallel()
 	assert := assert.New(t)
 
 	ts := newTestServer(CreateUser)
@@ -37,6 +38,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestListUsers(t *testing.T) {
+	t.Parallel()
 	assert := assert.New(t)
 
 	ts := newTestServer(ListUsers)
@@ -55,6 +57,7 @@ func TestListUsers(t *testing.T) {
 }
 
 func TestRemoveUser(t *testing.T) {
+	t.Parallel()
 	assert := assert.New(t)
 
 	ts := newTestServer(RemoveUser)

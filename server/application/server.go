@@ -81,6 +81,16 @@ func (r *router) registerRoutes() {
 		r.Post("/", CreateUser)
 		r.Delete("/", RemoveUser)
 	})
+
+	// package routes
+	r.Route("/p", func(r chi.Router) {
+		r.Get("/{user}", ListPackagesByUser)
+		r.Get("/{user}/{pkg}", ListPackageDetails)
+
+		r.Post("/", UploadPackage)
+		r.Delete("/", RemovePackage)
+		r.Delete("/{pkg}", RemoveAllPackages)
+	})
 }
 
 func toJson(w http.ResponseWriter, object interface{}) {

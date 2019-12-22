@@ -32,6 +32,8 @@ type Channel interface {
 	// Gets the channel's meta information
 	GetMetaInfo() (*condatypes.ChannelMetaInfo, error)
 
+	GetPackageDetails(name string) ([]*condatypes.Package, error)
+
 	// Adds a package into the channel
 	AddPackage(file io.Reader, platform string, name string) (*condatypes.Package, error)
 

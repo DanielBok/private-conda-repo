@@ -14,14 +14,12 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-
-	"private-conda-repo/conda/condatypes"
 )
 
 type testPackage struct {
 	Filename string
 	Path     string
-	Platform condatypes.Platform
+	Platform string
 }
 
 var (
@@ -40,18 +38,15 @@ var (
 
 func packageFolder() string {
 	_, filename, _, _ := runtime.Caller(1)
-	pkgDir, _ := filepath.Abs(filepath.Join(filepath.Dir(filename), "tmp"))
+	pkgDir, _ := filepath.Abs(filepath.Join(filepath.Dir(filename), "testpackages"))
 
 	return pkgDir
 }
 
-func appendTestPackage(url string, wg *sync.WaitGroup) {
+func appendTestPackage(url string, wg *sync.WaitGroup, m *sync.Mutex) {
 	parts := strings.Split(url, "/")
 	filename := parts[len(parts)-1]
-	platform, err := condatypes.MapPlatform(parts[len(parts)-2])
-	if err != nil {
-		log.Fatalln(err)
-	}
+	platform := parts[len(parts)-2]
 
 	pkgPath := filepath.Join(packageFolder(), filename)
 	if _, err := os.Stat(pkgPath); os.IsNotExist(err) {
@@ -74,11 +69,13 @@ func appendTestPackage(url string, wg *sync.WaitGroup) {
 	}
 
 	if filename != "" {
+		m.Lock()
 		testPackages[filename] = testPackage{
 			Filename: filename,
 			Path:     pkgPath,
 			Platform: platform,
 		}
+		m.Unlock()
 	}
 
 	wg.Done()
@@ -86,10 +83,11 @@ func appendTestPackage(url string, wg *sync.WaitGroup) {
 
 func init() {
 	var wg sync.WaitGroup
+	var m sync.Mutex
 
 	for _, url := range urls {
 		wg.Add(1)
-		go appendTestPackage(url, &wg)
+		go appendTestPackage(url, &wg, &m)
 	}
 
 	wg.Wait()

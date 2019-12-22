@@ -38,6 +38,6 @@ type Channel interface {
 	// Removes a package from the channel
 	RemoveSinglePackage(pkg *condatypes.Package) error
 
-	// Removes all versions of package specified by name
-	RemovePackageAllVersions(name string) error
+	// Removes all versions of package specified by name. Returns the number of packages removed
+	RemovePackageAllVersions(name string) (int, error)
 }

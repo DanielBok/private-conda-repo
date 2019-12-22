@@ -4,10 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
@@ -63,7 +66,7 @@ func (c *Channel) GetMetaInfo() (*condatypes.ChannelMetaInfo, error) {
 	if os.IsNotExist(err) {
 		return nil, nil
 	}
-	defer jsonFile.Close()
+	defer func() { _ = jsonFile.Close() }()
 
 	var data condatypes.ChannelMetaInfo
 	if err = json.NewDecoder(jsonFile).Decode(&data); err != nil {
@@ -130,8 +133,55 @@ func (c *Channel) RemoveSinglePackage(pkg *condatypes.Package) error {
 	return nil
 }
 
-func (c *Channel) RemovePackageAllVersions(name string) error {
-	panic("Implement me")
+func (c *Channel) RemovePackageAllVersions(name string) (int, error) {
+	var errs error
+	count := 0
+
+	// Remove all matching packages (packages match by the name prefix)
+	for _, p := range platforms {
+		dir := filepath.Join(c.dir, string(p))
+		files, err := ioutil.ReadDir(dir)
+		if err != nil {
+			return 0, errors.Wrapf(err, "could not read files in directory")
+		}
+
+		for _, f := range files {
+			if strings.HasPrefix(f.Name(), name+"-") {
+				fp := filepath.Join(dir, f.Name())
+				if err = os.Remove(fp); err != nil {
+					errs = multierror.Append(errs, errors.Wrapf(err, "could not remove file at '%s'", fp))
+				} else {
+					count++
+				}
+			}
+		}
+	}
+	if errs != nil {
+		return count, errs
+	}
+
+	// reindex the subdirectories
+	err := c.Index()
+	if err != nil {
+		return count, err
+	}
+
+	// Remove data from the channel's main metadata
+	meta, err := c.GetMetaInfo()
+	if err != nil {
+		return count, errors.Wrap(err, "could not rewrite channel metadata")
+	}
+
+	if _, exists := meta.Packages[name]; exists {
+		delete(meta.Packages, name)
+
+		err := meta.Write(filepath.Join(c.dir, "channeldata.json"))
+		if err != nil {
+			return count, err
+		}
+	}
+
+	return count, nil
 }
 
 func (c *Channel) packagePath(pkg *condatypes.Package) string {

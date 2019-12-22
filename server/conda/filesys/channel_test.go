@@ -46,19 +46,9 @@ func TestChannel_GetMetaInfo(t *testing.T) {
 	t.Parallel()
 
 	var assert = assert.New(t)
-	repo, cleanup := newTestConda()
-	defer cleanup()
-
-	chn, err := repo.CreateChannel("get-meta-info-channel")
+	chn, cleanup, err := newPreloadedChannel("get-meta-info-channel")
 	assert.NoError(err)
-
-	for _, details := range testPackages {
-		f, err := os.Open(details.Path)
-		assert.NoError(err)
-		defer func() { _ = f.Close() }()
-		_, err = chn.AddPackage(f, details.Platform, details.Filename)
-		assert.NoError(err)
-	}
+	defer cleanup()
 
 	// both packages (copulae and perfana) are registered
 	meta, err := chn.GetMetaInfo()
@@ -78,4 +68,21 @@ func TestChannel_GetMetaInfo(t *testing.T) {
 	meta, err = chn.GetMetaInfo()
 	assert.NoError(err)
 	assert.EqualValues("0.0.5", *meta.Packages["perfana"].Version)
+}
+
+func TestChannel_RemovePackageAllVersions(t *testing.T) {
+	t.Parallel()
+
+	var assert = assert.New(t)
+	chn, cleanup, err := newPreloadedChannel("remove-package-all-versions-channel")
+	assert.NoError(err)
+	defer cleanup()
+
+	n, err := chn.RemovePackageAllVersions("copulae")
+	assert.NoError(err)
+	assert.EqualValues(6, n)
+
+	meta, err := chn.GetMetaInfo()
+	assert.NoError(err)
+	assert.Len(meta.Packages, 1)
 }

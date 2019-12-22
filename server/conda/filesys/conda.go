@@ -9,7 +9,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"private-conda-repo/conda"
-	"private-conda-repo/conda/condatypes"
 	"private-conda-repo/config"
 )
 
@@ -45,8 +44,8 @@ func (c Conda) CreateChannel(channel string) (conda.Channel, error) {
 		return nil, err
 	}
 
-	for _, p := range platforms.Values() {
-		path := filepath.Join(chn.Dir(), string(p.(condatypes.Platform)))
+	for _, p := range platforms {
+		path := filepath.Join(chn.Dir(), string(p))
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			err = os.MkdirAll(path, os.ModePerm)
 			if err != nil {

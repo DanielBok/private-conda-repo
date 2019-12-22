@@ -14,6 +14,8 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+
+	"private-conda-repo/conda"
 )
 
 type testPackage struct {
@@ -105,6 +107,30 @@ func newTestConda() (*Conda, func()) {
 		}, func() {
 			_ = os.RemoveAll(tmpdir)
 		}
+}
+
+func newPreloadedChannel(name string) (conda.Channel, func(), error) {
+	repo, cleanup := newTestConda()
+
+	chn, err := repo.CreateChannel(name)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	for _, details := range testPackages {
+		f, err := os.Open(details.Path)
+		if err != nil {
+			return nil, nil, err
+		}
+		defer func() { _ = f.Close() }()
+
+		_, err = chn.AddPackage(f, details.Platform, details.Filename)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	return chn, cleanup, err
 }
 
 func TestConda_CRUDChannel(t *testing.T) {

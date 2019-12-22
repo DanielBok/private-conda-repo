@@ -1,5 +1,12 @@
 package condatypes
 
+import (
+	"encoding/json"
+	"io/ioutil"
+
+	"github.com/pkg/errors"
+)
+
 type ChannelMetaPackageInfo struct {
 	Subdirs      []string `json:"subdirs"`
 	Version      *string  `json:"version"`
@@ -32,4 +39,18 @@ type ChannelMetaInfo struct {
 	ChannelDataVersion int                               `json:"channeldata_version"`
 	Packages           map[string]ChannelMetaPackageInfo `json:"packages"`
 	Subdirs            []string                          `json:"subdirs"`
+}
+
+func (m *ChannelMetaInfo) Write(path string) error {
+	data, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		return errors.Wrap(err, "could not marshal ChannelMetaInfo to json")
+	}
+
+	err = ioutil.WriteFile(path, data, 0644)
+	if err != nil {
+		return errors.Wrap(err, "could not overwrite ChannelMetaInfo data")
+	}
+
+	return nil
 }

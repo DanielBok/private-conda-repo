@@ -32,7 +32,7 @@ type ChannelMetaPackageInfo struct {
 	Summary      *string  `json:"summary"`
 	Tags         []string `json:"tags"`
 	TextPrefix   bool     `json:"text_prefix"`
-	Timestamp    int64    `json:"timestamp"`
+	Timestamp    uint64   `json:"timestamp"`
 }
 
 type ChannelMetaInfo struct {

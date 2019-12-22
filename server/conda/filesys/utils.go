@@ -1,6 +1,8 @@
 package filesys
 
 import (
+	"encoding/json"
+	"os"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -17,4 +19,17 @@ func formatChannel(channel string) (string, error) {
 	}
 
 	return channel, nil
+}
+
+func decodeJsonFile(filepath string, object interface{}) error {
+	jsonFile, err := os.Open(filepath)
+	if os.IsNotExist(err) {
+		return errors.Wrap(err, "json file does not exist")
+	}
+	defer func() { _ = jsonFile.Close() }()
+
+	if err = json.NewDecoder(jsonFile).Decode(&object); err != nil {
+		return err
+	}
+	return nil
 }

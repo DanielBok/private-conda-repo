@@ -1,7 +1,6 @@
 package filesys
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -60,16 +59,9 @@ func (c *Channel) Index() error {
 }
 
 func (c *Channel) GetMetaInfo() (*condatypes.ChannelMetaInfo, error) {
-	file := filepath.Join(c.dir, "channeldata.json")
-
-	jsonFile, err := os.Open(file)
-	if os.IsNotExist(err) {
-		return nil, nil
-	}
-	defer func() { _ = jsonFile.Close() }()
-
 	var data condatypes.ChannelMetaInfo
-	if err = json.NewDecoder(jsonFile).Decode(&data); err != nil {
+
+	if err := decodeJsonFile(filepath.Join(c.dir, "channeldata.json"), &data); err != nil {
 		return nil, errors.Wrapf(err, "error decoding '%s' meta info", c.name)
 	}
 	return &data, nil

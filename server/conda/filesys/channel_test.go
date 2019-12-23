@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"private-conda-repo/conda/condatypes"
+	"private-conda-repo/testutils"
 )
 
 func TestConda_CRUDPackage(t *testing.T) {
@@ -19,7 +20,7 @@ func TestConda_CRUDPackage(t *testing.T) {
 	chn, err := repo.CreateChannel("test-channel")
 	assert.NoError(err)
 
-	testPkg := testPackages["perfana-0.0.6-py_0.tar.bz2"]
+	testPkg := testutils.GetTestPackages()["perfana-0.0.6-py_0.tar.bz2"]
 
 	file, err := os.Open(testPkg.Path)
 	assert.NoError(err)

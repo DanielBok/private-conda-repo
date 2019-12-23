@@ -73,7 +73,7 @@ func (r *router) attachMiddleware() {
 }
 
 func (r *router) registerRoutes() {
-	r.Get("/HealthCheck", HealthCheck)
+	r.Get("/healthcheck", HealthCheck)
 
 	// user routes
 	r.Route("/user", func(r chi.Router) {
@@ -90,6 +90,14 @@ func (r *router) registerRoutes() {
 		r.Post("/", UploadPackage)
 		r.Delete("/", RemovePackage)
 		r.Delete("/{pkg}", RemoveAllPackages)
+	})
+
+	r.Route("/", func(r chi.Router) {
+		r.Get("/*", missing404Handler)
+		r.Put("/*", missing404Handler)
+		r.Post("/*", missing404Handler)
+		r.Delete("/*", missing404Handler)
+		r.Patch("/*", missing404Handler)
 	})
 }
 

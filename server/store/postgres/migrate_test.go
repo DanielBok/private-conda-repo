@@ -10,7 +10,12 @@ import (
 
 func TestStore_Migrate(t *testing.T) {
 	dktest.Run(t, imageName, postgresImageOptions, func(t *testing.T, info dktest.ContainerInfo) {
-		_, err := newTestDb()
+		db, err := newTestDb()
 		assert.NoError(t, err)
+
+		for i := 0; i < 3; i++ {
+			err = db.Migrate()
+			assert.NoError(t, err, "migration should not raise errors even when migrating database which is at latest revision")
+		}
 	})
 }

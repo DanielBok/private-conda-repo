@@ -26,7 +26,7 @@ func (s *Store) Migrate() error {
 		return errors.Wrap(err, "could not create migration instance")
 	}
 
-	if err := m.Up(); err != nil {
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		return errors.Wrap(err, "could not apply migrations")
 	}
 	return nil

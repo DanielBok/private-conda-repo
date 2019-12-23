@@ -7,10 +7,14 @@ import (
 	"github.com/spf13/viper"
 )
 
+var defaultKeyValue = map[string]string{
+	"decompressor.type": ".tar.bz2",
+}
+
 var defaultKeyValueMap = map[string]map[string]interface{}{
-	"CONDA.MOUNT_FOLDER": {
-		"WIN": "C:/temp/condapkg",
-		"LIN": "/var/condapkg",
+	"conda.mount_folder": {
+		"win": "C:/temp/condapkg",
+		"lin": "/var/condapkg",
 	},
 }
 
@@ -18,9 +22,9 @@ func setDefaults() error {
 	var os string
 	switch runtime.GOOS {
 	case "windows":
-		os = "WIN"
+		os = "win"
 	case "linux":
-		os = "LIN"
+		os = "lin"
 	default:
 		return errors.Errorf("Unsupported platform: %s", runtime.GOOS)
 	}
@@ -29,6 +33,10 @@ func setDefaults() error {
 		if val := viper.GetString(key); val == "" {
 			viper.Set(key, valueMap[os])
 		}
+	}
+
+	for key, value := range defaultKeyValue {
+		viper.Set(key, value)
 	}
 
 	return nil

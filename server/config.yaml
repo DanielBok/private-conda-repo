@@ -21,4 +21,7 @@ repository:
 application:
   port: 5060
 
+decompressor:
+  type: .tar.bz2  # leave this as the default, only used for testing purposes
+
 salt: "It is best to set this from the environment variable (PCR_SALT=)"

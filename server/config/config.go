@@ -10,12 +10,13 @@ import (
 )
 
 type AppConfig struct {
-	Admin      adminProfile `mapstructure:"admin"`
-	Conda      condaConfig  `mapstructure:"conda"`
-	DB         database     `mapstructure:"db"`
-	Salt       string       `mapstructure:"salt"`
-	RepoServer server       `mapstructure:"repository"`
-	AppServer  server       `mapstructure:"application"`
+	Admin        adminProfile `mapstructure:"admin"`
+	Conda        condaConfig  `mapstructure:"conda"`
+	DB           database     `mapstructure:"db"`
+	Salt         string       `mapstructure:"salt"`
+	RepoServer   server       `mapstructure:"repository"`
+	AppServer    server       `mapstructure:"application"`
+	Decompressor decompressor `mapstructure:"decompressor"`
 }
 
 type adminProfile struct {
@@ -40,6 +41,10 @@ type database struct {
 
 type server struct {
 	Port int `mapstructure:"port"`
+}
+
+type decompressor struct {
+	Type string `mapstructure:"type"`
 }
 
 const prefix = "PCR"

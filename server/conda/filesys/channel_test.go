@@ -26,11 +26,7 @@ func TestConda_CRUDPackage(t *testing.T) {
 	assert.NoError(err)
 	defer func() { _ = file.Close() }()
 
-	platform := string(condatypes.NOARCH)
-	pkg, err := chn.AddPackage(file, platform, "perfana")
-	assert.Error(err)
-
-	pkg, err = chn.AddPackage(file, platform, testPkg.Filename)
+	pkg, err := chn.AddPackage(file, testPkg.ToPackage())
 	assert.NoError(err)
 
 	meta, err := chn.GetMetaInfo()

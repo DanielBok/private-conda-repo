@@ -85,12 +85,7 @@ func (c *Channel) GetPackageDetails(name string) ([]*condatypes.Package, error) 
 	return packageDetails, nil
 }
 
-func (c *Channel) AddPackage(file io.Reader, platform string, name string) (*condatypes.Package, error) {
-	pkg, err := condatypes.PackageFromFileName(name, platform)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *Channel) AddPackage(file io.Reader, pkg *condatypes.Package) (*condatypes.Package, error) {
 	if c.packageExists(pkg) {
 		err := c.RemoveSinglePackage(pkg)
 		if err != nil {
@@ -101,7 +96,7 @@ func (c *Channel) AddPackage(file io.Reader, platform string, name string) (*con
 	destPath := c.packagePath(pkg)
 	newFile, err := os.Create(destPath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error creating package '%s' in channel '%s' for platform '%s'", pkg.Name, c.name, platform)
+		return nil, errors.Wrapf(err, "error creating package '%s' in channel '%s' for platform '%s'", pkg.Name, c.name, pkg.Platform)
 	}
 
 	defer func() {
@@ -112,7 +107,7 @@ func (c *Channel) AddPackage(file io.Reader, platform string, name string) (*con
 
 	_, err = io.Copy(newFile, file)
 	if err != nil && err != io.EOF {
-		return nil, errors.Wrapf(err, "error saving package '%s' in channel '%s' for platform '%s' to disk", pkg.Name, c.name, platform)
+		return nil, errors.Wrapf(err, "error saving package '%s' in channel '%s' for platform '%s' to disk", pkg.Name, c.name, pkg.Platform)
 	}
 
 	err = c.Index()

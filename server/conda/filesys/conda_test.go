@@ -42,7 +42,7 @@ func newPreloadedChannel(name string) (conda.Channel, func(), error) {
 			return nil, nil, err
 		}
 
-		_, err = chn.AddPackage(f, details.Platform, details.Filename)
+		_, err = chn.AddPackage(f, details.ToPackage())
 		if err != nil {
 			return nil, nil, err
 		}

@@ -35,7 +35,7 @@ type Channel interface {
 	GetPackageDetails(name string) ([]*condatypes.Package, error)
 
 	// Adds a package into the channel
-	AddPackage(file io.Reader, platform string, name string) (*condatypes.Package, error)
+	AddPackage(file io.Reader, pkg *condatypes.Package) (*condatypes.Package, error)
 
 	// Removes a package from the channel
 	RemoveSinglePackage(pkg *condatypes.Package) error

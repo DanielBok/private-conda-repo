@@ -45,7 +45,7 @@ var meta = &condatypes.ChannelMetaInfo{
 	Subdirs: []string{"dir1", "dir2"},
 }
 
-func (m MockChannel) AddPackage(file io.Reader, platform string, name string) (*condatypes.Package, error) {
+func (m MockChannel) AddPackage(file io.Reader, pkg *condatypes.Package) (*condatypes.Package, error) {
 	panic("implement me")
 }
 

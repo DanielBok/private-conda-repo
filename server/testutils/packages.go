@@ -5,12 +5,16 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+
+	"private-conda-repo/conda/condatypes"
 )
 
 type TestPackage struct {
@@ -97,4 +101,18 @@ func GetTestPackages() map[string]TestPackage {
 		data[k] = v
 	}
 	return data
+}
+
+func (t *TestPackage) ToPackage() *condatypes.Package {
+	re := regexp.MustCompile(`([\w\-]+)-([\w.]+)-(\w+)_(\d+)\.tar\.bz2`)
+	matches := re.FindStringSubmatch(t.Filename)
+	n, _ := strconv.Atoi(matches[4])
+
+	return &condatypes.Package{
+		Name:        matches[1],
+		Version:     matches[2],
+		BuildString: matches[3],
+		BuildNumber: n,
+		Platform:    t.Platform,
+	}
 }

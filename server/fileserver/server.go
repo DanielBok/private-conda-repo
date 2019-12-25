@@ -21,7 +21,7 @@ func New() (*http.Server, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "could not start repository server due to issue with config")
 	}
-	addr := fmt.Sprintf(":%d", conf.RepoServer.Port)
+	addr := fmt.Sprintf(":%d", conf.FileServer.Port)
 	log.WithField("Address", addr).Info("Server details")
 
 	r := router{chi.NewRouter()}

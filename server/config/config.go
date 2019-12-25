@@ -14,7 +14,7 @@ type AppConfig struct {
 	Conda        condaConfig  `mapstructure:"conda"`
 	DB           database     `mapstructure:"db"`
 	Salt         string       `mapstructure:"salt"`
-	RepoServer   server       `mapstructure:"repository"`
+	FileServer   server       `mapstructure:"fileserver"`
 	AppServer    server       `mapstructure:"application"`
 	Decompressor decompressor `mapstructure:"decompressor"`
 }

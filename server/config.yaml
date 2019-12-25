@@ -15,7 +15,7 @@ db:
   dbname: pcrdb
   type: postgres
 
-repository:
+fileserver:
   port: 5050
 
 application:

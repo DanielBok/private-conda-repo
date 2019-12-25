@@ -58,6 +58,7 @@ func (r *router) attachMiddleware() {
 
 func (r *router) registerRoutes() {
 	r.Get("/healthcheck", HealthCheck)
+	r.Get("/meta", MetaInfo)
 
 	// user routes
 	r.Route("/user", func(r chi.Router) {

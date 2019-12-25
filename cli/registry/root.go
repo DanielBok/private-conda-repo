@@ -16,8 +16,6 @@ var RootCmd = &cobra.Command{
 	Short: "Logs the user into the system",
 	Long: `Logs the user into the system. This will raise an
 error if the private conda repository's url is not set.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 		conf := config.New()
 		registry := conf.Registry

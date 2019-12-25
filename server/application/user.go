@@ -80,7 +80,7 @@ func CheckUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if actual.HasValidPassword(u.Name) {
+	if actual.HasValidPassword(u.Password) {
 		ok(w)
 	} else {
 		http.Error(w, "invalid credentials", http.StatusForbidden)

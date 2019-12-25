@@ -23,7 +23,7 @@ type router struct {
 func New() (*http.Server, error) {
 	conf, err := config.New()
 	if err != nil {
-		return nil, errors.Wrap(err, "could not start repository server due to issue with config")
+		return nil, errors.Wrap(err, "could not start application server due to issue with config")
 	}
 	addr := fmt.Sprintf(":%d", conf.AppServer.Port)
 	log.WithField("Address", addr).Info("Server details")

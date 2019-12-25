@@ -18,6 +18,9 @@ func TestCreateUser(t *testing.T) {
 	ts := newTestServer(CreateUser)
 	defer ts.Close()
 
+	_, err := db.AddUser("daniel", "Password123")
+	assert.NoError(err)
+
 	payload := strings.NewReader(`
 	{
 		"name": "daniel",
@@ -44,6 +47,9 @@ func TestListUsers(t *testing.T) {
 	ts := newTestServer(ListUsers)
 	defer ts.Close()
 
+	_, err := db.AddUser("Pikachu", "pika-pi!!")
+	assert.NoError(err)
+
 	resp, err := http.Get(ts.URL)
 	assert.NoError(err)
 	assert.EqualValues(resp.StatusCode, 200)
@@ -53,7 +59,9 @@ func TestListUsers(t *testing.T) {
 	assert.NoError(err)
 	defer func() { _ = resp.Body.Close() }()
 
-	assert.Len(users, 2) // hard-coded from the mock interface
+	allUsers, err := db.GetAllUsers()
+	assert.NoError(err)
+	assert.Len(users, len(allUsers))
 }
 
 func TestRemoveUser(t *testing.T) {

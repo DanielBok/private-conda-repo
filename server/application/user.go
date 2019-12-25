@@ -12,6 +12,9 @@ func ListUsers(w http.ResponseWriter, _ *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	for _, user := range users {
+		user.Password = ""
+	}
 
 	toJson(w, &users)
 }

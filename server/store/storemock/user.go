@@ -20,15 +20,12 @@ func (m MockStore) AddUser(name, password string) (*models.User, error) {
 }
 
 func (m *MockStore) GetAllUsers() ([]*models.User, error) {
-	return []*models.User{
-		{
-			Id:   1,
-			Name: "Daniel",
-		}, {
-			Id:   2,
-			Name: "Pikachu",
-		},
-	}, nil
+	var userList []*models.User
+	for _, u := range users {
+		userList = append(userList, u)
+	}
+
+	return userList, nil
 }
 
 func (m MockStore) GetUser(name string) (*models.User, error) {

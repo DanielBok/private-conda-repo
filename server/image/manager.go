@@ -10,7 +10,7 @@ import (
 )
 
 type Manager struct {
-	image string
+	Image string
 	repo  string
 }
 
@@ -23,11 +23,11 @@ func New() (*Manager, error) {
 	image := conf.Conda.ImageName
 	imageParts := strings.Split(image, "/")
 	if len(imageParts) != 2 {
-		return nil, errors.Errorf("expected conda image to be in the form <repo>/<image name> but got '%s' instead", image)
+		return nil, errors.Errorf("expected conda Image to be in the form <repo>/<Image name> but got '%s' instead", image)
 	}
 
 	mgr := &Manager{
-		image: image,
+		Image: image,
 		repo:  imageParts[0],
 	}
 

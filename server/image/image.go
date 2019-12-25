@@ -18,7 +18,7 @@ type DockerImageInfo struct {
 }
 
 func (m *Manager) UpdateImage() (int, error) {
-	current, err := m.checkCurrentVersion()
+	current, err := m.CheckCurrentVersion()
 	if err != nil {
 		return -1, err
 	}
@@ -37,8 +37,8 @@ func (m *Manager) UpdateImage() (int, error) {
 	return latest, nil
 }
 
-func (m *Manager) checkCurrentVersion() (int, error) {
-	cmd := exec.Command("docker", "image", "list", "--format", "{{.Tag}}", m.image)
+func (m *Manager) CheckCurrentVersion() (int, error) {
+	cmd := exec.Command("docker", "image", "list", "--format", "{{.Tag}}", m.Image)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return -1, err
@@ -58,7 +58,7 @@ func (m *Manager) checkCurrentVersion() (int, error) {
 
 		i, err := strconv.Atoi(tag)
 		if err != nil {
-			return -1, errors.Errorf("could not parse image tag: '%s'", tag)
+			return -1, errors.Errorf("could not parse Image tag: '%s'", tag)
 		}
 		if i > current {
 			current = i
@@ -69,15 +69,15 @@ func (m *Manager) checkCurrentVersion() (int, error) {
 }
 
 func (m *Manager) checkLatestVersion() (int, error) {
-	resp, err := http.Get(fmt.Sprintf("https://hub.docker.com/v2/repositories/%s/tags", m.image))
+	resp, err := http.Get(fmt.Sprintf("https://hub.docker.com/v2/repositories/%s/tags", m.Image))
 	if err != nil {
-		return -1, errors.Wrapf(err, "could not fetch latest image tags for '%s' from docker hub", m.image)
+		return -1, errors.Wrapf(err, "could not fetch latest Image tags for '%s' from docker hub", m.Image)
 	}
 	defer func() { _ = resp.Body.Close() }()
 
 	var output DockerImageInfo
 	if err := json.NewDecoder(resp.Body).Decode(&output); err != nil {
-		return -1, errors.Wrap(err, "could not decode image meta data from docker hub")
+		return -1, errors.Wrap(err, "could not decode Image meta data from docker hub")
 	}
 
 	latest := 0
@@ -87,7 +87,7 @@ func (m *Manager) checkLatestVersion() (int, error) {
 		}
 		i, err := strconv.Atoi(res.Name)
 		if err != nil {
-			return -1, errors.Errorf("could not parse image tag: '%s'", res.Name)
+			return -1, errors.Errorf("could not parse Image tag: '%s'", res.Name)
 		}
 		if i > latest {
 			latest = i
@@ -98,16 +98,16 @@ func (m *Manager) checkLatestVersion() (int, error) {
 }
 
 func (m *Manager) pullLatestImage(tag int) error {
-	image := fmt.Sprintf("%s:%d", m.image, tag)
+	image := fmt.Sprintf("%s:%d", m.Image, tag)
 
-	cmd := exec.Command("docker", "image", "pull", image)
+	cmd := exec.Command("docker", "Image", "pull", image)
 	if err := cmd.Run(); err != nil {
-		return errors.Wrapf(err, "could not pull image '%s' from docker hub", image)
+		return errors.Wrapf(err, "could not pull Image '%s' from docker hub", image)
 	}
 
-	cmd = exec.Command("docker", "image", "tag", image, m.image+":latest")
+	cmd = exec.Command("docker", "Image", "tag", image, m.Image+":latest")
 	if err := cmd.Run(); err != nil {
-		return errors.Wrapf(err, "could not tag image '%s' to latest", image)
+		return errors.Wrapf(err, "could not tag Image '%s' to latest", image)
 	}
 
 	return nil

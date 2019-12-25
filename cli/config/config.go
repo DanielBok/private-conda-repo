@@ -66,7 +66,7 @@ func init() {
 }
 
 func (c *Config) HasRegistry() bool {
-	if conf.Registry != "" {
+	if conf.Registry == "" {
 		log.Println("Registry location not set. Please use 'pcr registry set' to specify your private conda repo registry")
 		return false
 	}

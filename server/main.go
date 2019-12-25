@@ -13,12 +13,14 @@ import (
 
 	"private-conda-repo/application"
 	"private-conda-repo/fileserver"
+	"private-conda-repo/image"
 	"private-conda-repo/store"
 )
 
 func main() {
 	setLogger()
 	initStore()
+	updateCondaImage()
 	<-runServers()
 }
 
@@ -36,6 +38,23 @@ func initStore() {
 		log.Fatalln(err)
 	}
 	if err := s.Migrate(); err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func updateCondaImage() {
+	mgr, err := image.New()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	version, err := mgr.CheckDockerVersion()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Printf("Docker client version: %s\n", version)
+
+	err = mgr.UpdateImage()
+	if err != nil {
 		log.Fatalln(err)
 	}
 }

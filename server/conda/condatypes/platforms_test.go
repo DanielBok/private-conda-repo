@@ -3,7 +3,7 @@ package condatypes
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMapPlatform(t *testing.T) {
@@ -29,10 +29,10 @@ func TestMapPlatform(t *testing.T) {
 	for _, test := range tests {
 		p, err := MapPlatform(test.input)
 		if test.hasError {
-			assert.Error(t, err)
+			require.Error(t, err)
 		} else {
-			assert.NoError(t, err)
-			assert.EqualValues(t, test.expected, p)
+			require.NoError(t, err)
+			require.EqualValues(t, test.expected, p)
 		}
 	}
 }

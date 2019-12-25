@@ -6,14 +6,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"private-conda-repo/store/models"
 )
 
 func TestCreateUser(t *testing.T) {
 	t.Parallel()
-	assert := assert.New(t)
+	assert := require.New(t)
 
 	ts := newTestServer(CreateUser)
 	defer ts.Close()
@@ -39,7 +39,7 @@ func TestCreateUser(t *testing.T) {
 
 func TestListUsers(t *testing.T) {
 	t.Parallel()
-	assert := assert.New(t)
+	assert := require.New(t)
 
 	ts := newTestServer(ListUsers)
 	defer ts.Close()
@@ -58,23 +58,54 @@ func TestListUsers(t *testing.T) {
 
 func TestRemoveUser(t *testing.T) {
 	t.Parallel()
-	assert := assert.New(t)
+
+	type TestRow struct {
+		Payload    string
+		StatusCode int
+	}
+
+	assert := require.New(t)
 
 	ts := newTestServer(RemoveUser)
 	defer ts.Close()
-
-	payload := strings.NewReader(`
-	{
-		"name": "daniel",
-		"password": "Password123"
-	}`)
-
-	client := &http.Client{}
-	req, err := http.NewRequest("DELETE", ts.URL, payload)
+	_, err := db.AddUser("daniel", "Password123")
 	assert.NoError(err)
 
-	resp, err := client.Do(req)
-	assert.NoError(err)
+	tests := []TestRow{
+		{
+			Payload: `{
+			"name": "daniel",
+			"password": "Password123"
+			}`,
+			StatusCode: http.StatusOK,
+		},
+		{
+			Payload: `{
+			"name": "daniel123",
+			"password": "Password123"
+			}`,
+			StatusCode: http.StatusBadRequest,
+		},
+		{
+			Payload: `{
+			"name": "daniel",
+			"password": "Password"
+			}`,
+			StatusCode: http.StatusBadRequest,
+		},
+	}
 
-	assert.EqualValues(resp.StatusCode, 200)
+	runTest := func(test TestRow) {
+		client := &http.Client{}
+		req, err := http.NewRequest("DELETE", ts.URL, strings.NewReader(test.Payload))
+		assert.NoError(err)
+
+		resp, err := client.Do(req)
+		assert.NoError(err)
+		assert.EqualValues(test.StatusCode, resp.StatusCode)
+	}
+
+	for _, test := range tests {
+		runTest(test)
+	}
 }

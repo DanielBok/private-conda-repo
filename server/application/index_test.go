@@ -4,16 +4,15 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHealthCheck(t *testing.T) {
-	assert := assert.New(t)
+	assert := require.New(t)
 	ts := newTestServer(HealthCheck)
 	defer ts.Close()
 
 	resp, err := http.Get(ts.URL)
-	if assert.NoError(err) {
-		assert.EqualValues(200, resp.StatusCode)
-	}
+	assert.NoError(err)
+	assert.EqualValues(200, resp.StatusCode)
 }

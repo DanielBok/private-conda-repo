@@ -10,14 +10,14 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"private-conda-repo/conda/condatypes"
 	"private-conda-repo/testutils"
 )
 
 func TestListPackagesByUser(t *testing.T) {
-	assert := assert.New(t)
+	assert := require.New(t)
 
 	ts := newTestServerWithRouteContext("GET", "/{user}", ListPackagesByUser)
 	defer ts.Close()
@@ -41,7 +41,7 @@ func TestListPackageDetails(t *testing.T) {
 		expectedLen int
 	}
 
-	assert := assert.New(t)
+	assert := require.New(t)
 
 	ts := newTestServerWithRouteContext("GET", "/{user}/{pkg}", ListPackageDetails)
 	defer ts.Close()
@@ -66,9 +66,9 @@ func TestListPackageDetails(t *testing.T) {
 		if test.statusCode == 200 && resp.StatusCode == 200 {
 			defer func() { _ = resp.Body.Close() }()
 			var output []*condatypes.Package
-			if err := json.NewDecoder(resp.Body).Decode(&output); assert.NoError(err) {
-				assert.Len(output, test.expectedLen)
-			}
+			err := json.NewDecoder(resp.Body).Decode(&output)
+			assert.NoError(err)
+			assert.Len(output, test.expectedLen)
 		}
 	}
 
@@ -78,7 +78,7 @@ func TestListPackageDetails(t *testing.T) {
 }
 
 func TestUploadPackage(t *testing.T) {
-	assert := assert.New(t)
+	assert := require.New(t)
 
 	ts := newTestServer(UploadPackage)
 	defer ts.Close()
@@ -127,7 +127,7 @@ func TestUploadPackage(t *testing.T) {
 	defer func() { _ = resp.Body.Close() }()
 
 	var output condatypes.Package
-	if err = json.NewDecoder(resp.Body).Decode(&output); assert.NoError(err) {
-		assert.EqualValues(*pkg.ToPackage(), output)
-	}
+	err = json.NewDecoder(resp.Body).Decode(&output)
+	assert.NoError(err)
+	assert.EqualValues(*pkg.ToPackage(), output)
 }

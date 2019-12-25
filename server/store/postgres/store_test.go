@@ -42,7 +42,7 @@ func dbReady(ctx context.Context, c dktest.ContainerInfo) bool {
 	if err != nil {
 		return false
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	return db.PingContext(ctx) == nil
 }

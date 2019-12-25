@@ -1,17 +1,19 @@
 package application
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
+
+	"private-conda-repo/conda/condatypes"
 )
 
 type ChannelDetails struct {
-	Channel  string `json:"channel"`
-	Password string `json:"password"`
+	Channel  string              `json:"channel"`
+	Password string              `json:"password"`
+	Package  *condatypes.Package `json:"package"`
 }
 
 func (c *ChannelDetails) Validate() error {
@@ -94,14 +96,8 @@ func UploadPackage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check channel and password
-	user, err := db.GetUser(channel)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	if isValid := user.HasValidPassword(r.FormValue("password")); !isValid {
-		http.Error(w, fmt.Sprintf("password given for channel '%s' is incorrect", channel), http.StatusForbidden)
+	if status, err := validateCredentials(channel, r.FormValue("password")); err != nil {
+		http.Error(w, err.Error(), status)
 		return
 	}
 
@@ -129,9 +125,70 @@ func UploadPackage(w http.ResponseWriter, r *http.Request) {
 }
 
 func RemovePackage(w http.ResponseWriter, r *http.Request) {
+	var c ChannelDetails
+	if err := readJson(r, &c); err != nil {
+		http.Error(w, errors.Wrap(err, "could not parse input JSON").Error(), http.StatusBadRequest)
+		return
+	}
 
+	if c.Package == nil {
+		http.Error(w, "package details must be defined", http.StatusBadRequest)
+		return
+	}
+
+	if status, err := validateCredentials(c.Channel, c.Password); err != nil {
+		http.Error(w, err.Error(), status)
+		return
+	}
+
+	chn, err := repo.GetChannel(c.Channel)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := chn.RemoveSinglePackage(c.Package); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	ok(w)
 }
 
 func RemoveAllPackages(w http.ResponseWriter, r *http.Request) {
+	var c ChannelDetails
+	if err := readJson(r, &c); err != nil {
+		http.Error(w, errors.Wrap(err, "could not parse input JSON").Error(), http.StatusBadRequest)
+		return
+	}
 
+	if status, err := validateCredentials(c.Channel, c.Password); err != nil {
+		http.Error(w, err.Error(), status)
+		return
+	}
+
+	chn, err := repo.GetChannel(c.Channel)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	numDeleted, err := chn.RemovePackageAllVersions(chi.URLParam(r, "pkg"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	toJson(w, numDeleted)
+}
+
+func validateCredentials(channel, password string) (int, error) {
+	user, err := db.GetUser(channel)
+	if err != nil {
+		return http.StatusBadRequest, err
+	}
+
+	if isValid := user.HasValidPassword(password); !isValid {
+		return http.StatusForbidden, errors.Errorf("password given for channel '%s' is incorrect", channel)
+	}
+	return http.StatusOK, nil
 }

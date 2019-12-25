@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -130,4 +131,41 @@ func TestUploadPackage(t *testing.T) {
 	err = json.NewDecoder(resp.Body).Decode(&output)
 	assert.NoError(err)
 	assert.EqualValues(*pkg.ToPackage(), output)
+}
+
+func TestRemovePackage(t *testing.T) {
+	assert := require.New(t)
+
+	ts := newTestServer(RemovePackage)
+	defer ts.Close()
+	_, err := db.AddUser("daniel", "pikachu")
+	assert.NoError(err)
+	chn, _ := repo.GetChannel("remove-package-channel")
+	_, _ = chn.AddPackage(nil, &condatypes.Package{
+		Name:        "test-package",
+		Version:     "0.1",
+		BuildString: "py12345",
+		BuildNumber: 0,
+		Platform:    "noarch",
+	})
+
+	payload := `{
+		"channel": "daniel",
+		"password": "pikachu",
+		"package": {
+			"name": "test-package",
+			"version": "0.1",
+			"build_string": "py12345",
+			"build_number": 0,
+			"platform": "noarch"
+		}
+	}`
+
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", ts.URL, strings.NewReader(payload))
+	assert.NoError(err)
+
+	resp, err := client.Do(req)
+	assert.NoError(err)
+	assert.EqualValues(http.StatusOK, resp.StatusCode)
 }

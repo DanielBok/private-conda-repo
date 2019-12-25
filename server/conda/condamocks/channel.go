@@ -45,12 +45,18 @@ var meta = &condatypes.ChannelMetaInfo{
 	Subdirs: []string{"dir1", "dir2"},
 }
 
+var packages = make(map[string]*condatypes.Package)
+
 func (m MockChannel) AddPackage(_ io.Reader, pkg *condatypes.Package) (*condatypes.Package, error) {
+	packages[pkg.Name] = pkg
 	return pkg, nil
 }
 
 func (m MockChannel) RemoveSinglePackage(pkg *condatypes.Package) error {
-	panic("implement me")
+	if _, ok := packages[pkg.Name]; !ok {
+		return errors.New("package specified does not exist")
+	}
+	return nil
 }
 
 func (m MockChannel) RemovePackageAllVersions(name string) (int, error) {

@@ -47,16 +47,17 @@ func updateCondaImage() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	version, err := mgr.CheckDockerVersion()
+	dockerVersion, err := mgr.CheckDockerVersion()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Printf("Docker client version: %s\n", version)
+	log.Printf("Docker client version: %s", dockerVersion)
 
-	err = mgr.UpdateImage()
+	imageVersion, err := mgr.UpdateImage()
 	if err != nil {
 		log.Fatalln(err)
 	}
+	log.Printf("Conda Image Manager version: %d", imageVersion)
 }
 
 // Runs the servers. Returns a channel for graceful shutdown

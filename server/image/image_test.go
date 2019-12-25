@@ -13,6 +13,7 @@ func TestIndexImage_UpdateImage(t *testing.T) {
 
 	mgr, err := New()
 	assert.NoError(err)
-	err = mgr.UpdateImage()
+	version, err := mgr.UpdateImage()
 	assert.NoError(err)
+	assert.Greater(version, 0)
 }

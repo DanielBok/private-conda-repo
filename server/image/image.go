@@ -17,24 +17,24 @@ type DockerImageInfo struct {
 	} `json:"results"`
 }
 
-func (m *Manager) UpdateImage() error {
+func (m *Manager) UpdateImage() (int, error) {
 	current, err := m.checkCurrentVersion()
 	if err != nil {
-		return err
+		return -1, err
 	}
 
 	latest, err := m.checkLatestVersion()
 	if err != nil {
-		return err
+		return -1, err
 	}
 
 	if latest > current {
 		if err := m.pullLatestImage(latest); err != nil {
-			return err
+			return -1, err
 		}
 	}
 
-	return nil
+	return latest, nil
 }
 
 func (m *Manager) checkCurrentVersion() (int, error) {

@@ -64,6 +64,7 @@ func (r *router) registerRoutes() {
 		r.Get("/", ListUsers)
 		r.Post("/", CreateUser)
 		r.Delete("/", RemoveUser)
+		r.Post("/check", CheckUser)
 	})
 
 	// package routes

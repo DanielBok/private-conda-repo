@@ -20,14 +20,13 @@ func ListUsers(w http.ResponseWriter, _ *http.Request) {
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	var u *models.User
-	if err := readJson(r, &u); err != nil {
+	u, err := getUser(r)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err := u.IsValid()
-	if err != nil {
+	if err := u.IsValid(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -48,14 +47,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func RemoveUser(w http.ResponseWriter, r *http.Request) {
-	var u *models.User
-	if err := readJson(r, &u); err != nil {
+	u, err := getUser(r)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err := db.RemoveUser(u.Name, u.Password)
-	if err != nil {
+	if err := db.RemoveUser(u.Name, u.Password); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -67,4 +65,32 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ok(w)
+}
+
+func CheckUser(w http.ResponseWriter, r *http.Request) {
+	u, err := getUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	actual, err := db.GetUser(u.Name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if actual.HasValidPassword(u.Name) {
+		ok(w)
+	} else {
+		http.Error(w, "invalid credentials", http.StatusForbidden)
+	}
+}
+
+func getUser(r *http.Request) (*models.User, error) {
+	var u *models.User
+	if err := readJson(r, &u); err != nil {
+		return nil, err
+	}
+	return u, nil
 }

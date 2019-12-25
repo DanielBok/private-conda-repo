@@ -1,10 +1,22 @@
 package storemock
 
-import "private-conda-repo/store/models"
+import (
+	"github.com/pkg/errors"
+
+	"private-conda-repo/store/models"
+)
+
+var users = make(map[string]*models.User)
 
 func (m MockStore) AddUser(name, password string) (*models.User, error) {
 	m.Called(name, password)
-	return models.NewUser(name, password)
+	u, err := models.NewUser(name, password)
+	if err != nil {
+		return nil, err
+	}
+
+	users[u.Name] = u
+	return users[u.Name], nil
 }
 
 func (m *MockStore) GetAllUsers() ([]*models.User, error) {
@@ -20,10 +32,23 @@ func (m *MockStore) GetAllUsers() ([]*models.User, error) {
 }
 
 func (m MockStore) GetUser(name string) (*models.User, error) {
-	panic("implement me")
+	if u, ok := users[name]; !ok {
+		return nil, errors.Errorf("user '%s' does not exist", name)
+	} else {
+		return u, nil
+	}
 }
 
 func (m MockStore) RemoveUser(name, password string) error {
 	m.Called(name, password)
-	return nil
+	u, ok := users[name]
+	if !ok {
+		return errors.Errorf("user '%s' does not exist", name)
+	}
+	if u.HasValidPassword(password) {
+		delete(users, name)
+		return nil
+	} else {
+		return errors.New("password does not match")
+	}
 }

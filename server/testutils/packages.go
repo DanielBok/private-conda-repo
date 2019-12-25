@@ -103,6 +103,20 @@ func GetTestPackages() map[string]TestPackage {
 	return data
 }
 
+func GetPackageN(n int) (TestPackage, error) {
+	if n < 0 || n >= len(urls) {
+		return TestPackage{}, errors.Errorf("n must be between 0 and %d", len(urls)-1)
+	}
+
+	for _, v := range packages {
+		if n == 0 {
+			return v, nil
+		}
+		n -= 1
+	}
+	panic("This should not happen")
+}
+
 func (t *TestPackage) ToPackage() *condatypes.Package {
 	re := regexp.MustCompile(`([\w\-]+)-([\w.]+)-(\w+)_(\d+)\.tar\.bz2`)
 	matches := re.FindStringSubmatch(t.Filename)

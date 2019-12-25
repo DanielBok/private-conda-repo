@@ -17,6 +17,8 @@ func New() (Decompressor, error) {
 	}
 
 	switch conf.Decompressor.Type {
+	case "mock":
+		return &mockDecompressor{}, nil
 	default:
 		return &tarBz2Decompressor{}, nil
 	}

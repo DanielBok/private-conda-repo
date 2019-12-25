@@ -19,6 +19,7 @@ const (
 func init() {
 	viper.Set("db.type", "mock")
 	viper.Set("conda.type", "mock")
+	viper.Set("decompressor.type", "mock")
 
 	if err := initStore(); err != nil {
 		log.Fatalln(err)

@@ -45,19 +45,13 @@ func ListPackageDetails(w http.ResponseWriter, r *http.Request) {
 	user := chi.URLParam(r, "user")
 	pkg := chi.URLParam(r, "pkg")
 
-	repo, err := repo.GetChannel(user)
-	if err != nil {
-		http.Error(w, errors.Wrapf(err, "could not find user/channel with name '%s'", user).Error(), http.StatusBadRequest)
-		return
-	}
-
-	details, err := repo.GetPackageDetails(pkg)
+	counts, err := db.GetPackageCounts(user, pkg)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	toJson(w, details)
+	toJson(w, counts)
 }
 
 func UploadPackage(w http.ResponseWriter, r *http.Request) {
@@ -117,6 +111,11 @@ func UploadPackage(w http.ResponseWriter, r *http.Request) {
 	p, err := chn.AddPackage(f, pkg.Package)
 	if err != nil {
 		http.Error(w, errors.Wrap(err, "upload failed").Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if _, err := db.CreateInitialPackageCount(p.ToPackageCount(channel)); err != nil {
+		http.Error(w, errors.Wrap(err, "could not create package count record").Error(), http.StatusInternalServerError)
 		return
 	}
 

@@ -66,8 +66,6 @@ func TestListUsers(t *testing.T) {
 }
 
 func TestRemoveUser(t *testing.T) {
-	t.Parallel()
-
 	type TestRow struct {
 		Payload    string
 		StatusCode int

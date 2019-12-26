@@ -69,11 +69,11 @@ func TestListPackageDetails(t *testing.T) {
 	tests := []TestRow{
 		{
 			input:       "bad-package-name",
-			statusCode:  500,
+			statusCode:  http.StatusOK,
 			expectedLen: 0,
 		}, {
 			input:       "perfana",
-			statusCode:  200,
+			statusCode:  http.StatusOK,
 			expectedLen: 1,
 		},
 	}

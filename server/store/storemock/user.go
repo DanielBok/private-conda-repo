@@ -8,15 +8,15 @@ import (
 
 var users = make(map[string]*models.User)
 
-func (m MockStore) AddUser(name, password string) (*models.User, error) {
-	m.Called(name, password)
-	u, err := models.NewUser(name, password)
+func (m MockStore) AddUser(channel, password string) (*models.User, error) {
+	m.Called(channel, password)
+	u, err := models.NewUser(channel, password)
 	if err != nil {
 		return nil, err
 	}
 
-	users[u.Name] = u
-	return users[u.Name], nil
+	users[u.Channel] = u
+	return users[u.Channel], nil
 }
 
 func (m *MockStore) GetAllUsers() ([]*models.User, error) {
@@ -28,22 +28,22 @@ func (m *MockStore) GetAllUsers() ([]*models.User, error) {
 	return userList, nil
 }
 
-func (m MockStore) GetUser(name string) (*models.User, error) {
-	if u, ok := users[name]; !ok {
-		return nil, errors.Errorf("user '%s' does not exist", name)
+func (m MockStore) GetUser(channel string) (*models.User, error) {
+	if u, ok := users[channel]; !ok {
+		return nil, errors.Errorf("user '%s' does not exist", channel)
 	} else {
 		return u, nil
 	}
 }
 
-func (m MockStore) RemoveUser(name, password string) error {
-	m.Called(name, password)
-	u, ok := users[name]
+func (m MockStore) RemoveUser(channel, password string) error {
+	m.Called(channel, password)
+	u, ok := users[channel]
 	if !ok {
-		return errors.Errorf("user '%s' does not exist", name)
+		return errors.Errorf("user '%s' does not exist", channel)
 	}
 	if u.HasValidPassword(password) {
-		delete(users, name)
+		delete(users, channel)
 		return nil
 	} else {
 		return errors.New("password does not match")

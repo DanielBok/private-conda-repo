@@ -6,8 +6,8 @@ import (
 	"private-conda-repo/store/models"
 )
 
-func (s *Store) AddUser(name, password string) (*models.User, error) {
-	user, err := models.NewUser(name, password)
+func (s *Store) AddUser(channel, password string) (*models.User, error) {
+	user, err := models.NewUser(channel, password)
 	if err != nil {
 		return nil, err
 	}
@@ -27,9 +27,9 @@ func (s *Store) GetAllUsers() ([]*models.User, error) {
 	return users, nil
 }
 
-func (s *Store) GetUser(name string) (*models.User, error) {
+func (s *Store) GetUser(channel string) (*models.User, error) {
 	var user models.User
-	if errs := s.db.Where("name = ?", name).First(&user).GetErrors(); len(errs) > 0 {
+	if errs := s.db.Where("channel = ?", channel).First(&user).GetErrors(); len(errs) > 0 {
 		if len(errs) == 1 {
 			return nil, errs[0]
 		}
@@ -39,9 +39,9 @@ func (s *Store) GetUser(name string) (*models.User, error) {
 	return &user, nil
 }
 
-func (s *Store) RemoveUser(name, password string) error {
+func (s *Store) RemoveUser(channel, password string) error {
 	var user models.User
-	if errs := s.db.Where("name = ?", name).First(&user).GetErrors(); len(errs) > 0 {
+	if errs := s.db.Where("channel = ?", channel).First(&user).GetErrors(); len(errs) > 0 {
 		return joinErrors(errs)
 	}
 

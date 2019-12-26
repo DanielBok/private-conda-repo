@@ -23,7 +23,7 @@ func TestCreateUser(t *testing.T) {
 
 	payload := strings.NewReader(`
 	{
-		"name": "daniel",
+		"channel": "daniel",
 		"password": "Password123"
 	}`)
 
@@ -36,7 +36,7 @@ func TestCreateUser(t *testing.T) {
 	assert.NoError(err)
 	defer func() { _ = resp.Body.Close() }()
 
-	assert.EqualValues(u.Name, "daniel")
+	assert.EqualValues(u.Channel, "daniel")
 	assert.Empty(u.Password)
 }
 
@@ -76,27 +76,27 @@ func TestRemoveUser(t *testing.T) {
 
 	ts := newTestServer(RemoveUser)
 	defer ts.Close()
-	_, err := db.AddUser("daniel", "Password123")
+	_, err := db.AddUser("daniel-r", "Password123")
 	assert.NoError(err)
 
 	tests := []TestRow{
 		{
 			Payload: `{
-			"name": "daniel",
+			"channel": "daniel-r",
 			"password": "Password123"
 			}`,
 			StatusCode: http.StatusOK,
 		},
 		{
 			Payload: `{
-			"name": "daniel123",
+			"channel": "daniel123",
 			"password": "Password123"
 			}`,
 			StatusCode: http.StatusBadRequest,
 		},
 		{
 			Payload: `{
-			"name": "daniel",
+			"channel": "daniel-r",
 			"password": "Password"
 			}`,
 			StatusCode: http.StatusBadRequest,

@@ -9,13 +9,13 @@ import (
 
 func TestUser_IsValid(t *testing.T) {
 	u := User{
-		Name:     "bad",
+		Channel:  "bad",
 		Password: "bad",
 	}
 	err := u.IsValid()
-	require.Error(t, err, "Name and password are both too short")
+	require.Error(t, err, "Channel and password are both too short")
 
-	u.Name = "good"
+	u.Channel = "good"
 	err = u.IsValid()
 	require.Error(t, err, "Password should still be short")
 

@@ -31,14 +31,14 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u, err = db.AddUser(u.Name, u.Password)
+	u, err = db.AddUser(u.Channel, u.Password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	u.Password = ""
 
-	if _, err := repo.CreateChannel(u.Name); err != nil {
+	if _, err := repo.CreateChannel(u.Channel); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -53,12 +53,12 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := db.RemoveUser(u.Name, u.Password); err != nil {
+	if err := db.RemoveUser(u.Channel, u.Password); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = repo.RemoveChannel(u.Name)
+	err = repo.RemoveChannel(u.Channel)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -74,7 +74,7 @@ func CheckUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	actual, err := db.GetUser(u.Name)
+	actual, err := db.GetUser(u.Channel)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

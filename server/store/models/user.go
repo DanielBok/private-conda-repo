@@ -14,7 +14,7 @@ import (
 
 type User struct {
 	Id       int    `json:"-"`
-	Name     string `json:"name"` // this will be the channel name as well
+	Channel  string `json:"channel"` // this will be the channel name as well
 	Password string `json:"password,omitempty"`
 }
 
@@ -28,10 +28,10 @@ func (u *User) HasValidPassword(password string) bool {
 }
 
 func (u *User) IsValid() (err error) {
-	u.Name = strings.TrimSpace(u.Name)
+	u.Channel = strings.TrimSpace(u.Channel)
 	u.Password = strings.TrimSpace(u.Password)
 
-	if len(u.Name) < 4 {
+	if len(u.Channel) < 4 {
 		err = multierror.Append(err, errors.New("username must be >= 4 characters"))
 	}
 	if len(u.Password) < 4 {
@@ -48,7 +48,7 @@ func NewUser(name, password string) (*User, error) {
 	}
 
 	return &User{
-		Name:     name,
+		Channel:  name,
 		Password: hashPassword(password, conf.Salt),
 	}, nil
 }

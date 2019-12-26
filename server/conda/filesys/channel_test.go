@@ -83,32 +83,3 @@ func TestChannel_RemovePackageAllVersions(t *testing.T) {
 	assert.NoError(err)
 	assert.Len(meta.Packages, 1)
 }
-
-func TestChannel_GetPackageDetails(t *testing.T) {
-	t.Parallel()
-
-	var assert = assert.New(t)
-	chn, cleanup, err := newPreloadedChannel("get-package-details-channel")
-	assert.NoError(err)
-	defer cleanup()
-
-	tests := []struct {
-		input    string
-		expected int
-		hasError bool
-	}{
-		{"copulae", 6, false},
-		{"perfana", 2, false},
-		{"non-existent-package", 0, false},
-	}
-
-	for _, test := range tests {
-		details, err := chn.GetPackageDetails(test.input)
-		if test.hasError {
-			assert.Error(err)
-		} else {
-			assert.NoError(err)
-			assert.Len(details, test.expected)
-		}
-	}
-}

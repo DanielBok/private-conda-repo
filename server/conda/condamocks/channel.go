@@ -60,22 +60,6 @@ func (m MockChannel) GetMetaInfo() (*condatypes.ChannelMetaInfo, error) {
 	return meta, nil
 }
 
-func (m *MockChannel) GetPackageDetails(name string) ([]*condatypes.Package, error) {
-	if _, exists := meta.Packages[name]; !exists {
-		return nil, errors.Errorf("Package '%s' does not exist", name)
-	}
-
-	return []*condatypes.Package{
-		{
-			Name:        name,
-			Version:     "0.1.0",
-			BuildString: "py_a187v872",
-			BuildNumber: 0,
-			Platform:    "noarch",
-		},
-	}, nil
-}
-
 func newMeta(pkg *condatypes.Package) condatypes.ChannelMetaPackageInfo {
 	return condatypes.ChannelMetaPackageInfo{
 		Subdirs:      []string{string(pkg.GetPlatform())},

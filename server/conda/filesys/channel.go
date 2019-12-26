@@ -67,24 +67,6 @@ func (c *Channel) GetMetaInfo() (*condatypes.ChannelMetaInfo, error) {
 	return &data, nil
 }
 
-func (c *Channel) GetPackageDetails(name string) ([]*condatypes.Package, error) {
-	var packageDetails []*condatypes.Package
-
-	for _, p := range platforms {
-		var data condatypes.RepoData
-		if err := decodeJsonFile(filepath.Join(c.dir, string(p), "repodata.json"), &data); err != nil {
-			return nil, errors.Wrapf(err, "could not read files in directory")
-		}
-		for _, pkg := range data.Packages {
-			if pkg.Name == name {
-				packageDetails = append(packageDetails, pkg.ToPackage())
-			}
-		}
-	}
-
-	return packageDetails, nil
-}
-
 func (c *Channel) AddPackage(file io.Reader, pkg *condatypes.Package) (*condatypes.Package, error) {
 	if c.packageExists(pkg) {
 		err := c.RemoveSinglePackage(pkg)

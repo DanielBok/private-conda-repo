@@ -17,6 +17,10 @@ type Store interface {
 	GetUser(channel string) (*models.User, error)
 	RemoveUser(channel, password string) error
 	GetAllUsers() ([]*models.User, error)
+
+	GetPackageCounts(channel, name string) ([]*models.PackageCount, error)
+	CreateInitialPackageCount(pkg *models.PackageCount) (*models.PackageCount, error)
+	IncreasePackageCount(channel, name, platform string) (*models.PackageCount, error)
 }
 
 var stores = make(map[string]func() (Store, error))

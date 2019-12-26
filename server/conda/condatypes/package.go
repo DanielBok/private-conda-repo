@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+
+	"private-conda-repo/store/models"
 )
 
 type Package struct {
@@ -37,4 +39,15 @@ func (p *Package) Validate() error {
 	}
 
 	return nil
+}
+
+func (p *Package) ToPackageCount(channel string) *models.PackageCount {
+	return &models.PackageCount{
+		Channel:     channel,
+		Package:     p.Name,
+		BuildString: p.BuildString,
+		BuildNumber: p.BuildNumber,
+		Version:     p.Version,
+		Platform:    p.Platform,
+	}
 }

@@ -24,7 +24,14 @@ func New() (*http.Server, error) {
 	addr := fmt.Sprintf(":%d", conf.FileServer.Port)
 	log.WithField("Address", addr).Info("Server details")
 
-	r := router{chi.NewRouter()}
+	if err := initStore(); err != nil {
+		return nil, err
+	}
+
+	r := router{
+		Mux: chi.NewRouter(),
+	}
+
 	r.attachMiddleware()
 	r.addFileServer(conf)
 
@@ -42,12 +49,5 @@ func (r *router) attachMiddleware() {
 }
 
 func (r *router) addFileServer(conf *config.AppConfig) {
-	root := http.Dir(conf.Conda.MountFolder)
-	fs := http.FileServer(root)
-
-	log.WithField("Repository mount folder used to serve packages", root).Info()
-
-	r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
-		fs.ServeHTTP(w, r)
-	})
+	r.Get("/*", FileHandler(conf.Conda.MountFolder))
 }

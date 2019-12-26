@@ -32,6 +32,6 @@ func MapPlatform(platform string) (Platform, error) {
 	case "noarch":
 		return NOARCH, nil
 	default:
-		return "", errors.Errorf("Unknown platform: '%s'", platform)
+		return "", errors.Errorf("Invalid platform: '%s'", platform)
 	}
 }

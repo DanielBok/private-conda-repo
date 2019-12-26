@@ -17,6 +17,7 @@ type AppConfig struct {
 	FileServer   server       `mapstructure:"fileserver"`
 	AppServer    server       `mapstructure:"application"`
 	Decompressor decompressor `mapstructure:"decompressor"`
+	TLS          tls          `mapstructure:"tls"`
 }
 
 type adminProfile struct {
@@ -28,15 +29,6 @@ type condaConfig struct {
 	ImageName   string `mapstructure:"image_name"`
 	MountFolder string `mapstructure:"mount_folder"`
 	Type        string `mapstructure:"type"`
-}
-
-type database struct {
-	Host     string `mapstructure:"host"`
-	Port     int    `mapstructure:"port"`
-	User     string `mapstructure:"user"`
-	Password string `mapstructure:"password"`
-	DbName   string `mapstructure:"dbname"`
-	Type     string `mapstructure:"type"`
 }
 
 type server struct {

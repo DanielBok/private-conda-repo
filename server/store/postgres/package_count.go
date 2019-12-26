@@ -29,13 +29,11 @@ func (s *Store) IncreasePackageCount(channel, name, platform string) (*models.Pa
 	var count models.PackageCount
 	if errs := s.db.
 		Where("channel = ? AND package = ? AND platform = ?", channel, name, platform).
-		First(count).
+		First(&count).
 		GetErrors(); len(errs) > 0 {
 		return nil, errors.Wrap(joinErrors(errs), "could not update count")
 	}
 
-	count.Count += 1
 	s.db.Model(&count).Update("count", count.Count+1)
-
 	return &count, nil
 }

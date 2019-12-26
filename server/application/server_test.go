@@ -1,6 +1,7 @@
 package application
 
 import (
+	"bytes"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -9,6 +10,7 @@ import (
 	"github.com/spf13/viper"
 
 	_ "private-conda-repo/conda/condamocks"
+	"private-conda-repo/conda/condatypes"
 	_ "private-conda-repo/store/storemock"
 )
 
@@ -44,4 +46,20 @@ func newTestServerWithRouteContext(method, pattern string, f http.HandlerFunc) *
 	m.MethodFunc(method, pattern, f)
 	ts := httptest.NewServer(m)
 	return ts
+}
+
+func createChannelAndAddPackages(channel string, packages ...condatypes.Package) error {
+	chn, err := repo.GetChannel(channel)
+	if err != nil {
+		return err
+	}
+
+	for _, p := range packages {
+		_, err := chn.AddPackage(bytes.NewBufferString("asd"), &p)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

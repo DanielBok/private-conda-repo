@@ -2,6 +2,7 @@ package application
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"testing"
@@ -76,29 +77,35 @@ func TestRemoveUser(t *testing.T) {
 
 	ts := newTestServer(RemoveUser)
 	defer ts.Close()
-	_, err := db.AddUser("daniel-r", "Password123")
+
+	channel := "daniel-remove-user"
+	password := "Password123"
+	err := createChannelAndAddPackages(channel)
+	assert.NoError(err)
+
+	_, err = db.AddUser(channel, password)
 	assert.NoError(err)
 
 	tests := []TestRow{
 		{
-			Payload: `{
-			"channel": "daniel-r",
-			"password": "Password123"
-			}`,
+			Payload: fmt.Sprintf(`{
+			"channel": "%s",
+			"password": "%s"
+			}`, channel, password),
 			StatusCode: http.StatusOK,
 		},
 		{
-			Payload: `{
-			"channel": "daniel123",
-			"password": "Password123"
-			}`,
+			Payload: fmt.Sprintf(`{
+			"channel": "BadChannel",
+			"password": "%s"
+			}`, password),
 			StatusCode: http.StatusBadRequest,
 		},
 		{
-			Payload: `{
-			"channel": "daniel-r",
-			"password": "Password"
-			}`,
+			Payload: fmt.Sprintf(`{
+			"channel": "%s",
+			"password": "BadPassword"
+			}`, channel),
 			StatusCode: http.StatusBadRequest,
 		},
 	}

@@ -20,10 +20,20 @@ import (
 func TestListPackagesByUser(t *testing.T) {
 	assert := require.New(t)
 
+	channel := "daniel-list-by-user"
+	err := createChannelAndAddPackages(channel, condatypes.Package{
+		Name:        "perfana",
+		Version:     "0.0.1",
+		BuildString: "py",
+		BuildNumber: 0,
+		Platform:    "noarch",
+	})
+	assert.NoError(err)
+
 	ts := newTestServerWithRouteContext("GET", "/{user}", ListPackagesByUser)
 	defer ts.Close()
 
-	resp, err := http.Get(ts.URL + "/pikachu")
+	resp, err := http.Get(fmt.Sprintf("%s/%s", ts.URL, channel))
 	assert.NoError(err)
 	assert.EqualValues(resp.StatusCode, 200)
 
@@ -32,7 +42,7 @@ func TestListPackagesByUser(t *testing.T) {
 	assert.NoError(err)
 	defer func() { _ = resp.Body.Close() }()
 
-	assert.Len(output, 1) // hard-coded from the mock interface
+	assert.Len(output, 1)
 }
 
 func TestListPackageDetails(t *testing.T) {
@@ -43,6 +53,15 @@ func TestListPackageDetails(t *testing.T) {
 	}
 
 	assert := require.New(t)
+	channel := "daniel-list"
+	err := createChannelAndAddPackages(channel, condatypes.Package{
+		Name:        "perfana",
+		Version:     "0.0.1",
+		BuildString: "py",
+		BuildNumber: 0,
+		Platform:    "noarch",
+	})
+	assert.NoError(err)
 
 	ts := newTestServerWithRouteContext("GET", "/{user}/{pkg}", ListPackageDetails)
 	defer ts.Close()
@@ -60,7 +79,7 @@ func TestListPackageDetails(t *testing.T) {
 	}
 
 	runTest := func(test TestRow) {
-		resp, err := http.Get(fmt.Sprintf("%s/pikachu/%s", ts.URL, test.input))
+		resp, err := http.Get(fmt.Sprintf("%s/%s/%s", ts.URL, channel, test.input))
 		assert.NoError(err)
 		assert.EqualValues(test.statusCode, resp.StatusCode)
 

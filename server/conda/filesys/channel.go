@@ -135,30 +135,39 @@ func (c *Channel) RemoveSinglePackage(pkg *condatypes.Package) error {
 		return err
 	}
 
+	packages, err := c.retrievePackageFamily(pkg.Name)
+	if err != nil {
+		return errors.Wrapf(err, "could not check other directories for '%s' package", pkg.Name)
+	}
+
+	if len(packages) == 0 {
+		if err := c.removeEntryFromMetaInfo(pkg.Name); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
 func (c *Channel) RemovePackageAllVersions(name string) (int, error) {
 	var errs error
-	count := 0
 
 	// Remove all matching packages (packages match by the name prefix)
-	for _, p := range platforms {
-		dir := filepath.Join(c.dir, string(p))
-		files, err := ioutil.ReadDir(dir)
-		if err != nil {
-			return 0, errors.Wrapf(err, "could not read files in directory")
-		}
+	packages, err := c.retrievePackageFamily(name)
+	if err != nil {
+		return 0, err
+	}
 
-		for _, f := range files {
-			if strings.HasPrefix(f.Name(), name+"-") {
-				fp := filepath.Join(dir, f.Name())
-				if err = os.Remove(fp); err != nil {
-					errs = multierror.Append(errs, errors.Wrapf(err, "could not remove file at '%s'", fp))
-				} else {
-					count++
-				}
-			}
+	if len(packages) == 0 {
+		return 0, nil
+	}
+
+	count := 0
+	for _, fp := range packages {
+		if err = os.Remove(fp); err != nil {
+			errs = multierror.Append(errs, errors.Wrapf(err, "could not remove file at '%s'", fp))
+		} else {
+			count++
 		}
 	}
 	if errs != nil {
@@ -166,24 +175,12 @@ func (c *Channel) RemovePackageAllVersions(name string) (int, error) {
 	}
 
 	// reindex the subdirectories
-	err := c.Index()
-	if err != nil {
+	if err := c.Index(); err != nil {
 		return count, err
 	}
 
-	// Remove data from the channel's main metadata
-	meta, err := c.GetMetaInfo()
-	if err != nil {
-		return count, errors.Wrap(err, "could not rewrite channel metadata")
-	}
-
-	if _, exists := meta.Packages[name]; exists {
-		delete(meta.Packages, name)
-
-		err := meta.Write(filepath.Join(c.dir, "channeldata.json"))
-		if err != nil {
-			return count, err
-		}
+	if err := c.removeEntryFromMetaInfo(name); err != nil {
+		return count, err
 	}
 
 	return count, nil
@@ -198,4 +195,43 @@ func (c *Channel) packageExists(pkg *condatypes.Package) bool {
 		return false
 	}
 	return true
+}
+
+// This should be called whenever an entire package is removed from the channel.
+// The function will remove the entry from the channeldata.json file
+func (c *Channel) removeEntryFromMetaInfo(name string) error {
+	meta, err := c.GetMetaInfo()
+	if err != nil {
+		return errors.Wrap(err, "could not rewrite channel metadata")
+	}
+
+	if _, exists := meta.Packages[name]; exists {
+		delete(meta.Packages, name)
+
+		err := meta.Write(filepath.Join(c.dir, "channeldata.json"))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Channel) retrievePackageFamily(name string) ([]string, error) {
+	var packages []string
+
+	for _, p := range platforms {
+		dir := filepath.Join(c.dir, string(p))
+		files, err := ioutil.ReadDir(dir)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not read files in directory")
+		}
+
+		for _, f := range files {
+			if strings.HasPrefix(f.Name(), name+"-") {
+				fp := filepath.Join(dir, f.Name())
+				packages = append(packages, fp)
+			}
+		}
+	}
+	return packages, nil
 }

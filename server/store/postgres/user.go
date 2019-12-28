@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"errors"
+	"strings"
 
 	"private-conda-repo/store/models"
 )
@@ -29,10 +30,10 @@ func (s *Store) GetAllUsers() ([]*models.User, error) {
 
 func (s *Store) GetUser(channel string) (*models.User, error) {
 	var user models.User
-	if errs := s.db.Where("channel = ?", channel).First(&user).GetErrors(); len(errs) > 0 {
-		if len(errs) == 1 {
-			return nil, errs[0]
-		}
+	if errs := s.db.
+		Where("channel = ?", strings.ToLower(channel)).
+		First(&user).
+		GetErrors(); len(errs) > 0 {
 		return nil, joinErrors(errs)
 	}
 
@@ -41,7 +42,10 @@ func (s *Store) GetUser(channel string) (*models.User, error) {
 
 func (s *Store) RemoveUser(channel, password string) error {
 	var user models.User
-	if errs := s.db.Where("channel = ?", channel).First(&user).GetErrors(); len(errs) > 0 {
+	if errs := s.db.
+		Where("channel = ?", strings.ToLower(channel)).
+		First(&user).
+		GetErrors(); len(errs) > 0 {
 		return joinErrors(errs)
 	}
 

@@ -48,7 +48,7 @@ func NewUser(name, password string) (*User, error) {
 	}
 
 	return &User{
-		Channel:  name,
+		Channel:  strings.ToLower(name),
 		Password: hashPassword(password, conf.Salt),
 	}, nil
 }

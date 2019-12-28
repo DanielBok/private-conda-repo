@@ -1,11 +1,6 @@
 import React from "react";
-import { Button } from "antd";
+import Layout from "./Layout";
 
 export default () => {
-  return (
-    <div>
-      Hello World
-      <Button>Press me</Button>
-    </div>
-  );
+  return <Layout />;
 };

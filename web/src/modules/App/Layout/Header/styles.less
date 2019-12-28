@@ -1,0 +1,26 @@
+@header-height: 64px;
+
+.header {
+  height: @header-height;
+  background-color: white !important;
+
+  .title {
+    display: flex;
+    align-items: center;
+
+    .logo {
+      width: 24px;
+    }
+
+    .text {
+      color: #43b02a;
+      margin-left: 8px;
+      font-size: 18px;
+      font-weight: 700;
+
+      .non-bold {
+        font-weight: normal;
+      }
+    }
+  }
+}

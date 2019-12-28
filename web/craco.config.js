@@ -42,9 +42,10 @@ module.exports = {
           noIeCompat: true
         },
         cssLoaderOptions: {
-          modules: true,
-          camelCase: true,
-          localIdentName: "[local]_[hash:base64:5]"
+          modules: {
+            localIdentName: "[name]_[local]_[hash:base64:5]"
+          },
+          localsConvention: "camelCase"
         }
       }
     }

@@ -1,0 +1,30 @@
+@import (reference) "../styles";
+
+.radioGroup {
+  padding: 30px 20px 0 20px !important;
+  width: 100%;
+
+  .button {
+    color: @primary-color;
+    width: 50%;
+    text-align: center;
+
+    &:hover {
+      color: @primary-color;
+    }
+  }
+
+  :global(.ant-radio-button-wrapper-checked) {
+    background-color: @primary-color !important;
+    border-color: @primary-color !important;
+    color: white;
+
+    &:not(.ant-radio-button-wrapper-disabled):before {
+      background-color: @primary-color !important;
+    }
+  }
+}
+
+.form {
+  padding: 20px 20px 0 20px;
+}

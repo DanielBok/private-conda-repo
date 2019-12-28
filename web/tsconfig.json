@@ -14,7 +14,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "plugins": [{ "transform": "ts-optchain/transform" }]
+    "plugins": [
+      {
+        "transform": "ts-optchain/transform"
+      }
+    ]
   },
   "include": ["src", "types/*.d.ts"],
   "extends": "./tsconfig.path"

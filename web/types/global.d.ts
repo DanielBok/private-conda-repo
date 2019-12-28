@@ -1,6 +1,8 @@
 declare module "*.less";
 declare module "*.png";
 
+type LoadingState = "REQUEST" | "SUCCESS" | "FAILURE";
+
 type ModuleRoute = {
   component:
     | React.ComponentType<RouteComponentProps<any>>

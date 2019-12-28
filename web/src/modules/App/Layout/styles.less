@@ -1,18 +1,14 @@
 @import "Header/styles";
 @import "Footer/styles";
-@max-width: 1300px;
+@min-height: calc(100vh - @header-height - @footer-height);
 
 .content {
   display: flex;
   justify-content: center;
 
   .body {
-    @side-padding: 40px;
+    min-height: @min-height;
 
-    min-height: calc(100vh - @header-height - @footer-height);
-
-    max-width: @max-width;
-    padding: 0 @side-padding 24px @side-padding;
     width: 100%;
   }
 }

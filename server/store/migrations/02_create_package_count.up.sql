@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS package_counts
     build_string VARCHAR(64) NOT NULL,
     build_number INT         NOT NULL DEFAULT 0,
     version      VARCHAR(30) NOT NULL,
-    count        INT         NOT NULL DEFAULT 0
+    count        INT         NOT NULL DEFAULT 0,
+    upload_date  TIMESTAMP   NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_package_counts__channel_package on package_counts

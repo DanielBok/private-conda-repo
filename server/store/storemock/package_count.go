@@ -16,7 +16,7 @@ func (m MockStore) GetPackageCounts(channel, name string) ([]*models.PackageCoun
 	return counts, nil
 }
 
-func (m MockStore) CreateInitialPackageCount(pkg *models.PackageCount) (*models.PackageCount, error) {
+func (m MockStore) CreatePackageCount(pkg *models.PackageCount) (*models.PackageCount, error) {
 	c := pkg.Channel
 	n := pkg.Package
 	p := pkg.Platform

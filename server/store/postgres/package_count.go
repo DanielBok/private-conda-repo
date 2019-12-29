@@ -1,6 +1,8 @@
 package postgres
 
 import (
+	"time"
+
 	"github.com/pkg/errors"
 
 	"private-conda-repo/store/models"
@@ -17,9 +19,20 @@ func (s *Store) GetPackageCounts(channel, name string) ([]*models.PackageCount, 
 	return counts, nil
 }
 
-func (s *Store) CreateInitialPackageCount(pkg *models.PackageCount) (*models.PackageCount, error) {
-	pkg.Count = 0
-	if errs := s.db.Create(pkg).GetErrors(); len(errs) > 0 {
+func (s *Store) CreatePackageCount(pkg *models.PackageCount) (*models.PackageCount, error) {
+	if errs := s.db.
+		Where(models.PackageCount{
+			Channel:     pkg.Channel,
+			Package:     pkg.Package,
+			BuildString: pkg.BuildString,
+			BuildNumber: pkg.BuildNumber,
+			Version:     pkg.Version,
+			Platform:    pkg.Platform,
+		}).Assign(models.PackageCount{
+		Count:      0,
+		UploadDate: time.Now(),
+	}).FirstOrCreate(pkg).
+		GetErrors(); len(errs) > 0 {
 		return nil, joinErrors(errs)
 	}
 	return pkg, nil

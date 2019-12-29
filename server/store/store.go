@@ -19,7 +19,7 @@ type Store interface {
 	GetAllUsers() ([]*models.User, error)
 
 	GetPackageCounts(channel, name string) ([]*models.PackageCount, error)
-	CreateInitialPackageCount(pkg *models.PackageCount) (*models.PackageCount, error)
+	CreatePackageCount(pkg *models.PackageCount) (*models.PackageCount, error)
 	IncreasePackageCount(channel, name, platform string) (*models.PackageCount, error)
 }
 

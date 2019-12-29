@@ -64,7 +64,7 @@ func createChannelAndAddPackages(channel string, packages ...condatypes.Package)
 		if err != nil {
 			return err
 		}
-		_, err = db.CreateInitialPackageCount(p.ToPackageCount(channel))
+		_, err = db.CreatePackageCount(p.ToPackageCount(channel))
 		if err != nil {
 			return err
 		}

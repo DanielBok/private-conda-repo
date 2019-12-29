@@ -137,7 +137,7 @@ func UploadPackage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := db.CreateInitialPackageCount(p.ToPackageCount(channel)); err != nil {
+	if _, err := db.CreatePackageCount(p.ToPackageCount(channel)); err != nil {
 		http.Error(w, errors.Wrap(err, "could not create package count record").Error(), http.StatusInternalServerError)
 		return
 	}

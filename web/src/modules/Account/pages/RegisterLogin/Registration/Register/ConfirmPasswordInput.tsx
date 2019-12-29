@@ -30,7 +30,7 @@ export default () => {
             }
           }
         ]
-      })(<Input placeholder="Password" type="password" />)}
+      })(<Input placeholder="Confirm Password" type="password" />)}
     </Form.Item>
   );
 };

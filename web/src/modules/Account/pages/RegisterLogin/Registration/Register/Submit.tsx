@@ -27,6 +27,7 @@ export default () => {
       disabled={disabled}
       type="primary"
       block
+      size="large"
       className={styles.submitButton}
       onClick={() => {
         const username = G(CONST.USERNAME);

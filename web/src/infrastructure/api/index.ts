@@ -1,4 +1,7 @@
+import { RootState } from "@/infrastructure/rootState";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { Action } from "redux";
+import { ThunkDispatch } from "redux-thunk";
 import * as ApiTypes from "./types";
 
 const apiUrl = !!process.env.REACT_APP_API_URL
@@ -132,5 +135,14 @@ function runErrorHandlers(
 
 export default new API();
 
-export type ThunkFunction = ApiTypes.ThunkFunction;
-export type ThunkFunctionAsync = ApiTypes.ThunkFunctionAsync;
+export type ThunkFunction<T = void> = (
+  dispatch: ThunkDispatch<RootState, void, Action>,
+  getState: () => RootState
+) => T;
+
+export type ThunkFunctionAsync<T = void> = (
+  dispatch: ThunkDispatch<RootState, void, Action>,
+  getState: () => RootState
+) => Promise<T>;
+
+export type ThunkDispatchAsync = ThunkDispatch<RootState, void, Action>;

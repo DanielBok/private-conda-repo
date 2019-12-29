@@ -44,8 +44,8 @@ export const loadUser = (): ThunkFunctionAsync => async dispatch => {
 export const validateUser = (
   username: string,
   password: string
-): ThunkFunctionAsync => async (dispatch, getState) => {
-  if (getState().user.loading === "REQUEST") return;
+): ThunkFunctionAsync<boolean> => async (dispatch, getState) => {
+  if (getState().user.loading === "REQUEST") return false;
   const payload: UserType.UserInfo = {
     channel: username,
     password
@@ -56,9 +56,13 @@ export const validateUser = (
       dispatch(UserAction.fetchUserCredentialsAsync.request())
   });
 
-  if (status === 200)
+  if (status === 200) {
     dispatch(UserAction.fetchUserCredentialsAsync.success(payload));
-  else dispatch(UserAction.fetchUserCredentialsAsync.failure());
+    return true;
+  } else {
+    dispatch(UserAction.fetchUserCredentialsAsync.failure());
+    return false;
+  }
 };
 
 export const logout = (): ThunkFunction => dispatch => {

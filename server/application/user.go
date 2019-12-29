@@ -38,7 +38,12 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	u.Password = ""
 
-	if _, err := repo.CreateChannel(u.Channel); err != nil {
+	chn, err := repo.CreateChannel(u.Channel)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := chn.Index(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

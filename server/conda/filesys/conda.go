@@ -147,11 +147,9 @@ func isCondaDirectory(dirname string) (bool, error) {
 	// get number of unique platforms
 	dirMap := make(map[string]int)
 	for _, d := range dirs {
-		_, err := condatypes.MapPlatform(d.Name())
-		if err != nil {
-			return false, nil
+		if _, err := condatypes.MapPlatform(d.Name()); err == nil {
+			dirMap[d.Name()] = 0
 		}
-		dirMap[d.Name()] = 0
 	}
 
 	// check that all platforms match

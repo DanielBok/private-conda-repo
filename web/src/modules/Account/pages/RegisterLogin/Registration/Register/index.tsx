@@ -1,11 +1,12 @@
 import { Form, Typography } from "antd";
 import { WrappedFormUtils } from "antd/es/form/Form";
-import React from "react";
+import React, { useState } from "react";
 import ConfirmPasswordInput from "./ConfirmPasswordInput";
-import * as CONST from "./constants";
+import { FormContext } from "./hooks";
 import PasswordInput from "./PasswordInput";
 import styles from "./styles.less";
 import Submit from "./Submit";
+import { ValidateStatus } from "./types";
 import UsernameInput from "./UsernameInput";
 
 type Props = {
@@ -13,25 +14,19 @@ type Props = {
 };
 
 const LoginForm = ({ form }: Props) => {
-  const { getFieldDecorator, getFieldValue } = form;
+  const [validateStatus, setValidateStatus] = useState<ValidateStatus>("");
 
   return (
-    <div>
+    <FormContext.Provider value={{ form, validateStatus, setValidateStatus }}>
       <Typography.Paragraph className={styles.welcome}>
         New to Private Conda Repo? Register a channel for yourself!
       </Typography.Paragraph>
-      <UsernameInput decorator={getFieldDecorator} />
-      <PasswordInput form={form} />
-      <ConfirmPasswordInput form={form} />
-      <Submit form={form} onClick={submit} />
-    </div>
+      <UsernameInput />
+      <PasswordInput />
+      <ConfirmPasswordInput />
+      <Submit />
+    </FormContext.Provider>
   );
-
-  function submit() {
-    const username = getFieldValue(CONST.USERNAME);
-    const password = getFieldValue(CONST.PASSWORD);
-    console.log(username, password);
-  }
 };
 
 export default Form.create({

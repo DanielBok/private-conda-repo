@@ -1,23 +1,21 @@
 import { Button } from "antd";
-import { WrappedFormUtils } from "antd/es/form/Form";
 import React from "react";
 import * as CONST from "./constants";
+import { useFormContext } from "./hooks";
 import styles from "./styles.less";
 
-type Props = {
-  form: WrappedFormUtils;
-  onClick: () => void;
-};
-
-export default ({ form, onClick }: Props) => {
-  const { getFieldsError, isFieldTouched: T } = form;
+export default () => {
+  const {
+    form: { getFieldsError: E, isFieldTouched: T, getFieldValue: G },
+    validateStatus
+  } = useFormContext();
   const touched = T(CONST.USERNAME) && T(CONST.PASSWORD) && T(CONST.CONFIRM);
 
   const disabled =
     !touched ||
-    Object.values(getFieldsError()).reduce(
+    Object.values(E()).reduce(
       (acc, e) => acc || e !== undefined,
-      false as boolean
+      validateStatus !== "success"
     );
 
   return (
@@ -26,7 +24,10 @@ export default ({ form, onClick }: Props) => {
       type="primary"
       block
       className={styles.submitButton}
-      onClick={onClick}
+      onClick={() => {
+        const username = G(CONST.USERNAME);
+        const password = G(CONST.PASSWORD);
+      }}
     >
       Submit
     </Button>

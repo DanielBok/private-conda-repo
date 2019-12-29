@@ -1,17 +1,23 @@
 import { Form, Input } from "antd";
-import { WrappedFormUtils } from "antd/es/form/Form";
 import React from "react";
 import * as CONST from "./constants";
+import { useFormContext } from "./hooks";
 
-type Props = {
-  form: WrappedFormUtils;
-};
-
-export default ({ form }: Props) => {
-  const { getFieldDecorator, getFieldValue } = form;
+export default () => {
+  const {
+    getFieldDecorator,
+    getFieldError,
+    getFieldValue,
+    isFieldTouched
+  } = useFormContext().form;
+  const status = isFieldTouched(CONST.CONFIRM)
+    ? getFieldError(CONST.CONFIRM) === undefined
+      ? "success"
+      : "error"
+    : "";
 
   return (
-    <Form.Item>
+    <Form.Item validateStatus={status} hasFeedback>
       {getFieldDecorator(CONST.CONFIRM, {
         rules: [
           {

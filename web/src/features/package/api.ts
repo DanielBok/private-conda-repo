@@ -10,7 +10,7 @@ export const fetchAllPackages = (): ThunkFunctionAsync => async (
   dispatch,
   getState
 ) => {
-  if (getState().package.loading === "REQUEST") return;
+  if (getState().package.loading.packages === "REQUEST") return;
 
   const { data, status } = await api.Get<PackageType.PackageMetaInfo[]>("/p", {
     beforeRequest: () =>
@@ -26,4 +26,31 @@ export const fetchAllPackages = (): ThunkFunctionAsync => async (
   if (status === 200) {
     dispatch(PackageAction.fetchAllPackagesAsync.success(data));
   }
+};
+
+/**
+ * From the specified channel, fetch all details about the package
+ *
+ * @param channel channel/user name
+ * @param pkg package name
+ */
+export const fetchPackageDetail = (
+  channel: string,
+  pkg: string
+): ThunkFunctionAsync<LoadingState> => async (dispatch, getState) => {
+  if (getState().package.loading.details === "REQUEST") return "REQUEST";
+
+  const { data } = await api.Get<PackageType.PackageDetail[]>(
+    `p/${channel}/${pkg}`,
+    {
+      beforeRequest: () => dispatch(PackageAction.fetchPackageDetail.request())
+    }
+  );
+  if (data.length === 0) {
+    return "FAILURE";
+  }
+
+  dispatch(PackageAction.fetchPackageDetail.success(data));
+
+  return "SUCCESS";
 };

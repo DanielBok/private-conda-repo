@@ -1,39 +1,15 @@
 @import "~antd/lib/style/color/colors";
+@import "../../modules/App/styles";
 
 .error-page {
-  height: 50vh;
-  font-family: "Gotham Rounded SSm A", "Gotham Rounded SSm B", Helvetica, Arial, sans-serif;
+  background-color: white;
+  min-height: @min-height;
+  font-family: "Gotham Rounded SSm A", "Gotham Rounded SSm B", Helvetica, Arial,
+    sans-serif;
   margin: 20px auto;
+  padding-top: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
   color: #46575e;
-
-  .error-title {
-    font-size: 250%;
-  }
-
-  .error-button {
-    color: white;
-    background-color: @blue-8;
-    border-radius: 50px;
-    width: 300px;
-    font-size: 18px;
-    margin: 0 auto;
-    padding: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    user-select: none;
-    text-align: center;
-
-    &:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      background-color: @blue-7;
-    }
-  }
-
-  .error-text {
-    margin-top: 5px;
-  }
 }

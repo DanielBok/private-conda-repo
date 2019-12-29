@@ -1,3 +1,4 @@
+import { MetaApi } from "@/features/meta";
 import { PackageApi } from "@/features/package";
 import { UserApi } from "@/features/user";
 import { routerMiddleware } from "connected-react-router";
@@ -26,7 +27,8 @@ async function initializeStore(store: Store) {
 
   await Promise.all([
     dispatch(PackageApi.fetchAllPackages()),
-    dispatch(UserApi.loadUser())
+    dispatch(UserApi.loadUser()),
+    dispatch(MetaApi.fetchMetaInfo())
   ]);
 }
 

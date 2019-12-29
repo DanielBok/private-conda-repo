@@ -109,7 +109,7 @@ func TestListPackageDetails(t *testing.T) {
 	tests := []TestRow{
 		{
 			input:       "bad-package-name",
-			statusCode:  http.StatusOK,
+			statusCode:  http.StatusNotFound,
 			expectedLen: 0,
 		}, {
 			input:       "perfana",
@@ -123,12 +123,16 @@ func TestListPackageDetails(t *testing.T) {
 		assert.NoError(err)
 		assert.EqualValues(test.statusCode, resp.StatusCode)
 
-		if test.statusCode == 200 && resp.StatusCode == 200 {
+		if test.statusCode == http.StatusOK && resp.StatusCode == http.StatusOK {
 			defer func() { _ = resp.Body.Close() }()
-			var output []*condatypes.Package
-			err := json.NewDecoder(resp.Body).Decode(&output)
+			var output ChannelPackageDetails
+			err = json.NewDecoder(resp.Body).Decode(&output)
 			assert.NoError(err)
-			assert.Len(output, test.expectedLen)
+			assert.Len(output.Details, test.expectedLen)
+			assert.EqualValues(output.Channel, channel)
+			assert.EqualValues(output.Package, test.input)
+
+			assert.NotNil(output.Latest)
 		}
 	}
 

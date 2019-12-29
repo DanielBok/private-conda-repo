@@ -60,7 +60,7 @@ func createChannelAndAddPackages(channel string, packages ...condatypes.Package)
 	}
 
 	for _, p := range packages {
-		_, err := chn.AddPackage(bytes.NewBufferString("asd"), &p)
+		_, err := chn.AddPackage(bytes.NewBufferString(""), &p)
 		if err != nil {
 			return err
 		}

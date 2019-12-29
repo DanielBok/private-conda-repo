@@ -8,12 +8,20 @@ import (
 	"github.com/pkg/errors"
 
 	"private-conda-repo/conda/condatypes"
+	"private-conda-repo/store/models"
 )
 
 type ChannelDetails struct {
 	Channel  string              `json:"channel"`
 	Password string              `json:"password"`
 	Package  *condatypes.Package `json:"package"`
+}
+
+type ChannelPackageDetails struct {
+	Channel string                               `json:"channel"`
+	Package string                               `json:"package"`
+	Details []*models.PackageCount               `json:"details"`
+	Latest  *condatypes.ChannelMetaPackageOutput `json:"latest"`
 }
 
 func (c *ChannelDetails) Validate() error {
@@ -68,13 +76,43 @@ func ListPackageDetails(w http.ResponseWriter, r *http.Request) {
 	user := chi.URLParam(r, "user")
 	pkg := chi.URLParam(r, "pkg")
 
-	counts, err := db.GetPackageCounts(user, pkg)
+	details, err := db.GetPackageCounts(user, pkg)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	} else if len(details) == 0 {
+		http.Error(w, "package does not exist in channel", http.StatusNotFound)
+		return
+	}
+
+	chn, err := repo.GetChannel(user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	toJson(w, counts)
+	meta, err := chn.GetMetaInfo()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// get latest package
+	var latest *condatypes.ChannelMetaPackageOutput
+	for _, m := range meta.NormalizedPackagesOutput(user) {
+		if m.Name != pkg {
+			continue
+		}
+		if latest == nil {
+			latest = m
+		} else if (latest.Version == nil || m.Version == nil) && latest.Timestamp < m.Timestamp {
+			latest = m
+		} else if *latest.Version < *m.Version {
+			latest = m
+		}
+	}
+
+	toJson(w, ChannelPackageDetails{user, pkg, details, latest})
 }
 
 func UploadPackage(w http.ResponseWriter, r *http.Request) {

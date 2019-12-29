@@ -2,6 +2,25 @@ import api, { ThunkFunctionAsync } from "@/infrastructure/api";
 import * as UserAction from "./actions";
 import * as UserType from "./types";
 
+export const createUser = (
+  username: string,
+  password: string
+): ThunkFunctionAsync => async (dispatch, getState) => {
+  if (getState().user.loading === "REQUEST") return;
+
+  const payload: UserType.UserInfo = {
+    channel: username,
+    password
+  };
+
+  const { status } = await api.Post("/user", payload, {
+    beforeRequest: () => dispatch(UserAction.createUserAsync.request())
+  });
+
+  if (status === 200) dispatch(UserAction.createUserAsync.success(payload));
+  else dispatch(UserAction.createUserAsync.failure());
+};
+
 export const validateUser = (
   username: string,
   password: string
@@ -17,11 +36,9 @@ export const validateUser = (
       dispatch(UserAction.fetchUserCredentialsAsync.request())
   });
 
-  if (status === 200) {
+  if (status === 200)
     dispatch(UserAction.fetchUserCredentialsAsync.success(payload));
-  } else {
-    dispatch(UserAction.fetchUserCredentialsAsync.failure());
-  }
+  else dispatch(UserAction.fetchUserCredentialsAsync.failure());
 };
 
 export const isUsernameAvailable = async (username: string) => {

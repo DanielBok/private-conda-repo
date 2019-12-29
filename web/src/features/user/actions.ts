@@ -1,4 +1,4 @@
-import { createAsyncAction } from "typesafe-actions";
+import { createAction, createAsyncAction } from "typesafe-actions";
 import * as UserType from "./types";
 
 export const createUserAsync = createAsyncAction(
@@ -12,3 +12,5 @@ export const fetchUserCredentialsAsync = createAsyncAction(
   "FETCH_USER_CREDENTIALS_SUCCESS",
   "FETCH_USER_CREDENTIALS_FAILURE"
 )<void, UserType.UserInfo, void>();
+
+export const logoutUser = createAction("LOGOUT_USER")<void>();

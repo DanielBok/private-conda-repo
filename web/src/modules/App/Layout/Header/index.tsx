@@ -1,8 +1,10 @@
+import { UserApi, UserSelector } from "@/features/user";
+import { Icon, Layout, Menu } from "antd";
 import React from "react";
-import { Layout } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import Logo from "./logo.png";
 
 import styles from "./styles.less";
-import Logo from "./logo.png";
 
 export default () => {
   return (
@@ -13,6 +15,28 @@ export default () => {
           Private Conda <span className={styles.nonBold}>Repository</span>
         </span>
       </div>
+      <UserManager />
     </Layout.Header>
+  );
+};
+
+const UserManager = () => {
+  const dispatch = useDispatch();
+  const user = useSelector(UserSelector.userInfo);
+  if (!user.validated) return null;
+
+  return (
+    <Menu mode="horizontal">
+      <Menu.SubMenu
+        title={
+          <span className={styles.user}>
+            <Icon type="user" className={styles.userLogo} />
+            {user.username}
+          </span>
+        }
+      >
+        <Menu.Item onClick={() => dispatch(UserApi.logout())}>Logout</Menu.Item>
+      </Menu.SubMenu>
+    </Menu>
   );
 };

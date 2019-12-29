@@ -33,5 +33,12 @@ export default (state = defaultState, action: AllActions) =>
         draft.username = action.payload.channel;
         draft.password = action.payload.password;
         break;
+
+      case getType(UserAction.logoutUser):
+        draft.validated = false;
+        draft.loading = "SUCCESS";
+        draft.username = "";
+        draft.password = "";
+        break;
     }
   });

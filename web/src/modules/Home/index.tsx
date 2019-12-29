@@ -1,10 +1,8 @@
-import React from "react";
-
-const Home = () => <h1>HomePage</h1>;
+import Main from "./pages/Main";
 
 export default [
   {
-    component: Home,
+    component: Main,
     path: "/",
     title: "Homepage"
   }

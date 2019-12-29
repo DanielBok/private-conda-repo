@@ -3,7 +3,7 @@ export type Store = {
   loading: LoadingState;
 };
 
-type Platform = "noarch" | "win-64" | "osx-64" | "linux-64";
+export type Platform = "noarch" | "win-64" | "osx-64" | "linux-64";
 
 export type PackageMetaInfo = {
   channel: string;

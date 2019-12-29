@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS package_counts
 (
     id           SERIAL PRIMARY KEY,
-    channel      VARCHAR(50) NOT NULL UNIQUE,
+    channel      VARCHAR(50) NOT NULL,
     package      VARCHAR(64) NOT NULL,
     platform     VARCHAR(10) NOT NULL,
     build_string VARCHAR(64) NOT NULL,

@@ -24,6 +24,29 @@ func (c *ChannelDetails) Validate() error {
 	return nil
 }
 
+func ListAllPackages(w http.ResponseWriter, r *http.Request) {
+	channels, err := repo.ListAllChannels()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var output []*condatypes.ChannelMetaPackageOutput
+	for _, c := range channels {
+		meta, err := c.GetMetaInfo()
+		if err != nil {
+			http.Error(w, "error getting meta info", http.StatusInternalServerError)
+			return
+		}
+
+		for _, m := range meta.NormalizedPackagesOutput(c.Name()) {
+			output = append(output, m)
+		}
+	}
+
+	toJson(w, output)
+}
+
 func ListPackagesByUser(w http.ResponseWriter, r *http.Request) {
 	user := chi.URLParam(r, "user")
 	chn, err := repo.GetChannel(user)

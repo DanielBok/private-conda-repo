@@ -70,6 +70,7 @@ func (r *router) registerRoutes() {
 
 	// package routes
 	r.Route("/p", func(r chi.Router) {
+		r.Get("/", ListAllPackages)
 		r.Get("/{user}", ListPackagesByUser)
 		r.Get("/{user}/{pkg}", ListPackageDetails)
 

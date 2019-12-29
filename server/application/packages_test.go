@@ -17,6 +17,46 @@ import (
 	"private-conda-repo/testutils"
 )
 
+func TestListAllPackages(t *testing.T) {
+	assert := require.New(t)
+
+	ts := newTestServer(ListAllPackages)
+	defer ts.Close()
+
+	numChn := 10
+	pkgPerChn := 4
+	var channels []string
+	for i := 0; i < 10; i++ {
+		name := fmt.Sprintf("new-channel-%d", i)
+		chn, _ := repo.CreateChannel(name)
+
+		for j := 0; j < pkgPerChn; j++ {
+			_, _ = chn.AddPackage(nil, &condatypes.Package{
+				Name:        fmt.Sprintf("package-%d", j),
+				Version:     fmt.Sprintf("%d.%d", j, j+1),
+				BuildString: "py",
+				BuildNumber: 0,
+				Platform:    "noarch",
+			})
+		}
+		channels = append(channels, name)
+	}
+
+	resp, err := http.Get(ts.URL)
+	assert.NoError(err)
+	defer func() { _ = resp.Body.Close() }()
+
+	var output []*condatypes.ChannelMetaPackageOutput
+	err = json.NewDecoder(resp.Body).Decode(&output)
+	assert.NoError(err)
+	assert.Len(output, numChn*pkgPerChn)
+
+	for _, chn := range channels {
+		err := repo.RemoveChannel(chn)
+		assert.NoError(err)
+	}
+}
+
 func TestListPackagesByUser(t *testing.T) {
 	assert := require.New(t)
 

@@ -41,6 +41,9 @@ export const loadUser = (): ThunkFunctionAsync => async dispatch => {
   }
 };
 
+/**
+ * Checks if the user is valid. Used for logging in
+ */
 export const validateUser = (
   username: string,
   password: string
@@ -66,6 +69,9 @@ export const validateUser = (
   }
 };
 
+/**
+ * Logs the user out
+ */
 export const logout = (): ThunkFunction => dispatch => {
   UserStorage.clear();
   dispatch(UserAction.logoutUser());

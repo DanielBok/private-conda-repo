@@ -1,3 +1,4 @@
+import { PackageApi } from "@/features/package";
 import { UserApi } from "@/features/user";
 import { routerMiddleware } from "connected-react-router";
 import { createBrowserHistory } from "history";
@@ -23,7 +24,10 @@ function configureStore() {
 async function initializeStore(store: Store) {
   const dispatch = (action: any) => store.dispatch(action);
 
-  await dispatch(UserApi.loadUser());
+  await Promise.all([
+    dispatch(PackageApi.fetchAllPackages()),
+    dispatch(UserApi.loadUser())
+  ]);
 }
 
 export default configureStore();

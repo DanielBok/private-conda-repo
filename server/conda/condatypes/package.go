@@ -3,6 +3,7 @@ package condatypes
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -49,5 +50,6 @@ func (p *Package) ToPackageCount(channel string) *models.PackageCount {
 		BuildNumber: p.BuildNumber,
 		Version:     p.Version,
 		Platform:    p.Platform,
+		UploadDate:  time.Now(),
 	}
 }

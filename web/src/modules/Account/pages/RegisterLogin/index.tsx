@@ -1,17 +1,16 @@
 import { UserSelector } from "@/features/user";
 import { Col, Row } from "antd";
-import { push } from "connected-react-router";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import { Redirect } from "react-router-dom";
 
 import Description from "./Description";
 import Registration from "./Registration";
 import styles from "./styles.less";
 
 export default () => {
-  const dispatch = useDispatch();
   if (useSelector(UserSelector.userValidated)) {
-    dispatch(push("/"));
+    return <Redirect to="/" />;
   }
 
   return (

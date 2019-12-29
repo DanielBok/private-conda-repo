@@ -58,6 +58,7 @@ export const validateUser = (
 
   if (status === 200) {
     dispatch(UserAction.fetchUserCredentialsAsync.success(payload));
+    UserStorage.save(payload);
     return true;
   } else {
     dispatch(UserAction.fetchUserCredentialsAsync.failure());

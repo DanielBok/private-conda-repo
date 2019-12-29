@@ -49,6 +49,11 @@ func newTestServerWithRouteContext(method, pattern string, f http.HandlerFunc) *
 }
 
 func createChannelAndAddPackages(channel string, packages ...condatypes.Package) error {
+	_, err := repo.CreateChannel(channel)
+	if err != nil {
+		return err
+	}
+
 	chn, err := repo.GetChannel(channel)
 	if err != nil {
 		return err

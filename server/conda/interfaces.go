@@ -16,7 +16,7 @@ type Conda interface {
 	// Removes the specified Conda channel
 	RemoveChannel(channel string) error
 
-	// renames the conda channel
+	// Renames the conda channel
 	ChangeChannelName(oldChannel, newChannel string) (Channel, error)
 }
 

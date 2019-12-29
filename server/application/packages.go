@@ -38,7 +38,7 @@ func ListPackagesByUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	toJson(w, meta.NormalizedPackagesOutput())
+	toJson(w, meta.NormalizedPackagesOutput(user))
 }
 
 func ListPackageDetails(w http.ResponseWriter, r *http.Request) {

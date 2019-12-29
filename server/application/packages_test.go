@@ -99,17 +99,20 @@ func TestListPackageDetails(t *testing.T) {
 
 func TestUploadPackage(t *testing.T) {
 	assert := require.New(t)
+	channelName := "daniel-upload-package"
 
 	ts := newTestServer(UploadPackage)
 	defer ts.Close()
-	_, err := db.AddUser("daniel", "pikachu")
+	_, err := db.AddUser(channelName, "pikachu")
+	assert.NoError(err)
+	_, err = repo.CreateChannel(channelName)
 	assert.NoError(err)
 
 	formData := func(pkg testutils.TestPackage) (io.ReadWriter, string, error) {
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
 
-		if err := writer.WriteField("channel", "daniel"); err != nil {
+		if err := writer.WriteField("channel", channelName); err != nil {
 			return nil, "", err
 		}
 		if err := writer.WriteField("password", "pikachu"); err != nil {
@@ -154,12 +157,15 @@ func TestUploadPackage(t *testing.T) {
 
 func TestRemovePackage(t *testing.T) {
 	assert := require.New(t)
+	channelName := "daniel-remove-package"
 
 	ts := newTestServer(RemovePackage)
 	defer ts.Close()
-	_, err := db.AddUser("daniel", "pikachu")
+	_, err := db.AddUser(channelName, "pikachu")
 	assert.NoError(err)
-	chn, _ := repo.GetChannel("remove-package-channel")
+	chn, err := repo.CreateChannel(channelName)
+	assert.NoError(err)
+
 	_, _ = chn.AddPackage(nil, &condatypes.Package{
 		Name:        "test-package",
 		Version:     "0.1",
@@ -168,8 +174,8 @@ func TestRemovePackage(t *testing.T) {
 		Platform:    "noarch",
 	})
 
-	payload := `{
-		"channel": "daniel",
+	payload := fmt.Sprintf(`{
+		"channel": "%s",
 		"password": "pikachu",
 		"package": {
 			"name": "test-package",
@@ -178,7 +184,7 @@ func TestRemovePackage(t *testing.T) {
 			"build_number": 0,
 			"platform": "noarch"
 		}
-	}`
+	}`, channelName)
 
 	client := &http.Client{}
 	req, err := http.NewRequest("DELETE", ts.URL, strings.NewReader(payload))

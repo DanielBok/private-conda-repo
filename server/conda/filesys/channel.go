@@ -36,6 +36,10 @@ func newChannel(name, dir, image string) (conda.Channel, error) {
 	}, nil
 }
 
+func (c *Channel) Name() string {
+	return c.name
+}
+
 func (c *Channel) Dir() string {
 	return c.dir
 }

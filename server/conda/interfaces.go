@@ -18,6 +18,9 @@ type Conda interface {
 
 	// Renames the conda channel
 	ChangeChannelName(oldChannel, newChannel string) (Channel, error)
+
+	// List all channels in the server
+	ListAllChannels() ([]Channel, error)
 }
 
 type Channel interface {
@@ -28,6 +31,9 @@ type Channel interface {
 	// During this process, the metadata in the channeldata.json file will be updated. This json file is used
 	// by conda to know how to install the package requested by the client
 	Index() error
+
+	// Returns the name of the channel
+	Name() string
 
 	// Gets the channel's meta information
 	GetMetaInfo() (*condatypes.ChannelMetaInfo, error)

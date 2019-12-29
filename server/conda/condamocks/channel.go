@@ -10,6 +10,7 @@ import (
 )
 
 type MockChannel struct {
+	name string
 	mock.Mock
 }
 
@@ -20,6 +21,10 @@ var meta = &condatypes.ChannelMetaInfo{
 }
 
 var packages = make(map[string]*condatypes.Package)
+
+func (m MockChannel) Name() string {
+	return m.name
+}
 
 func (m MockChannel) AddPackage(_ io.Reader, pkg *condatypes.Package) (*condatypes.Package, error) {
 	packages[pkg.Name] = pkg

@@ -42,8 +42,17 @@ type ChannelMetaInfo struct {
 }
 
 type ChannelMetaPackageOutput struct {
-	ChannelMetaPackageInfo
-	Name string `json:"name"`
+	Channel     string   `json:"channel"`
+	Platforms   []string `json:"platforms"`
+	Version     *string  `json:"version"`
+	Description *string  `json:"description"`
+	DevUrl      *string  `json:"dev_url"`
+	DocUrl      *string  `json:"doc_url"`
+	Home        *string  `json:"home"`
+	License     *string  `json:"license"`
+	Summary     *string  `json:"summary"`
+	Timestamp   uint64   `json:"timestamp"`
+	Name        string   `json:"name"`
 }
 
 func (m *ChannelMetaInfo) Write(path string) error {
@@ -61,12 +70,21 @@ func (m *ChannelMetaInfo) Write(path string) error {
 }
 
 // Returns the ChannelMetaInfo as an array of normalized data
-func (m *ChannelMetaInfo) NormalizedPackagesOutput() []*ChannelMetaPackageOutput {
+func (m *ChannelMetaInfo) NormalizedPackagesOutput(channel string) []*ChannelMetaPackageOutput {
 	var output []*ChannelMetaPackageOutput
 	for name, p := range m.Packages {
 		output = append(output, &ChannelMetaPackageOutput{
-			ChannelMetaPackageInfo: p,
-			Name:                   name,
+			Channel:     channel,
+			Platforms:   p.Subdirs,
+			Version:     p.Version,
+			Description: p.Description,
+			DevUrl:      p.DevUrl,
+			DocUrl:      p.DocUrl,
+			Home:        p.Home,
+			License:     p.License,
+			Summary:     p.Summary,
+			Timestamp:   p.Timestamp,
+			Name:        name,
 		})
 	}
 

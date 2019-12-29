@@ -13,10 +13,6 @@ func init() {
 	conda.Register("mock", &MockConda{})
 }
 
-func New() (conda.Conda, error) {
-	return &MockConda{}, nil
-}
-
 type MockConda struct {
 	mock.Mock
 }
@@ -46,4 +42,14 @@ func (m MockConda) RemoveChannel(channel string) error {
 
 func (m MockConda) ChangeChannelName(_, _ string) (conda.Channel, error) {
 	return &MockChannel{}, nil
+}
+
+func (m MockConda) ListAllChannels() ([]conda.Channel, error) {
+	var output []conda.Channel
+
+	for _, c := range channels {
+		output = append(output, c)
+	}
+
+	return output, nil
 }

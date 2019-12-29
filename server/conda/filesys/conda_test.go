@@ -1,6 +1,7 @@
 package filesys
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -83,4 +84,15 @@ func TestConda_CRUDChannel(t *testing.T) {
 
 	err = repo.RemoveChannel(channelNewName)
 	assert.NoError(err)
+
+	// Test listing all channels
+	numChannels := 10
+	for i := 0; i < numChannels; i++ {
+		_, err := repo.CreateChannel(fmt.Sprintf("test-channel-%d", i))
+		assert.NoError(err)
+	}
+
+	allChannels, err := repo.ListAllChannels()
+	assert.NoError(err)
+	assert.Len(allChannels, numChannels)
 }

@@ -1,6 +1,7 @@
 package filesys
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -9,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"private-conda-repo/conda"
+	"private-conda-repo/conda/condatypes"
 	"private-conda-repo/config"
 )
 
@@ -113,4 +115,45 @@ func (c *Conda) ChangeChannelName(oldChannel, newChannel string) (conda.Channel,
 		name: newChannel,
 		dir:  newFolder,
 	}, nil
+}
+
+func (c *Conda) ListAllChannels() ([]conda.Channel, error) {
+	dirs, err := ioutil.ReadDir(c.dir)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not list channel directories")
+	}
+	var channels []conda.Channel
+	for _, d := range dirs {
+		chn, err := c.GetChannel(d.Name())
+		if err != nil {
+			return nil, errors.Wrapf(err, "error retrieving channel '%s'", d.Name())
+		}
+		if valid, err := isCondaDirectory(filepath.Join(c.dir, d.Name())); err != nil {
+			return nil, err
+		} else if valid {
+			channels = append(channels, chn)
+		}
+	}
+
+	return channels, nil
+}
+
+func isCondaDirectory(dirname string) (bool, error) {
+	dirs, err := ioutil.ReadDir(dirname)
+	if err != nil {
+		return false, errors.Wrapf(err, "could not verify if directory is a conda dir")
+	}
+
+	// get number of unique platforms
+	dirMap := make(map[string]int)
+	for _, d := range dirs {
+		_, err := condatypes.MapPlatform(d.Name())
+		if err != nil {
+			return false, nil
+		}
+		dirMap[d.Name()] = 0
+	}
+
+	// check that all platforms match
+	return len(dirMap) == len(platforms), nil
 }

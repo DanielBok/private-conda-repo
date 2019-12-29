@@ -6,6 +6,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import Header from "./Header";
 import { PackageContext } from "./hooks";
 import styles from "./styles.less";
+import PackageInfo from "./PackageInfo";
 import { MatchParams } from "./types";
 
 const { TabPane } = Tabs;
@@ -33,7 +34,7 @@ const PackageDetail = ({
           className={styles.tabBar}
         >
           <TabPane tab={<span>Conda</span>} key="conda">
-            Content of Tab Pane 1
+            <PackageInfo />
           </TabPane>
           <TabPane tab="Files" key="files">
             Content of Tab Pane 2

@@ -1,0 +1,41 @@
+@import (reference) "../styles";
+
+.install-guide {
+  .title {
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    font-size: 20px;
+
+    > i:hover {
+      color: @primary-color;
+      cursor: pointer;
+    }
+  }
+
+  .tooltip {
+    min-width: 800px;
+  }
+
+  .platform {
+    font-size: 12px;
+    margin: 14px 0 18px 0;
+
+    .tags {
+      background-color: @primary-color;
+      color: white;
+      padding: 1px 5px;
+      margin-right: 8px;
+    }
+  }
+
+  .command {
+    font-size: 16px;
+
+    > span {
+      margin-top: 60px;
+    }
+  }
+}

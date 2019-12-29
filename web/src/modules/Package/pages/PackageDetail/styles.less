@@ -1,0 +1,34 @@
+@import (reference) "../../../App/styles";
+
+.container {
+  min-height: @min-height;
+  padding: 40px;
+
+  .tab-bar {
+    margin: 16px 0;
+
+    :global(.ant-tabs-nav-container) {
+      background-color: @primary-color-light;
+      color: white;
+    }
+
+    :global(.ant-tabs-tab) {
+      margin: 0;
+      width: 300px;
+      text-align: center;
+
+      &:hover {
+        color: #3e3e3e;
+      }
+    }
+
+    :global(.ant-tabs-tab-active) {
+      color: white;
+      background-color: @primary-color;
+    }
+
+    :global(.ant-tabs-ink-bar) {
+      background-color: @primary-color-light;
+    }
+  }
+}

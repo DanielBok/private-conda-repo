@@ -1,8 +1,9 @@
 import AllActions from "@/infrastructure/rootAction";
 import produce from "immer";
+import moment from "moment";
 import { getType } from "typesafe-actions";
-import * as PackageType from "./types";
 import * as PackageAction from "./actions";
+import * as PackageType from "./types";
 
 const defaultState: PackageType.Store = {
   packages: [],
@@ -10,11 +11,23 @@ const defaultState: PackageType.Store = {
     details: "SUCCESS",
     packages: "SUCCESS"
   },
-  selected: {
+  packageDetail: {
     channel: "",
     package: "",
     details: [],
-    latestVersion: ""
+    latest: {
+      channel: "",
+      platforms: [],
+      version: "",
+      description: "",
+      devUrl: "",
+      docUrl: "",
+      home: "",
+      license: "",
+      summary: "",
+      timestamp: 0,
+      name: ""
+    }
   }
 };
 
@@ -44,16 +57,16 @@ export default (state = defaultState, action: AllActions) =>
 
       case getType(PackageAction.fetchPackageDetail.success): {
         draft.loading.details = "SUCCESS";
-        const details = action.payload;
+        const { details, ...rest } = action.payload;
 
-        draft.selected = {
-          details,
-          channel: details[0].channel,
-          package: details[0].package,
-          latestVersion: details.reduce(
-            (v, { version }) => (v > version ? v : version),
-            details[0].version
-          )
+        draft.packageDetail = {
+          details: details
+            .map(({ uploadDate, ...rest }) => ({
+              ...rest,
+              uploadDate: moment(uploadDate)
+            }))
+            .sort((x, y) => (x.uploadDate.isAfter(y.uploadDate) ? -1 : 1)),
+          ...rest
         };
         break;
       }

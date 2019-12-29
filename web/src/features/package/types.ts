@@ -1,15 +1,12 @@
+import { Moment } from "moment";
+
 export type Store = {
   packages: PackageMetaInfo[];
   loading: {
     packages: LoadingState;
     details: LoadingState;
   };
-  selected: {
-    channel: string;
-    package: string;
-    details: PackageDetail[];
-    latestVersion: string;
-  };
+  packageDetail: PackageDetail<Moment>;
 };
 
 export type Platform = "noarch" | "win-64" | "osx-64" | "linux-64";
@@ -28,7 +25,14 @@ export type PackageMetaInfo = {
   name: string;
 };
 
-export type PackageDetail = {
+export type PackageDetail<T extends string | Moment> = {
+  channel: string;
+  package: string;
+  details: PackageCountInfo<T>[];
+  latest: PackageMetaInfo;
+};
+
+export type PackageCountInfo<T extends string | Moment> = {
   channel: string;
   package: string;
   buildString: string;
@@ -36,5 +40,5 @@ export type PackageDetail = {
   version: string;
   platform: string;
   count: number;
-  uploadDate: string;
+  uploadDate: T;
 };

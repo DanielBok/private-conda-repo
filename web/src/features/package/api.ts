@@ -40,17 +40,16 @@ export const fetchPackageDetail = (
 ): ThunkFunctionAsync<LoadingState> => async (dispatch, getState) => {
   if (getState().package.loading.details === "REQUEST") return "REQUEST";
 
-  const { data } = await api.Get<PackageType.PackageDetail[]>(
+  const { data, status } = await api.Get<PackageType.PackageDetail<string>>(
     `p/${channel}/${pkg}`,
     {
       beforeRequest: () => dispatch(PackageAction.fetchPackageDetail.request())
     }
   );
-  if (data.length === 0) {
+  if (status !== 200) {
     return "FAILURE";
   }
 
   dispatch(PackageAction.fetchPackageDetail.success(data));
-
   return "SUCCESS";
 };

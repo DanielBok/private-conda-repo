@@ -11,4 +11,4 @@ export const fetchPackageDetail = createAsyncAction(
   "FETCH_PACKAGE_DETAIL_REQUEST",
   "FETCH_PACKAGE_DETAIL_SUCCESS",
   "FETCH_PACKAGE_DETAIL_FAILURE"
-)<void, PackageType.PackageDetail[], void>();
+)<void, PackageType.PackageDetail<string>, void>();

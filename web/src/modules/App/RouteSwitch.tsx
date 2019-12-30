@@ -26,11 +26,10 @@ const routeList = Object.values(moduleMap).flatMap(module =>
   ))
 );
 
-export default () => {
-  return (
-    <Switch>
-      {routeList}
-      <Route component={() => <ErrorPage />} />
-    </Switch>
-  );
-};
+export default () => (
+  <Switch>
+    {routeList}
+    <Route path="/not-found" component={() => <ErrorPage />} />
+    <Route component={() => <ErrorPage />} />
+  </Switch>
+);

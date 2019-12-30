@@ -43,7 +43,8 @@ export const fetchPackageDetail = (
   const { data, status } = await api.Get<PackageType.PackageDetail<string>>(
     `p/${channel}/${pkg}`,
     {
-      beforeRequest: () => dispatch(PackageAction.fetchPackageDetail.request())
+      beforeRequest: () => dispatch(PackageAction.fetchPackageDetail.request()),
+      onError: () => dispatch(PackageAction.fetchPackageDetail.failure())
     }
   );
   if (status !== 200) {

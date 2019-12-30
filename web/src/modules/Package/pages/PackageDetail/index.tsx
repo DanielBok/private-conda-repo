@@ -1,12 +1,13 @@
 import { PackageApi } from "@/features/package";
+import { RootState } from "@/infrastructure/rootState";
 import { Tabs } from "antd";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { RouteComponentProps, withRouter } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Redirect, RouteComponentProps, withRouter } from "react-router-dom";
 import Header from "./Header";
 import { PackageContext } from "./hooks";
-import styles from "./styles.less";
 import PackageInfo from "./PackageInfo";
+import styles from "./styles.less";
 import { MatchParams } from "./types";
 
 const { TabPane } = Tabs;
@@ -20,9 +21,18 @@ const PackageDetail = ({
 }: Props) => {
   const dispatch = useDispatch();
   const [tab, setTab] = useState<"conda" | "files">("conda");
+
   useEffect(() => {
     dispatch(PackageApi.fetchPackageDetail(channel, pkg));
   }, [channel, pkg, dispatch]);
+
+  const failure = useSelector(
+    (s: RootState) => s.package.loading.details === "FAILURE"
+  );
+
+  if (failure) {
+    return <Redirect to="/not-found" />;
+  }
 
   return (
     <PackageContext.Provider value={{ channel, pkg }}>

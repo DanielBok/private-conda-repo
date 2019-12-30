@@ -1,4 +1,4 @@
-import { createAsyncAction } from "typesafe-actions";
+import { createAction, createAsyncAction } from "typesafe-actions";
 import * as PackageType from "./types";
 
 export const fetchAllPackagesAsync = createAsyncAction(
@@ -12,3 +12,7 @@ export const fetchPackageDetail = createAsyncAction(
   "FETCH_PACKAGE_DETAIL_SUCCESS",
   "FETCH_PACKAGE_DETAIL_FAILURE"
 )<void, PackageType.PackageDetail<string>, void>();
+
+export const resetLoadingStore = createAction("RESET_PACKAGE_LOADING_STORE")<
+  void
+>();

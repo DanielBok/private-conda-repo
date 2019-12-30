@@ -70,5 +70,12 @@ export default (state = defaultState, action: AllActions) =>
         };
         break;
       }
+
+      case getType(PackageAction.resetLoadingStore):
+        draft.loading = {
+          details: "SUCCESS",
+          packages: "SUCCESS"
+        };
+        break;
     }
   });

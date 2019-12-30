@@ -1,6 +1,7 @@
+import { PackageAction } from "@/features/package";
 import { Button, Typography } from "antd";
 import { push } from "connected-react-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { withRouter } from "react-router-dom";
 import NotFound from "./NotFound.png";
@@ -8,6 +9,8 @@ import styles from "./styles.less";
 
 const ErrorPage = () => {
   const dispatch = useDispatch();
+
+  useEffect(resets);
 
   return (
     <div className={styles.errorPage}>
@@ -25,6 +28,10 @@ const ErrorPage = () => {
 
   function goto(path: string) {
     dispatch(push(path));
+  }
+
+  function resets() {
+    dispatch(PackageAction.resetLoadingStore());
   }
 };
 

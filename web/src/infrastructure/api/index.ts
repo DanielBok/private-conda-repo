@@ -40,7 +40,7 @@ export class API {
   }
 
   async Get<R>(endpoint: string, config?: ApiTypes.RequestConfig<R>) {
-    return await this.execute<R>("GET", endpoint, {}, config);
+    return await this.execute<R>("GET", endpoint, undefined, config);
   }
 
   async Post<R>(
@@ -59,8 +59,12 @@ export class API {
     return await this.execute<R>("PUT", endpoint, payload, config);
   }
 
-  async Delete<R>(endpoint: string, config?: ApiTypes.RequestConfig<R>) {
-    return await this.execute<R>("DELETE", endpoint, {}, config);
+  async Delete<R>(
+    endpoint: string,
+    payload?: any,
+    config?: ApiTypes.RequestConfig<R>
+  ) {
+    return await this.execute<R>("DELETE", endpoint, payload, config);
   }
 
   private async execute<R>(
@@ -86,8 +90,9 @@ export class API {
       runSuccessHandlers(result.data, onSuccess);
       return result;
     } catch (e) {
-      runErrorHandlers(e.response, onError);
-      if (returnErrorResponse) return e.response;
+      const error = wrapErrorResponse(e.response);
+      runErrorHandlers(error, onError);
+      if (returnErrorResponse) return error;
 
       throw e;
     } finally {
@@ -112,6 +117,11 @@ export class API {
       case "POST":
         return await this.client.post<R>(endpoint, payload, config);
       case "DELETE":
+        if (payload) {
+          config.data = payload;
+          config.headers = { "content-type": "application/json" };
+        }
+
         return await this.client.delete<R>(endpoint, config);
     }
   }
@@ -168,3 +178,17 @@ export type ThunkFunctionAsync<T = void> = (
 ) => Promise<T>;
 
 export type ThunkDispatchAsync = ThunkDispatch<RootState, void, Action>;
+
+function wrapErrorResponse(e?: AxiosResponse) {
+  if (!e)
+    // if server down, this would be empty
+    return {
+      status: 500,
+      data: "Server is likely to be down",
+      config: {},
+      headers: {},
+      request: {},
+      statusText: ""
+    };
+  return e;
+}

@@ -30,7 +30,7 @@ func (s *Store) CreatePackageCount(pkg *models.PackageCount) (*models.PackageCou
 			Platform:    pkg.Platform,
 		}).Assign(models.PackageCount{
 		Count:      0,
-		UploadDate: time.Now(),
+		UploadDate: time.Now().UTC(),
 	}).FirstOrCreate(pkg).
 		GetErrors(); len(errs) > 0 {
 		return nil, joinErrors(errs)

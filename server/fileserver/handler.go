@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"private-conda-repo/conda/condatypes"
+	"private-conda-repo/store/models"
 )
 
 var nameRegex = regexp.MustCompile(`([\w\-_]+)-([\w.]+)-(\w+)_(\d+).tar.bz2`)
@@ -45,7 +46,14 @@ func FileHandler(mountFolder string) http.HandlerFunc {
 				return
 			}
 
-			if _, err := db.IncreasePackageCount(channel, p.Name, platform, p.Version); err != nil {
+			if _, err := db.IncreasePackageCount(&models.PackageCount{
+				Channel:     channel,
+				Package:     p.Name,
+				BuildString: p.BuildString,
+				BuildNumber: p.BuildNumber,
+				Version:     p.Version,
+				Platform:    platform,
+			}); err != nil {
 				http.Error(w, errors.Wrap(err, "could not increment package count").Error(), http.StatusInternalServerError)
 				return
 			}

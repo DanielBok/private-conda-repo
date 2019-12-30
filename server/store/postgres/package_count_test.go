@@ -23,7 +23,7 @@ func TestStore_PackageCountOperations(t *testing.T) {
 		assert.NoError(err)
 		assert.Len(counts, 0)
 
-		_, err = store.CreatePackageCount(&models.PackageCount{
+		pkg, err := store.CreatePackageCount(&models.PackageCount{
 			Channel:     channel,
 			Package:     packageName,
 			BuildString: "py",
@@ -33,7 +33,7 @@ func TestStore_PackageCountOperations(t *testing.T) {
 		})
 		assert.NoError(err)
 
-		count, err := store.IncreasePackageCount(channel, packageName, platform)
+		count, err := store.IncreasePackageCount(pkg)
 		assert.NoError(err)
 		assert.EqualValues(1, count.Count)
 

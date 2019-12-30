@@ -38,10 +38,17 @@ func (s *Store) CreatePackageCount(pkg *models.PackageCount) (*models.PackageCou
 	return pkg, nil
 }
 
-func (s *Store) IncreasePackageCount(channel, name, platform, version string) (*models.PackageCount, error) {
+func (s *Store) IncreasePackageCount(pkg *models.PackageCount) (*models.PackageCount, error) {
 	var count models.PackageCount
 	if errs := s.db.
-		Where("channel = ? AND package = ? AND platform = ? AND version = ?", channel, name, platform, version).
+		Where(models.PackageCount{
+			Channel:     pkg.Channel,
+			Package:     pkg.Package,
+			BuildString: pkg.BuildString,
+			BuildNumber: pkg.BuildNumber,
+			Version:     pkg.Version,
+			Platform:    pkg.Platform,
+		}).
 		First(&count).
 		GetErrors(); len(errs) > 0 {
 		return nil, errors.Wrap(joinErrors(errs), "could not update count")

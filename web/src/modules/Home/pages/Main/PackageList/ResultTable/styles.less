@@ -1,3 +1,5 @@
+@import (reference) "../../styles";
+
 .header {
   font-weight: 600;
   font-size: 18px;
@@ -13,5 +15,13 @@
 
   .alternate {
     background-color: #f8f8f8;
+  }
+}
+
+.link {
+  color: @primary-color;
+
+  &:hover {
+    color: @primary-color-dark;
   }
 }

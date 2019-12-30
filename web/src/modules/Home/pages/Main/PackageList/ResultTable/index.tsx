@@ -3,6 +3,7 @@ import { Col, List, Row } from "antd";
 import Fuse from "fuse.js";
 import React from "react";
 import { useSelector } from "react-redux";
+import Link from "./Link";
 import { useSearchContext } from "../hooks";
 import Tag from "./Tag";
 import styles from "./styles.less";
@@ -35,7 +36,7 @@ export default () => {
             <Row gutter={12}>
               <Col span={18}>
                 <List.Item.Meta
-                  title={`${item.channel} / ${item.name}`}
+                  title={<Link name={item.name} channel={item.channel} />}
                   description={item.description}
                 />
               </Col>

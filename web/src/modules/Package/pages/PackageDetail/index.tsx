@@ -9,6 +9,7 @@ import { PackageContext } from "./hooks";
 import PackageInfo from "./PackageInfo";
 import styles from "./styles.less";
 import { MatchParams } from "./types";
+import Files from "./Files";
 
 const { TabPane } = Tabs;
 
@@ -20,7 +21,7 @@ const PackageDetail = ({
   }
 }: Props) => {
   const dispatch = useDispatch();
-  const [tab, setTab] = useState<"conda" | "files">("conda");
+  const [tab, setTab] = useState<"conda" | "files">("files");
 
   useEffect(() => {
     dispatch(PackageApi.fetchPackageDetail(channel, pkg));
@@ -47,7 +48,7 @@ const PackageDetail = ({
             <PackageInfo />
           </TabPane>
           <TabPane tab="Files" key="files">
-            Content of Tab Pane 2
+            <Files />
           </TabPane>
         </Tabs>
       </div>

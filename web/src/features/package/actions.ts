@@ -13,6 +13,12 @@ export const fetchPackageDetail = createAsyncAction(
   "FETCH_PACKAGE_DETAIL_FAILURE"
 )<void, PackageType.PackageDetail<string>, void>();
 
+export const removePackageDetail = createAsyncAction(
+  "REMOVE_PACKAGE_DETAIL_REQUEST",
+  "REMOVE_PACKAGE_DETAIL_SUCCESS",
+  "REMOVE_PACKAGE_DETAIL_FAILURE"
+)<void, PackageType.RemovePackagePayload["package"], void>();
+
 export const resetLoadingStore = createAction("RESET_PACKAGE_LOADING_STORE")<
   void
 >();

@@ -42,3 +42,15 @@ export type PackageCountInfo<T extends string | Moment> = {
   count: number;
   uploadDate: T;
 };
+
+export type RemovePackagePayload = {
+  channel: string;
+  password: string;
+  package: {
+    name: string;
+    version: string;
+    buildString: string;
+    buildNumber: number;
+    platform: string;
+  };
+};

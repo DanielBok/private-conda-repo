@@ -12,7 +12,7 @@ export const fetchAllPackages = (): ThunkFunctionAsync => async (
 ) => {
   if (getState().package.loading.packages === "REQUEST") return;
 
-  const { data, status } = await api.Get<PackageType.PackageMetaInfo[]>("/p", {
+  const { data, status } = await api.Get<PackageType.PackageMetaInfo[]>("p", {
     beforeRequest: () =>
       dispatch(PackageAction.fetchAllPackagesAsync.request()),
     onError: e => {
@@ -53,4 +53,38 @@ export const fetchPackageDetail = (
 
   dispatch(PackageAction.fetchPackageDetail.success(data));
   return "SUCCESS";
+};
+
+/**
+ * Removes the package from the channel. The user must be signed in and must be the owner of the channel
+ * for operation to succeed
+ *
+ * @param channel name of the channel
+ * @param detail package details
+ */
+export const removePackage = (
+  channel: string,
+  detail: PackageType.RemovePackagePayload["package"]
+): ThunkFunctionAsync => async (dispatch, getState) => {
+  const {
+    user,
+    package: { loading }
+  } = getState();
+  if (loading.packages === "REQUEST") return;
+
+  if (!user.validated || user.username !== channel) return;
+
+  const payload: PackageType.RemovePackagePayload = {
+    channel,
+    password: user.password,
+    package: detail
+  };
+  const { status } = await api.Delete<void>("p", payload, {
+    beforeRequest: () => dispatch(PackageAction.removePackageDetail.request()),
+    onError: () => dispatch(PackageAction.removePackageDetail.failure())
+  });
+
+  if (status === 200) {
+    dispatch(PackageAction.removePackageDetail.success(payload.package));
+  }
 };

@@ -34,6 +34,7 @@ const defaultState: PackageType.Store = {
 export default (state = defaultState, action: AllActions) =>
   produce(state, draft => {
     switch (action.type) {
+      case getType(PackageAction.removePackageDetail.request):
       case getType(PackageAction.fetchAllPackagesAsync.request):
         draft.loading.packages = "REQUEST";
         break;
@@ -42,6 +43,7 @@ export default (state = defaultState, action: AllActions) =>
         draft.loading.details = "REQUEST";
         break;
 
+      case getType(PackageAction.removePackageDetail.failure):
       case getType(PackageAction.fetchAllPackagesAsync.failure):
         draft.loading.packages = "FAILURE";
         break;
@@ -63,11 +65,30 @@ export default (state = defaultState, action: AllActions) =>
           details: details
             .map(({ uploadDate, ...rest }) => ({
               ...rest,
-              uploadDate: moment(uploadDate)
+              uploadDate: moment.utc(uploadDate)
             }))
             .sort((x, y) => (x.uploadDate.isAfter(y.uploadDate) ? -1 : 1)),
           ...rest
         };
+        break;
+      }
+
+      case getType(PackageAction.removePackageDetail.success): {
+        const p = action.payload;
+
+        // remove same item from list of package details
+        draft.packageDetail.details = draft.packageDetail.details.filter(
+          d =>
+            ![
+              p.version === d.version,
+              p.buildNumber === d.buildNumber,
+              p.buildString === d.buildString,
+              p.platform === d.platform,
+              p.name === d.package
+            ].reduce((a, e) => a && e, true)
+        );
+
+        draft.loading.packages = "SUCCESS";
         break;
       }
 

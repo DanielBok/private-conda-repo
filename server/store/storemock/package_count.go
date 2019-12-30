@@ -40,6 +40,16 @@ func (m MockStore) IncreasePackageCount(pkg *models.PackageCount) (*models.Packa
 	}
 }
 
+func (m MockStore) RemovePackageCount(pkg *models.PackageCount) error {
+	key := formKey(pkg)
+	if _, exists := packageCounts[key]; !exists {
+		return errors.New("package does not exist")
+	} else {
+		delete(packageCounts, key)
+		return nil
+	}
+}
+
 func formKey(pkg *models.PackageCount) string {
 	return strings.Join([]string{
 		pkg.Channel,

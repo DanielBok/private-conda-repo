@@ -40,5 +40,8 @@ func TestStore_PackageCountOperations(t *testing.T) {
 		counts, err = store.GetPackageCounts(channel, packageName)
 		assert.NoError(err)
 		assert.Len(counts, 1)
+
+		err = store.RemovePackageCount(pkg)
+		assert.NoError(err)
 	})
 }

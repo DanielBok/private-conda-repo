@@ -212,6 +212,18 @@ func RemovePackage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := db.RemovePackageCount(&models.PackageCount{
+		Channel:     c.Channel,
+		Package:     c.Package.Name,
+		BuildString: c.Package.BuildString,
+		BuildNumber: c.Package.BuildNumber,
+		Version:     c.Package.Version,
+		Platform:    c.Package.Platform,
+	}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	ok(w)
 }
 

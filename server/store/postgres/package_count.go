@@ -57,3 +57,17 @@ func (s *Store) IncreasePackageCount(pkg *models.PackageCount) (*models.PackageC
 	s.db.Model(&count).Update("count", count.Count+1)
 	return &count, nil
 }
+
+func (s *Store) RemovePackageCount(pkg *models.PackageCount) error {
+	if errs := s.db.Delete(models.PackageCount{
+		Channel:     pkg.Channel,
+		Package:     pkg.Package,
+		BuildString: pkg.BuildString,
+		BuildNumber: pkg.BuildNumber,
+		Version:     pkg.Version,
+		Platform:    pkg.Platform,
+	}).GetErrors(); len(errs) > 0 {
+		return joinErrors(errs)
+	}
+	return nil
+}

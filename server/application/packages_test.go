@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"private-conda-repo/conda/condatypes"
+	"private-conda-repo/store/models"
 	"private-conda-repo/testutils"
 )
 
@@ -210,12 +211,22 @@ func TestRemovePackage(t *testing.T) {
 	chn, err := repo.CreateChannel(channelName)
 	assert.NoError(err)
 
-	_, _ = chn.AddPackage(nil, &condatypes.Package{
+	pkg := &condatypes.Package{
 		Name:        "test-package",
 		Version:     "0.1",
 		BuildString: "py12345",
 		BuildNumber: 0,
 		Platform:    "noarch",
+	}
+
+	_, _ = chn.AddPackage(nil, pkg)
+	_, _ = db.CreatePackageCount(&models.PackageCount{
+		Channel:     channelName,
+		Package:     pkg.Name,
+		BuildString: pkg.BuildString,
+		BuildNumber: pkg.BuildNumber,
+		Version:     pkg.Version,
+		Platform:    pkg.Platform,
 	})
 
 	payload := fmt.Sprintf(`{

@@ -20,7 +20,7 @@ type Store interface {
 
 	GetPackageCounts(channel, name string) ([]*models.PackageCount, error)
 	CreatePackageCount(pkg *models.PackageCount) (*models.PackageCount, error)
-	IncreasePackageCount(channel, name, platform string) (*models.PackageCount, error)
+	IncreasePackageCount(channel, name, platform, version string) (*models.PackageCount, error)
 }
 
 var stores = make(map[string]func() (Store, error))

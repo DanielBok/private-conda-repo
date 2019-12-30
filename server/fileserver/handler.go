@@ -3,6 +3,7 @@ package fileserver
 import (
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -11,7 +12,7 @@ import (
 	"private-conda-repo/conda/condatypes"
 )
 
-var nameRegex = regexp.MustCompile(`([\w\-_]+)-[\w.]+-\w+_\d+.tar.bz2`)
+var nameRegex = regexp.MustCompile(`([\w\-_]+)-([\w.]+)-(\w+)_(\d+).tar.bz2`)
 
 func FileHandler(mountFolder string) http.HandlerFunc {
 	root := http.Dir(mountFolder)
@@ -38,13 +39,13 @@ func FileHandler(mountFolder string) http.HandlerFunc {
 		case file == "current_repodata.json":
 			log.Infof("requesting repodata from '%s/%s'", channel, platform)
 		case strings.HasSuffix(file, ".tar.bz2"):
-			name, err := getPackageName(file)
+			p, err := getPackageDetail(file)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
 
-			if _, err := db.IncreasePackageCount(channel, name, platform); err != nil {
+			if _, err := db.IncreasePackageCount(channel, p.Name, platform, p.Version); err != nil {
 				http.Error(w, errors.Wrap(err, "could not increment package count").Error(), http.StatusInternalServerError)
 				return
 			}
@@ -58,10 +59,21 @@ func FileHandler(mountFolder string) http.HandlerFunc {
 	}
 }
 
-func getPackageName(file string) (string, error) {
-	matches := nameRegex.FindStringSubmatch(file)
-	if len(matches) != 2 {
-		return "", errors.Errorf("could not detect package name from '%s'", file)
+func getPackageDetail(file string) (*condatypes.Package, error) {
+	m := nameRegex.FindStringSubmatch(file)
+	if len(m) != 5 {
+		return nil, errors.Errorf("could not parse package name from '%s'", file)
 	}
-	return matches[1], nil
+
+	bNo, err := strconv.Atoi(m[4])
+	if err != nil {
+		return nil, errors.Errorf("could not parse build number from '%s'", file)
+	}
+
+	return &condatypes.Package{
+		Name:        m[1],
+		Version:     m[2],
+		BuildString: m[3],
+		BuildNumber: bNo,
+	}, nil
 }

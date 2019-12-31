@@ -5,8 +5,13 @@ export type Store = {
   loading: {
     packages: LoadingState;
     details: LoadingState;
+    channelPackages: LoadingState;
   };
   packageDetail: PackageDetail<Moment>;
+  channelPackages: {
+    channel: string;
+    packages: PackageMetaInfo[];
+  };
 };
 
 export type Platform = "noarch" | "win-64" | "osx-64" | "linux-64";

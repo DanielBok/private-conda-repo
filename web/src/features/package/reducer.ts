@@ -2,14 +2,15 @@ import AllActions from "@/infrastructure/rootAction";
 import produce from "immer";
 import moment from "moment";
 import { getType } from "typesafe-actions";
-import * as PackageAction from "./actions";
+import * as Action from "./actions";
 import * as PackageType from "./types";
 
 const defaultState: PackageType.Store = {
   packages: [],
   loading: {
     details: "SUCCESS",
-    packages: "SUCCESS"
+    packages: "SUCCESS",
+    channelPackages: "SUCCESS"
   },
   packageDetail: {
     channel: "",
@@ -28,36 +29,40 @@ const defaultState: PackageType.Store = {
       timestamp: 0,
       name: ""
     }
+  },
+  channelPackages: {
+    channel: "",
+    packages: []
   }
 };
 
 export default (state = defaultState, action: AllActions) =>
   produce(state, draft => {
     switch (action.type) {
-      case getType(PackageAction.removePackageDetail.request):
-      case getType(PackageAction.fetchAllPackagesAsync.request):
+      case getType(Action.fetchAllPackagesAsync.request):
         draft.loading.packages = "REQUEST";
         break;
 
-      case getType(PackageAction.fetchPackageDetail.request):
+      case getType(Action.removePackageDetail.request):
+      case getType(Action.fetchPackageDetail.request):
         draft.loading.details = "REQUEST";
         break;
 
-      case getType(PackageAction.removePackageDetail.failure):
-      case getType(PackageAction.fetchAllPackagesAsync.failure):
+      case getType(Action.fetchAllPackagesAsync.failure):
         draft.loading.packages = "FAILURE";
         break;
 
-      case getType(PackageAction.fetchPackageDetail.failure):
+      case getType(Action.removePackageDetail.failure):
+      case getType(Action.fetchPackageDetail.failure):
         draft.loading.details = "FAILURE";
         break;
 
-      case getType(PackageAction.fetchAllPackagesAsync.success):
+      case getType(Action.fetchAllPackagesAsync.success):
         draft.packages = action.payload;
         draft.loading.packages = "SUCCESS";
         break;
 
-      case getType(PackageAction.fetchPackageDetail.success): {
+      case getType(Action.fetchPackageDetail.success): {
         draft.loading.details = "SUCCESS";
         const { details, ...rest } = action.payload;
 
@@ -73,7 +78,7 @@ export default (state = defaultState, action: AllActions) =>
         break;
       }
 
-      case getType(PackageAction.removePackageDetail.success): {
+      case getType(Action.removePackageDetail.success): {
         const p = action.payload;
 
         // remove same item from list of package details
@@ -88,12 +93,26 @@ export default (state = defaultState, action: AllActions) =>
             ].reduce((a, e) => a && e, true)
         );
 
-        draft.loading.packages = "SUCCESS";
+        draft.loading.details = "SUCCESS";
         break;
       }
 
-      case getType(PackageAction.resetLoadingStore):
+      case getType(Action.fetchUserPackages.request):
+        draft.loading.channelPackages = "REQUEST";
+        break;
+
+      case getType(Action.fetchUserPackages.failure):
+        draft.loading.channelPackages = "FAILURE";
+        break;
+
+      case getType(Action.fetchUserPackages.success):
+        draft.loading.channelPackages = "SUCCESS";
+        draft.channelPackages = action.payload;
+        break;
+
+      case getType(Action.resetLoadingStore):
         draft.loading = {
+          channelPackages: "SUCCESS",
           details: "SUCCESS",
           packages: "SUCCESS"
         };

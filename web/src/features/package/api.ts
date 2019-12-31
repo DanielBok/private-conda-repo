@@ -37,8 +37,8 @@ export const fetchAllPackages = (): ThunkFunctionAsync => async (
 export const fetchPackageDetail = (
   channel: string,
   pkg: string
-): ThunkFunctionAsync<LoadingState> => async (dispatch, getState) => {
-  if (getState().package.loading.details === "REQUEST") return "REQUEST";
+): ThunkFunctionAsync => async (dispatch, getState) => {
+  if (getState().package.loading.details === "REQUEST") return;
 
   const { data, status } = await api.Get<PackageType.PackageDetail<string>>(
     `p/${channel}/${pkg}`,
@@ -47,12 +47,24 @@ export const fetchPackageDetail = (
       onError: () => dispatch(PackageAction.fetchPackageDetail.failure())
     }
   );
-  if (status !== 200) {
-    return "FAILURE";
-  }
+  if (status === 200) dispatch(PackageAction.fetchPackageDetail.success(data));
+};
 
-  dispatch(PackageAction.fetchPackageDetail.success(data));
-  return "SUCCESS";
+/**
+ * Fetches all packages by user/channel
+ * @param channel channel/user name
+ */
+export const fetchUserPackages = (
+  channel: string
+): ThunkFunctionAsync => async (dispatch, getState) => {
+  if (getState().package.loading.channelPackages === "REQUEST") return;
+
+  await api.Get<PackageType.PackageMetaInfo[]>(`p/${channel}`, {
+    beforeRequest: () => dispatch(PackageAction.fetchUserPackages.request()),
+    onError: () => dispatch(PackageAction.fetchUserPackages.failure()),
+    onSuccess: packages =>
+      dispatch(PackageAction.fetchUserPackages.success({ channel, packages }))
+  });
 };
 
 /**
@@ -70,7 +82,7 @@ export const removePackage = (
     user,
     package: { loading }
   } = getState();
-  if (loading.packages === "REQUEST") return;
+  if (loading.details === "REQUEST") return;
 
   if (!user.validated || user.username !== channel) return;
 

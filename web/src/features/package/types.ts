@@ -8,13 +8,17 @@ export type Store = {
     channelPackages: LoadingState;
   };
   packageDetail: PackageDetail<Moment>;
-  channelPackages: {
-    channel: string;
-    packages: PackageMetaInfo[];
-  };
+  channelPackages: ChannelPackages<Moment>;
 };
 
 export type Platform = "noarch" | "win-64" | "osx-64" | "linux-64";
+
+export type ChannelPackages<T extends string | Moment> = {
+  channel: string;
+  email: string;
+  joinDate: T;
+  packages: PackageMetaInfo[];
+};
 
 export type PackageMetaInfo = {
   channel: string;

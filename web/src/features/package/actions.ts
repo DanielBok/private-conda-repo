@@ -17,7 +17,7 @@ export const fetchUserPackages = createAsyncAction(
   "FETCH_USER_PACKAGES_REQUEST",
   "FETCH_USER_PACKAGES_SUCCESS",
   "FETCH_USER_PACKAGES_FAILURE"
-)<void, PackageType.Store["channelPackages"], void>();
+)<void, PackageType.ChannelPackages<string>, void>();
 
 export const removePackageDetail = createAsyncAction(
   "REMOVE_PACKAGE_DETAIL_REQUEST",

@@ -32,6 +32,8 @@ const defaultState: PackageType.Store = {
   },
   channelPackages: {
     channel: "",
+    email: "",
+    joinDate: moment(),
     packages: []
   }
 };
@@ -105,11 +107,15 @@ export default (state = defaultState, action: AllActions) =>
         draft.loading.channelPackages = "FAILURE";
         break;
 
-      case getType(Action.fetchUserPackages.success):
+      case getType(Action.fetchUserPackages.success): {
         draft.loading.channelPackages = "SUCCESS";
-        draft.channelPackages = action.payload;
+        const { joinDate, ...rest } = action.payload;
+        draft.channelPackages = {
+          ...rest,
+          joinDate: moment.utc(joinDate)
+        };
         break;
-
+      }
       case getType(Action.resetLoadingStore):
         draft.loading = {
           channelPackages: "SUCCESS",

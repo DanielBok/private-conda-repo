@@ -1,5 +1,8 @@
 PROJECT_NAME = "PCR"
 
+server-image:
+	docker image build -t danielbok/pcr-server .
+
 conda-image:
 	docker image build -t danielbok/conda-repo-mgr -f conda.Dockerfile .
 	docker image prune -f

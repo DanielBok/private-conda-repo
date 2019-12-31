@@ -36,7 +36,6 @@
     "circular-dependency-plugin": "^5.2.0",
     "craco": "0.0.3",
     "craco-antd": "^1.14.1",
-    "husky": "^3.1.0",
     "lint-staged": "^9.5.0",
     "prettier": "^1.19.1",
     "redux-devtools-extension": "^2.13.8",
@@ -60,17 +59,6 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
-      "prettier --write",
-      "git add"
     ]
   }
 }

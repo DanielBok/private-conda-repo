@@ -5,7 +5,7 @@ import moment, { Moment } from "moment";
  * @param timestamp milliseconds from unix epoch or Moment instance
  */
 export const timeSinceUpload = (timestamp: number | Moment) => {
-  if (typeof timestamp === "number") timestamp = moment.utc(timestamp);
+  if (typeof timestamp === "number") timestamp = moment.unix(timestamp);
 
   const now = moment.utc();
   const duration = moment.duration(now.diff(timestamp));

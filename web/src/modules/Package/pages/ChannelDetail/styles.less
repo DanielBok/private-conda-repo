@@ -1,0 +1,58 @@
+@import (reference) "../../../App/styles";
+
+.container {
+  min-height: @min-height;
+  padding: 40px;
+}
+
+.card {
+  :global(.ant-card-head) {
+    background-color: #1c1c1c;
+  }
+
+  .title {
+    color: white;
+    font-size: 20px;
+  }
+
+  .profile-div {
+    margin-bottom: 12px;
+
+    .channel-name {
+      font-size: 24px;
+      font-weight: 500;
+    }
+  }
+
+  .icon-link {
+    color: @primary-color;
+    margin-right: 8px;
+
+    &:hover {
+      color: @primary-color-light;
+    }
+  }
+}
+
+.list-item {
+  @size: 18px;
+
+  img {
+    width: @size;
+    margin-right: 8px;
+  }
+
+  a {
+    color: @primary-color;
+    font-size: @size;
+    margin-right: 8px;
+
+    &:hover {
+      color: @primary-color-dark;
+    }
+  }
+
+  span {
+    font-size: 10px;
+  }
+}

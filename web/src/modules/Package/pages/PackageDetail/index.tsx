@@ -21,7 +21,7 @@ const PackageDetail = ({
   }
 }: Props) => {
   const dispatch = useDispatch();
-  const [tab, setTab] = useState<"conda" | "files">("files");
+  const [tab, setTab] = useState<"conda" | "files">("conda");
 
   useEffect(() => {
     dispatch(PackageApi.fetchPackageDetail(channel, pkg));

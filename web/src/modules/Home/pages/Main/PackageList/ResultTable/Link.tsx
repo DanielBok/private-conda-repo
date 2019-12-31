@@ -9,7 +9,10 @@ type Props = {
 
 export default ({ name, channel }: Props) => (
   <span>
-    {channel} /{" "}
+    <Link className={styles.link} to={`/p/${channel}`}>
+      {channel}
+    </Link>
+    {" / "}
     <Link className={styles.link} to={`/p/${channel}/${name}`}>
       {name}
     </Link>

@@ -1,6 +1,7 @@
 package application
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -59,7 +60,7 @@ func ListPackagesByUser(w http.ResponseWriter, r *http.Request) {
 	user := chi.URLParam(r, "user")
 	chn, err := repo.GetChannel(user)
 	if err != nil {
-		http.Error(w, errors.Wrapf(err, "could not find user/channel with name '%s'", user).Error(), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("could not find user/channel with name '%s'", user), http.StatusBadRequest)
 		return
 	}
 

@@ -8,9 +8,9 @@ import (
 
 var users = make(map[string]*models.User)
 
-func (m MockStore) AddUser(channel, password string) (*models.User, error) {
+func (m MockStore) AddUser(channel, password, email string) (*models.User, error) {
 	m.Called(channel, password)
-	u, err := models.NewUser(channel, password)
+	u, err := models.NewUser(channel, password, email)
 	if err != nil {
 		return nil, err
 	}

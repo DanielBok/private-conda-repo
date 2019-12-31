@@ -24,7 +24,15 @@ application:
 decompressor:
   type: .tar.bz2  # leave this as the default, only used for testing purposes
 
-salt: "It is best to set this from the environment variable (PCR_SALT=)"
+# user checks and validation validation
+user:
+  # salt is used for password hashing so we don't save plaintext passwords in the database
+  salt: "It is best to set this from the environment variable (PCR_SALT=)"
+  # email domain is the ending regex used to specify if you want a user/channel to come from a
+  # certain domain. For example, if you want to only accept gmail only, you could use "gmail\..*$",
+  # if you want gmail and hotmail you could use "(gmail|hotmail)\..*". Leave blank if you accept
+  # all domains
+  email_domain:
 
 # if valid key and cert files are provided, server runs in HTTPS mode automatically
 tls:

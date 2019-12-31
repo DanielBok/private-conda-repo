@@ -19,13 +19,14 @@ func TestCreateUser(t *testing.T) {
 	ts := newTestServer(CreateUser)
 	defer ts.Close()
 
-	_, err := db.AddUser("daniel", "Password123")
-	assert.NoError(err)
+	//_, err := db.AddUser("daniel", "Password123", "")
+	//assert.NoError(err)
 
 	payload := strings.NewReader(`
 	{
 		"channel": "daniel",
-		"password": "Password123"
+		"password": "Password123",
+		"email": "daniel@gmail.com"
 	}`)
 
 	resp, err := http.Post(ts.URL, ApplicationJson, payload)
@@ -48,7 +49,7 @@ func TestListUsers(t *testing.T) {
 	ts := newTestServer(ListUsers)
 	defer ts.Close()
 
-	_, err := db.AddUser("Pikachu", "pika-pi!!")
+	_, err := db.AddUser("Pikachu", "pika-pi!!", "daniel@gmail.com")
 	assert.NoError(err)
 
 	resp, err := http.Get(ts.URL)
@@ -81,7 +82,7 @@ func TestRemoveUser(t *testing.T) {
 	err := createChannelAndAddPackages(channel)
 	assert.NoError(err)
 
-	_, err = db.AddUser(channel, password)
+	_, err = db.AddUser(channel, password, "daniel@gmail.com")
 	assert.NoError(err)
 
 	tests := []TestRow{

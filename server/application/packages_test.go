@@ -148,7 +148,7 @@ func TestUploadPackage(t *testing.T) {
 
 	ts := newTestServer(UploadPackage)
 	defer ts.Close()
-	_, err := db.AddUser(channelName, "pikachu")
+	_, err := db.AddUser(channelName, "pikachu", "daniel@gmail.com")
 	assert.NoError(err)
 	_, err = repo.CreateChannel(channelName)
 	assert.NoError(err)
@@ -206,7 +206,7 @@ func TestRemovePackage(t *testing.T) {
 
 	ts := newTestServer(RemovePackage)
 	defer ts.Close()
-	_, err := db.AddUser(channelName, "pikachu")
+	_, err := db.AddUser(channelName, "pikachu", "daniel@gmail.com")
 	assert.NoError(err)
 	chn, err := repo.CreateChannel(channelName)
 	assert.NoError(err)

@@ -31,7 +31,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u, err = db.AddUser(u.Channel, u.Password)
+	u, err = db.AddUser(u.Channel, u.Password, u.Email)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

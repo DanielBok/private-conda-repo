@@ -7,8 +7,8 @@ import (
 	"private-conda-repo/store/models"
 )
 
-func (s *Store) AddUser(channel, password string) (*models.User, error) {
-	user, err := models.NewUser(channel, password)
+func (s *Store) AddUser(channel, password, email string) (*models.User, error) {
+	user, err := models.NewUser(channel, password, email)
 	if err != nil {
 		return nil, err
 	}

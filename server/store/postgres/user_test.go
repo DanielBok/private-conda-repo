@@ -13,6 +13,7 @@ import (
 func TestStore_UserOperations(t *testing.T) {
 	channel := "daniel"
 	password := "Password123"
+	email := "daniel@gmail.com"
 
 	dktest.Run(t, imageName, postgresImageOptions, func(t *testing.T, info dktest.ContainerInfo) {
 		assert := require.New(t)
@@ -22,7 +23,7 @@ func TestStore_UserOperations(t *testing.T) {
 		user, err := store.GetUser(channel)
 		assert.EqualError(err, gorm.ErrRecordNotFound.Error())
 
-		user, err = store.AddUser(channel, password)
+		user, err = store.AddUser(channel, password, email)
 		assert.NoError(err)
 		assert.IsType(*user, models.User{})
 		assert.Equal(user.Channel, channel)

@@ -13,7 +13,7 @@ import (
 type Store interface {
 	Migrate() error
 
-	AddUser(channel, password string) (*models.User, error)
+	AddUser(channel, password, email string) (*models.User, error)
 	GetUser(channel string) (*models.User, error)
 	RemoveUser(channel, password string) error
 	GetAllUsers() ([]*models.User, error)

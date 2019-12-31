@@ -13,7 +13,7 @@ type AppConfig struct {
 	Admin        adminProfile `mapstructure:"admin"`
 	Conda        condaConfig  `mapstructure:"conda"`
 	DB           database     `mapstructure:"db"`
-	Salt         string       `mapstructure:"salt"`
+	UserConfig   userConfig   `mapstructure:"user"`
 	FileServer   server       `mapstructure:"fileserver"`
 	AppServer    server       `mapstructure:"application"`
 	Decompressor decompressor `mapstructure:"decompressor"`
@@ -62,6 +62,10 @@ func New() (*AppConfig, error) {
 	var config AppConfig
 	if err := viper.Unmarshal(&config); err != nil {
 		return nil, errors.Wrap(err, "could not unmarshal config")
+	}
+
+	if err := config.UserConfig.init(); err != nil {
+		return nil, err
 	}
 
 	return &config, nil

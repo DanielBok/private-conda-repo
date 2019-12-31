@@ -3,6 +3,9 @@ package application
 import (
 	"net/http"
 
+	"github.com/go-chi/chi"
+	"github.com/pkg/errors"
+
 	"private-conda-repo/store/models"
 )
 
@@ -49,6 +52,18 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	toJson(w, &u)
+}
+
+func GetUserInfo(w http.ResponseWriter, r *http.Request) {
+	username := chi.URLParam(r, "user")
+	user, err := db.GetUser(username)
+	if err != nil {
+		http.Error(w, errors.Wrapf(err, "could not find user: %s", username).Error(), http.StatusBadRequest)
+		return
+	}
+	user.Password = ""
+
+	toJson(w, user)
 }
 
 func RemoveUser(w http.ResponseWriter, r *http.Request) {

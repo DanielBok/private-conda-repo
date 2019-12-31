@@ -19,9 +19,6 @@ func TestCreateUser(t *testing.T) {
 	ts := newTestServer(CreateUser)
 	defer ts.Close()
 
-	//_, err := db.AddUser("daniel", "Password123", "")
-	//assert.NoError(err)
-
 	payload := strings.NewReader(`
 	{
 		"channel": "daniel",
@@ -40,6 +37,32 @@ func TestCreateUser(t *testing.T) {
 
 	assert.EqualValues(u.Channel, "daniel")
 	assert.Empty(u.Password)
+}
+
+func TestGetUserInfo(t *testing.T) {
+	t.Parallel()
+	assert := require.New(t)
+	channel := "test-get-user-info"
+	email := "daniel@gmail.com"
+
+	_, err := db.AddUser(channel, "password", email)
+	assert.NoError(err)
+
+	ts := newTestServerWithRouteContext("GET", "/{user}", GetUserInfo)
+	defer ts.Close()
+
+	resp, err := http.Get(fmt.Sprintf("%s/%s", ts.URL, channel))
+	assert.NoError(err)
+	assert.EqualValues(resp.StatusCode, http.StatusOK)
+
+	var output models.User
+	err = json.NewDecoder(resp.Body).Decode(&output)
+	assert.NoError(err)
+	defer func() { _ = resp.Body.Close() }()
+
+	assert.EqualValues(output.Password, "")
+	assert.EqualValues(output.Channel, channel)
+	assert.EqualValues(output.Email, email)
 }
 
 func TestListUsers(t *testing.T) {

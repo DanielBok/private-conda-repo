@@ -14,7 +14,11 @@ export default () => {
     form: { getFieldsError: E, isFieldTouched: T, getFieldValue: G },
     validateStatus
   } = useFormContext();
-  const touched = T(CONST.USERNAME) && T(CONST.PASSWORD) && T(CONST.CONFIRM);
+  const touched =
+    T(CONST.USERNAME) &&
+    T(CONST.PASSWORD) &&
+    T(CONST.CONFIRM) &&
+    T(CONST.EMAIL);
 
   const disabled =
     isLoading ||
@@ -34,8 +38,9 @@ export default () => {
       onClick={() => {
         const username = G(CONST.USERNAME);
         const password = G(CONST.PASSWORD);
+        const email = G(CONST.EMAIL);
 
-        dispatch(UserApi.createUser(username, password));
+        dispatch(UserApi.createUser(username, password, email));
       }}
       loading={isLoading}
     >

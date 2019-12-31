@@ -9,7 +9,8 @@ import * as UserType from "./types";
  */
 export const createUser = (
   username: string,
-  password: string
+  password: string,
+  email: string
 ): ThunkFunctionAsync => async (dispatch, getState) => {
   if (getState().user.loading === "REQUEST") return;
 
@@ -18,9 +19,13 @@ export const createUser = (
     password
   };
 
-  const { status } = await api.Post("/user", payload, {
-    beforeRequest: () => dispatch(UserAction.createUserAsync.request())
-  });
+  const { status } = await api.Post(
+    "/user",
+    { ...payload, email },
+    {
+      beforeRequest: () => dispatch(UserAction.createUserAsync.request())
+    }
+  );
 
   if (status === 200) {
     dispatch(UserAction.createUserAsync.success(payload));

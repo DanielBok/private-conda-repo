@@ -8,6 +8,7 @@ import styles from "./styles.less";
 import Submit from "./Submit";
 import { ValidateStatus } from "./types";
 import UsernameInput from "./UsernameInput";
+import EmailInput from "./EmailInput";
 
 type Props = {
   form: WrappedFormUtils;
@@ -24,6 +25,7 @@ const LoginForm = ({ form }: Props) => {
       <UsernameInput />
       <PasswordInput />
       <ConfirmPasswordInput />
+      <EmailInput />
       <Submit />
     </FormContext.Provider>
   );

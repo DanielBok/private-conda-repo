@@ -5,19 +5,20 @@ import { useFormContext } from "./hooks";
 
 export default () => {
   const {
-    form: { getFieldDecorator, getFieldError },
-    validateStatus
-  } = useFormContext();
+    getFieldDecorator,
+    getFieldError,
+    isFieldTouched
+  } = useFormContext().form;
+
+  const status = isFieldTouched(CONST.EMAIL)
+    ? getFieldError(CONST.EMAIL) === undefined
+      ? "success"
+      : "error"
+    : "";
 
   return (
-    <Form.Item
-      validateStatus={
-        getFieldError(CONST.EMAIL) !== undefined ? "error" : validateStatus
-      }
-      hasFeedback
-    >
+    <Form.Item validateStatus={status} hasFeedback>
       {getFieldDecorator(CONST.EMAIL, {
-        validateFirst: true,
         rules: [
           { required: true, message: "Email is required" },
           { type: "email", message: "Invalid email" }

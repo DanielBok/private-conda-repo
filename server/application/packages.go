@@ -229,18 +229,18 @@ func RemovePackage(w http.ResponseWriter, r *http.Request) {
 }
 
 func RemoveAllPackages(w http.ResponseWriter, r *http.Request) {
-	var c ChannelDetails
-	if err := readJson(r, &c); err != nil {
+	user, err := getUser(r)
+	if err != nil {
 		http.Error(w, errors.Wrap(err, "could not parse input JSON").Error(), http.StatusBadRequest)
 		return
 	}
 
-	if status, err := validateCredentials(c.Channel, c.Password); err != nil {
+	if status, err := validateCredentials(user.Channel, user.Password); err != nil {
 		http.Error(w, err.Error(), status)
 		return
 	}
 
-	chn, err := repo.GetChannel(c.Channel)
+	chn, err := repo.GetChannel(user.Channel)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

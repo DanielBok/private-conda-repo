@@ -71,7 +71,7 @@ func (m *ChannelMetaInfo) Write(path string) error {
 
 // Returns the ChannelMetaInfo as an array of normalized data
 func (m *ChannelMetaInfo) NormalizedPackagesOutput(channel string) []*ChannelMetaPackageOutput {
-	var output []*ChannelMetaPackageOutput
+	output := []*ChannelMetaPackageOutput{}
 	for name, p := range m.Packages {
 		output = append(output, &ChannelMetaPackageOutput{
 			Channel:     channel,

@@ -1,9 +1,11 @@
 package application
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 
 	"private-conda-repo/store/models"
@@ -31,6 +33,14 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if err := u.IsValid(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if user, err := db.GetUser(u.Channel); err != nil && err != gorm.ErrRecordNotFound {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	} else if user != nil {
+		http.Error(w, fmt.Sprintf("channel '%s' already exists", u.Channel), http.StatusBadRequest)
 		return
 	}
 

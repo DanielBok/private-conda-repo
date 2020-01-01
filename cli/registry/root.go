@@ -23,16 +23,16 @@ error if the private conda repository's url is not set.`,
 			registry = "<undefined: Please set registry with 'pcr registry set'>"
 		}
 
-		user := conf.User.Username
-		if user == "" {
-			user = "<Not logged in: Please login with 'pcr registry login'>"
+		channel := conf.Channel.Channel
+		if channel == "" {
+			channel = "<Not logged in: Please login with 'pcr registry login'>"
 		}
 
 		log.Println(strings.TrimSpace(fmt.Sprintf(`
 CLI Registry details:
 	Registry:     %s
-	User/Channel: %s
-`, registry, user)))
+	Channel :     %s
+`, registry, channel)))
 	},
 }
 

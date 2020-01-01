@@ -15,11 +15,16 @@ var logoutCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(_ *cobra.Command, _ []string) {
 		conf := config.New()
-		user := conf.User.Username
-		conf.User.Username = ""
-		conf.User.Password = ""
+		channel := conf.Channel.Channel
+		conf.Channel.Channel = ""
+		conf.Channel.Password = ""
 
 		conf.Save()
-		log.Printf("logged out of '%s'", user)
+		if channel == "" {
+			log.Fatalln("You're not logged in")
+		} else {
+			log.Printf("logged out of '%s'", channel)
+		}
+
 	},
 }

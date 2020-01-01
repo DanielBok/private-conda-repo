@@ -56,8 +56,8 @@ func newUploadHandler() uploadHandler {
 	h := uploadHandler{
 		cmd:      nil,
 		url:      conf.Registry + "/p",
-		channel:  conf.User.Username,
-		password: conf.User.Password,
+		channel:  conf.Channel.Channel,
+		password: conf.Channel.Password,
 	}
 	return h
 }

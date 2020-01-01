@@ -15,9 +15,9 @@ import (
 )
 
 type Config struct {
-	Registry          string `mapstructure:"registry" yaml:"registry"`
-	User              User   `mapstructure:"user" yaml:"user"`
-	PackageRepository string `mapstructure:"package_repository" yaml:"package_repository"`
+	Registry          string  `mapstructure:"registry" yaml:"registry"`
+	Channel           Channel `mapstructure:"channel" yaml:"channel"`
+	PackageRepository string  `mapstructure:"package_repository" yaml:"package_repository"`
 }
 
 var (

@@ -14,28 +14,28 @@ import (
 )
 
 func init() {
-	loginCmd.Flags().StringP("username", "u", "", "Registry username")
+	loginCmd.Flags().StringP("channel", "c", "", "Channel name")
 	loginCmd.Flags().StringP("password", "p", "", "Registry password")
 }
 
 var loginCmd = &cobra.Command{
 	Use:   "login",
 	Short: "Log into the registry",
-	Long: `Logs the cli tool with the user's credentials. The user's credentials will be verified
+	Long: `Logs the cli tool with the channel's credentials. The channel's credentials will be verified
 against the server. `,
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, _ []string) {
 		handler := loginHandler{cmd: cmd}
-		username := handler.getUsername()
-		password := handler.getPassword()
+		channel := handler.getValue("channel", 0)
+		password := handler.getValue("password", '*')
 
-		handler.validateUserCredentials(username, password)
+		handler.validateChannelCredentials(channel, password)
 		conf := config.New()
-		conf.User.Username = username
-		conf.User.Password = password
+		conf.Channel.Channel = channel
+		conf.Channel.Password = password
 
 		conf.Save()
-		log.Printf("Logged in as '%s'", username)
+		log.Printf("Logged into '%s'", channel)
 	},
 }
 
@@ -43,22 +43,13 @@ type loginHandler struct {
 	cmd *cobra.Command
 }
 
-func (h *loginHandler) getUsername() string {
-	user := h.getFlag("username")
-	if user != "" {
-		return user
+func (h *loginHandler) getValue(flag string, mask rune) string {
+	value := h.getFlag(flag)
+	if value != "" {
+		return value
 	}
 
-	return h.promptValue("Username", 0)
-}
-
-func (h *loginHandler) getPassword() string {
-	password := h.getFlag("password")
-	if password != "" {
-		return password
-	}
-
-	return h.promptValue("Password", '*')
+	return h.promptValue(strings.Title(flag), mask)
 }
 
 func (h *loginHandler) getFlag(flag string) string {
@@ -93,16 +84,16 @@ func (h *loginHandler) promptValue(label string, mask rune) string {
 	return value
 }
 
-func (h *loginHandler) validateUserCredentials(username, password string) {
+func (h *loginHandler) validateChannelCredentials(channel, password string) {
 	conf := config.New()
 	if !conf.HasRegistry() {
 		return
 	}
 
 	payload := strings.NewReader(fmt.Sprintf(`{
-		"name": "%s",
+		"channel": "%s",
 		"password": "%s"
-	}`, username, password))
+	}`, channel, password))
 
 	resp, err := http.Post(conf.Registry+"/user/check", "application/json", payload)
 	if err != nil {
@@ -111,6 +102,6 @@ func (h *loginHandler) validateUserCredentials(username, password string) {
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		log.Fatalf("user credentials for '%s' is incorrect. Did you create the account created or have you forgotten the password?", username)
+		log.Fatalf("channel credentials for '%s' is incorrect. Did you create the account created or have you forgotten the password?", channel)
 	}
 }

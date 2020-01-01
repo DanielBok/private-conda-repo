@@ -1,11 +1,9 @@
 package filesys
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -45,21 +43,7 @@ func (c *Channel) Dir() string {
 }
 
 func (c *Channel) Index() error {
-	cmd := []string{
-		"container",
-		"run",
-		"--rm",
-		"--mount",
-		fmt.Sprintf("type=bind,src=%s,dst=/var/condapkg", c.dir),
-		c.image,
-		"index",
-	}
-
-	if _, err := exec.Command("docker", cmd...).Output(); err != nil {
-		return errors.Wrapf(err, "could not index channel '%s'", c.name)
-	}
-
-	return nil
+	return indMgr.Index(c.dir)
 }
 
 func (c *Channel) GetMetaInfo() (*condatypes.ChannelMetaInfo, error) {

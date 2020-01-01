@@ -13,7 +13,7 @@ func main() {
 	initStore()
 
 	app := NewApp()
-	app.updateCondaImage()
+	app.updateIndexer()
 	<-app.runServers()
 }
 

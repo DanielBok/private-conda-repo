@@ -82,11 +82,6 @@ func (r *router) registerRoutes() {
 		r.Delete("/{pkg}", RemoveAllPackages)
 	})
 
-	r.Route("/image", func(r chi.Router) {
-		r.Get("/", GetImageManagerVersion)
-		r.Post("/", UpdateImageManagerVersion)
-	})
-
 	r.Route("/", func(r chi.Router) {
 		r.Get("/*", missing404Handler)
 		r.Put("/*", missing404Handler)

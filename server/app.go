@@ -14,7 +14,9 @@ import (
 	"private-conda-repo/application"
 	"private-conda-repo/config"
 	"private-conda-repo/fileserver"
-	"private-conda-repo/image"
+	"private-conda-repo/indexer"
+	_ "private-conda-repo/indexer/docker"
+	_ "private-conda-repo/indexer/shell"
 )
 
 type App struct {
@@ -30,22 +32,19 @@ func NewApp() *App {
 	return &App{conf: conf}
 }
 
-func (a *App) updateCondaImage() *App {
-	mgr, err := image.New()
+func (a *App) updateIndexer() *App {
+	idx, err := indexer.New()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	dockerVersion, err := mgr.CheckDockerVersion()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Printf("Docker client version: %s", dockerVersion)
 
-	imageVersion, err := mgr.UpdateImage()
-	if err != nil {
-		log.Fatalln(err)
+	if err := idx.Check(); err != nil {
+		log.Fatalln("indexer does not exist. ", err)
 	}
-	log.Printf("Conda Image Manager version: %d", imageVersion)
+
+	if err := idx.Update(); err != nil {
+		log.Fatalln("Could not update indexer")
+	}
 
 	return a
 }

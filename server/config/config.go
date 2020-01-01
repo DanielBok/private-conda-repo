@@ -25,12 +25,6 @@ type adminProfile struct {
 	Password string `mapstructure:"password"`
 }
 
-type condaConfig struct {
-	ImageName   string `mapstructure:"image_name"`
-	MountFolder string `mapstructure:"mount_folder"`
-	Type        string `mapstructure:"type"`
-}
-
 type server struct {
 	Port int `mapstructure:"port"`
 }

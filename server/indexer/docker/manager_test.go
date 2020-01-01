@@ -1,4 +1,4 @@
-package image
+package docker
 
 import (
 	"testing"
@@ -11,6 +11,6 @@ func TestManager_CheckDockerVersion(t *testing.T) {
 
 	mgr, err := New()
 	assert.NoError(err)
-	version, err := mgr.CheckDockerVersion()
-	assert.NotEmpty(version)
+	err = mgr.Check()
+	assert.NoError(err)
 }

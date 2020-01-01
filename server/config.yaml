@@ -3,6 +3,13 @@ admin:
   password: "password"
 
 conda:
+  # 'use' can only be 'shell' or 'docker'. Using 'shell' means that PCR will use a shell
+  # version of conda to index the channels, using 'docker' will use a dockerized-conda instance
+  # to index the channels. Use 'shell' when running the server application in a dockerized
+  # container, like in docker-compose. This is because it is not easy to have a docker container
+  # run another docker container whilst setting up the volumes for the second docker container.
+  use: docker
+  # if using docker, the image name and mount folder options can be specified
   image_name: danielbok/conda-repo-mgr
   mount_folder:  # leave empty for the application to automatically set path based on OS
   type: filesys

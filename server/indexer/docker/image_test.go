@@ -1,4 +1,4 @@
-package image
+package docker
 
 import (
 	"testing"
@@ -13,7 +13,6 @@ func TestIndexImage_UpdateImage(t *testing.T) {
 
 	mgr, err := New()
 	assert.NoError(err)
-	version, err := mgr.UpdateImage()
+	err = mgr.Update()
 	assert.NoError(err)
-	assert.Greater(version, 0)
 }

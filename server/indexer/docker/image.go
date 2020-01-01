@@ -1,4 +1,4 @@
-package image
+package docker
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type DockerImageInfo struct {
+type ImageInfo struct {
 	Results []struct {
 		Name string `json:"name"`
 	} `json:"results"`
@@ -75,7 +75,7 @@ func (m *Manager) checkLatestVersion() (int, error) {
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	var output DockerImageInfo
+	var output ImageInfo
 	if err := json.NewDecoder(resp.Body).Decode(&output); err != nil {
 		return -1, errors.Wrap(err, "could not decode Image meta data from docker hub")
 	}

@@ -1,15 +1,16 @@
-FROM golang:1.13-alpine as builder
-
-RUN apk update && apk upgrade
+FROM golang:1.13-stretch as builder
 
 WORKDIR /app
 
 COPY . .
 RUN go build -o pcr .
 
-FROM alpine:3
+FROM continuumio/miniconda3:latest
+RUN conda config --set always_yes true && \
+    conda update --all && \
+    conda install conda-build && \
+    conda clean --all
 
-RUN apk update && apk upgrade && apk add docker
 RUN mkdir -p /var/condapkg
 
 WORKDIR /app

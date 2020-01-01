@@ -5,11 +5,13 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"private-conda-repo/config"
 	"private-conda-repo/store"
 )
 
 func main() {
 	setLogger()
+	listConfig()
 	initStore()
 
 	app := NewApp()
@@ -23,6 +25,14 @@ func setLogger() {
 	log.SetFormatter(&log.TextFormatter{
 		FullTimestamp: true,
 	})
+}
+
+func listConfig() {
+	conf, err := config.New()
+	if err != nil {
+		log.Fatalf("error getting config: ", err)
+	}
+	log.Printf("%+v\n", *conf)
 }
 
 func initStore() {

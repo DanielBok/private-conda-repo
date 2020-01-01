@@ -37,5 +37,5 @@ CLI Registry details:
 }
 
 func init() {
-	RootCmd.AddCommand(setCmd, loginCmd, logoutCmd)
+	RootCmd.AddCommand(setCmd, loginCmd, logoutCmd, registerCmd)
 }

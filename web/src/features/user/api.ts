@@ -1,4 +1,5 @@
 import api, { ThunkFunction, ThunkFunctionAsync } from "@/infrastructure/api";
+import { notification } from "antd";
 import * as UserAction from "./actions";
 
 import { UserStorage } from "./localstorage";
@@ -30,6 +31,9 @@ export const createUser = (
   if (status === 200) {
     dispatch(UserAction.createUserAsync.success(payload));
     UserStorage.save(payload);
+    notification.success({
+      message: `User: ${payload.channel} created. Looking forward to your contributions!`
+    });
   } else {
     dispatch(UserAction.createUserAsync.failure());
     UserStorage.clear();

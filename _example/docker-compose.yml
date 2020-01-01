@@ -21,10 +21,14 @@ services:
   server:
     image: danielbok/pcr-server
     ports:
-      - "5050:5050"    
+      - "5050:5050"
       - "5060:5060"
+    environment: 
+      - PCR_CONDA.USE=shell
     volumes: 
-      - /var/run/docker.sock:/var/run/docker.sock
+      - C:/temp/condapkg:/var/condapkg
+      # if overriding default config file
+      # - C:/temp/my-config.yaml:/var/private-conda-repo/config.yaml
     depends_on: 
       - postgres
 

@@ -7,4 +7,4 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - path/to/certs:/etc/nginx/certs
+      - ./certs:/etc/nginx/certs

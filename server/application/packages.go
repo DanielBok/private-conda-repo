@@ -40,7 +40,7 @@ func ListAllPackages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var output []*condatypes.ChannelMetaPackageOutput
+	output := []*condatypes.ChannelMetaPackageOutput{}
 	for _, c := range channels {
 		meta, err := c.GetMetaInfo()
 		if err != nil {

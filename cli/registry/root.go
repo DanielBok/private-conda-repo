@@ -2,7 +2,6 @@ package registry
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -19,6 +18,13 @@ error if the private conda repository's url is not set.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		conf := config.New()
 		registry := conf.Registry
+
+		if len(args) > 0 {
+			c := strings.Join(args, " ")
+			cmd.Printf("%s is not a valid command", c)
+			return
+		}
+
 		if registry == "" {
 			registry = "<undefined: Please set registry with 'pcr registry set'>"
 		}
@@ -28,11 +34,17 @@ error if the private conda repository's url is not set.`,
 			channel = "<Not logged in: Please login with 'pcr registry login'>"
 		}
 
-		log.Println(strings.TrimSpace(fmt.Sprintf(`
+		cmd.Println(strings.TrimSpace(fmt.Sprintf(`
 CLI Registry details:
 	Registry:     %s
 	Channel :     %s
-`, registry, channel)))
+
+Use "%s registry --help" for more information.
+
+Registry should be the api server that is used to create and add channel. 
+Usually this is https://<host>:5060. Remember to set it with the "set"
+command. 
+`, registry, channel, strings.Split(cmd.CommandPath(), " ")[0])))
 	},
 }
 

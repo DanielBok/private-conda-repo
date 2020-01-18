@@ -3,7 +3,6 @@ package registry
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 
@@ -27,17 +26,36 @@ var registerCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, _ []string) {
 		handler := registerHandler{cmd: cmd}
-		channel := handler.getValue("channel", 0)
-		password := handler.getValue("password", '*')
-		email := handler.getValue("email", 0)
+		channel, err := handler.getValue("channel", 0)
+		if err != nil {
+			cmd.PrintErr(err)
+			return
+		}
 
-		handler.registerChannel(channel, password, email)
+		password, err := handler.getValue("password", '*')
+		if err != nil {
+			cmd.PrintErr(err)
+			return
+		}
+
+		email, err := handler.getValue("email", 0)
+		if err != nil {
+			cmd.PrintErr(err)
+			return
+		}
+
+		err = handler.registerChannel(channel, password, email)
+		if err != nil {
+			cmd.PrintErr(err)
+			return
+		}
+
 		conf := config.New()
 		conf.Channel.Channel = channel
 		conf.Channel.Password = password
 
 		conf.Save()
-		log.Printf("Created and logged in as channel '%s'", channel)
+		cmd.Printf("Created and logged in as channel '%s'", channel)
 	},
 }
 
@@ -45,25 +63,27 @@ type registerHandler struct {
 	cmd *cobra.Command
 }
 
-func (h *registerHandler) getValue(flag string, mask rune) string {
-	value := h.getFlag(flag)
-	if value != "" {
-		return value
+func (h *registerHandler) getValue(flag string, mask rune) (string, error) {
+	value, err := h.getFlag(flag)
+	if err != nil {
+		return "", err
+	} else if value != "" {
+		return value, nil
 	}
 
 	return h.promptValue(strings.Title(flag), mask)
 }
 
-func (h *registerHandler) getFlag(flag string) string {
+func (h *registerHandler) getFlag(flag string) (string, error) {
 	value, err := h.cmd.Flags().GetString(flag)
 	if err != nil {
-		log.Fatalln(err)
+		return "", errors.Wrapf(err, "could not get %s flag value", flag)
 	}
 
-	return strings.TrimSpace(value)
+	return strings.TrimSpace(value), nil
 }
 
-func (h *registerHandler) promptValue(label string, mask rune) string {
+func (h *registerHandler) promptValue(label string, mask rune) (string, error) {
 	prompt := promptui.Prompt{
 		Label: label,
 		Validate: func(input string) error {
@@ -81,15 +101,15 @@ func (h *registerHandler) promptValue(label string, mask rune) string {
 
 	value, err := prompt.Run()
 	if err != nil {
-		log.Fatalln(err)
+		return "", err
 	}
-	return value
+	return value, nil
 }
 
-func (h *registerHandler) registerChannel(channel, password, email string) {
+func (h *registerHandler) registerChannel(channel, password, email string) error {
 	conf := config.New()
 	if !conf.HasRegistry() {
-		return
+		return nil
 	}
 
 	payload := strings.NewReader(fmt.Sprintf(`{
@@ -100,15 +120,17 @@ func (h *registerHandler) registerChannel(channel, password, email string) {
 
 	resp, err := http.Post(conf.Registry+"/user", "application/json", payload)
 	if err != nil {
-		log.Fatalln(errors.Wrap(err, "could not create account"))
+		return errors.Wrap(err, "could not create account")
 	}
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			log.Fatalln("error encountered and could not decipher error message from server", err)
+			return errors.Wrap(err, "error encountered and could not decipher error message from server")
 		}
-		log.Fatalf("could not create account: %s", string(body))
+		return errors.Errorf("could not create account: %s", string(body))
 	}
+
+	return nil
 }

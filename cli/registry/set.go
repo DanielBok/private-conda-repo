@@ -3,7 +3,6 @@ package registry
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -21,14 +20,18 @@ for the cli to work correctly`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		handler := setHandler{cmd: cmd}
-		handler.fetchMeta(args[0])
+		err := handler.fetchMeta(args[0])
+		if err != nil {
+			cmd.PrintErr(err)
+			return
+		}
 
 		conf := config.New()
 		conf.Registry = handler.Registry
 		conf.PackageRepository = handler.Repository
 
 		conf.Save()
-		log.Printf(strings.TrimSpace(fmt.Sprintf(`Set registry target to:
+		cmd.Printf(strings.TrimSpace(fmt.Sprintf(`Set registry target to:
 	Registry:   %s
 	Repository: %s
 `, conf.Registry, conf.PackageRepository)))
@@ -45,18 +48,20 @@ type registryMeta struct {
 	Repository string `json:"repository"`
 }
 
-func (h *setHandler) fetchMeta(host string) {
+func (h *setHandler) fetchMeta(host string) error {
 	resp, err := http.Get(host + "/meta")
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "could not fetch meta information from registry. Is this a valid Private Conda Repo?"))
+		return errors.Wrap(err, "could not fetch meta information from registry. Is this a valid Private Conda Repo?")
 	}
 	defer func() { _ = resp.Body.Close() }()
 
 	var meta registryMeta
 	if err := json.NewDecoder(resp.Body).Decode(&meta); err != nil {
-		log.Fatal(errors.Wrap(err, "could not parse meta information from registry"))
+		return errors.Wrap(err, "could not parse meta information from registry")
 	}
 
 	h.Registry = meta.Registry
 	h.Repository = meta.Repository
+
+	return nil
 }

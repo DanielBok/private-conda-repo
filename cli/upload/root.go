@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -29,10 +28,19 @@ var RootCmd = &cobra.Command{
 		file := args[0]
 		handler := newUploadHandler()
 
-		handler.verifyPackage(file)
-		pkg := handler.uploadPackage()
+		err := handler.verifyPackage(file)
+		if err != nil {
+			cmd.PrintErr(err)
+			return
+		}
 
-		log.Printf(strings.TrimSpace(fmt.Sprintf(`
+		pkg, err := handler.uploadPackage()
+		if err != nil {
+			cmd.PrintErr(err)
+			return
+		}
+
+		cmd.Printf(strings.TrimSpace(fmt.Sprintf(`
 Uploaded file '%s' successfully
 Details
 	Name:         %s
@@ -62,9 +70,9 @@ func newUploadHandler() uploadHandler {
 	return h
 }
 
-func (h *uploadHandler) verifyPackage(file string) {
+func (h *uploadHandler) verifyPackage(file string) error {
 	if !strings.HasSuffix(file, ".tar.bz2") {
-		log.Fatalln("expect conda package should have extension '.tar.bz2'")
+		return errors.New("expect conda package should have extension '.tar.bz2'")
 	}
 
 	if cwd, err := os.Getwd(); err == nil {
@@ -72,66 +80,65 @@ func (h *uploadHandler) verifyPackage(file string) {
 		path := filepath.Join(cwd, file)
 		if _, err := os.Stat(path); err == nil {
 			h.packagePath = path
-			return
+			return nil
 		}
 	}
 
 	// absolute path
 	if _, err := os.Stat(file); err == nil {
 		h.packagePath = file
-		return
+		return nil
 	}
 
-	log.Fatal("package does not exist")
+	return errors.New("package does not exist")
 }
 
-func (h *uploadHandler) uploadPackage() *Package {
+func (h *uploadHandler) uploadPackage() (*Package, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
 	if err := writer.WriteField("channel", h.channel); err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	if err := writer.WriteField("password", h.password); err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	parts, err := writer.CreateFormFile("file", filepath.Base(h.packagePath))
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	// Write package file into form field
 	file, err := os.Open(h.packagePath)
 	if err != nil {
-		log.Fatalf("could not open file at %s", h.packagePath)
+		return nil, errors.Errorf("could not open file at %s", h.packagePath)
 	}
 	if _, err = io.Copy(parts, file); err != nil {
-		log.Fatalf("could not copy file to form payload")
+		return nil, errors.New("could not copy file to form payload")
 	}
 
 	if err := writer.Close(); err != nil {
-		log.Fatalf("could not close form for upload")
+		return nil, errors.New("could not close form for upload")
 	}
 
 	resp, err := http.Post(h.url, writer.FormDataContentType(), body)
 	if err != nil {
-		log.Fatal(errors.Wrap(err, "package upload failed"))
+		return nil, errors.Wrap(err, "package upload failed")
 	}
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == 200 {
 		var output Package
 		if err := json.NewDecoder(resp.Body).Decode(&output); err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
-		return &output
+		return &output, nil
 	}
 
 	errorMessage, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal("Double whammy. Upload failed and cannot parse reason")
+		return nil, errors.New("Double whammy. Upload failed and cannot parse reason")
 	}
-	log.Fatalf("Upload failed: %s", string(errorMessage))
 
-	return nil
+	return nil, errors.Errorf("Upload failed: %s", string(errorMessage))
 }

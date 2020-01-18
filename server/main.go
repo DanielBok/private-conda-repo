@@ -28,11 +28,10 @@ func setLogger() {
 }
 
 func listConfig() {
-	conf, err := config.New()
+	_, err := config.New()
 	if err != nil {
 		log.Fatalf("error getting config: ", err)
 	}
-	log.Printf("%+v\n", *conf)
 }
 
 func initStore() {

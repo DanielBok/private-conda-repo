@@ -1,5 +1,6 @@
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 const CracoAntDesignPlugin = require("craco-antd");
+const CracoRawLoaderPlugin = require("@baristalabs/craco-raw-loader");
 const WebpackBar = require("webpackbar");
 
 const path = require("path");
@@ -47,6 +48,12 @@ module.exports = {
           },
           localsConvention: "camelCase"
         }
+      }
+    },
+    {
+      plugin: CracoRawLoaderPlugin,
+      options: {
+        test: /\.md$/
       }
     }
   ]

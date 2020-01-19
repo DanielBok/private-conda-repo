@@ -1,6 +1,7 @@
 declare module "*.less";
 declare module "*.png";
 declare module "*.svg";
+declare module "*.md";
 
 type LoadingState = "REQUEST" | "SUCCESS" | "FAILURE";
 

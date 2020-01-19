@@ -12,7 +12,15 @@ export default () => {
 
   return (
     <Menu mode="horizontal" selectedKeys={[""]}>
-      {validated && (
+      <Menu.Item
+        key="help"
+        onClick={() => {
+          dispatch(push("/help"));
+        }}
+      >
+        Help
+      </Menu.Item>
+      {validated ? (
         <Menu.SubMenu
           title={
             <span className={styles.user}>
@@ -31,9 +39,7 @@ export default () => {
             Logout
           </Menu.Item>
         </Menu.SubMenu>
-      )}
-
-      {!validated && (
+      ) : (
         <Menu.Item
           key="login-register"
           onClick={() => dispatch(push("/account"))}

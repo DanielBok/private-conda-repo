@@ -3,12 +3,10 @@ import RouteSwitch from "./RouteSwitch";
 import React from "react";
 import Layout from "./Layout";
 
-export default () => {
-  return (
-    <Layout>
-      <ErrorBoundary>
-        <RouteSwitch />
-      </ErrorBoundary>
-    </Layout>
-  );
-};
+export default () => (
+  <Layout>
+    <ErrorBoundary>
+      <RouteSwitch />
+    </ErrorBoundary>
+  </Layout>
+);

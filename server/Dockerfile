@@ -14,6 +14,7 @@ RUN conda config --set always_yes true && \
 RUN mkdir -p /var/condapkg
 
 WORKDIR /app
+COPY store/migrations                   store/migrations
 COPY --from=builder /app/pcr            pcr
 COPY --from=builder /app/config.yaml    /var/private-conda-repo/config.yaml
 

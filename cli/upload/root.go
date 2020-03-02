@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/ioutil"
 	"mime/multipart"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"cli/config"
+	"cli/request"
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -121,7 +121,7 @@ func (h *uploadHandler) uploadPackage() (*Package, error) {
 		return nil, errors.New("could not close form for upload")
 	}
 
-	resp, err := http.Post(h.url, writer.FormDataContentType(), body)
+	resp, err := request.Post(h.url, writer.FormDataContentType(), body)
 	if err != nil {
 		return nil, errors.Wrap(err, "package upload failed")
 	}

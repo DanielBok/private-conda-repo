@@ -3,13 +3,13 @@ package registry
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"cli/config"
+	"cli/request"
 )
 
 var setCmd = &cobra.Command{
@@ -49,7 +49,7 @@ type registryMeta struct {
 }
 
 func (h *setHandler) fetchMeta(host string) error {
-	resp, err := http.Get(host + "/meta")
+	resp, err := request.Get(host + "/meta")
 	if err != nil {
 		return errors.Wrap(err, "could not fetch meta information from registry. Is this a valid Private Conda Repo?")
 	}

@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"cli/config"
+	"cli/request"
 )
 
 func init() {
@@ -118,7 +119,7 @@ func (h *registerHandler) registerChannel(channel, password, email string) error
 		"email": "%s"
 	}`, channel, password, email))
 
-	resp, err := http.Post(conf.Registry+"/user", "application/json", payload)
+	resp, err := request.Post(conf.Registry+"/user", "application/json", payload)
 	if err != nil {
 		return errors.Wrap(err, "could not create account")
 	}

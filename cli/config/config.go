@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
@@ -18,34 +17,32 @@ type Config struct {
 	Registry          string  `mapstructure:"registry" yaml:"registry"`
 	Channel           Channel `mapstructure:"channel" yaml:"channel"`
 	PackageRepository string  `mapstructure:"package_repository" yaml:"package_repository"`
+	SslVerify         bool    `mapstructure:"ssl_verify" yaml:"ssl_verify"`
 }
 
 var (
-	once           sync.Once
-	conf           Config
 	configFilePath string
 )
 
 func New() *Config {
-	once.Do(func() {
-		home, err := homedir.Dir()
-		if err != nil {
-			log.Fatalln(err)
-		}
+	home, err := homedir.Dir()
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-		viper.AddConfigPath(home)
-		viper.SetConfigType("yaml")
-		viper.SetConfigName(".pcrrc")
+	viper.AddConfigPath(home)
+	viper.SetConfigType("yaml")
+	viper.SetConfigName(".pcrrc")
 
-		if err := viper.ReadInConfig(); err != nil {
-			log.Fatalln(errors.Wrap(err, "could not read in config"))
-		}
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalln(errors.Wrap(err, "could not read in config"))
+	}
 
-		if err := viper.Unmarshal(&conf); err != nil {
-			log.Fatalln(errors.Wrap(err, "could not unmarshal config"))
-		}
-		conf.Registry = strings.TrimSpace(strings.TrimRight(conf.Registry, "/"))
-	})
+	var conf Config
+	if err := viper.Unmarshal(&conf); err != nil {
+		log.Fatalln(errors.Wrap(err, "could not unmarshal config"))
+	}
+	conf.Registry = strings.TrimSpace(strings.TrimRight(conf.Registry, "/"))
 	return &conf
 }
 
@@ -66,7 +63,7 @@ func init() {
 }
 
 func (c *Config) HasRegistry() bool {
-	if conf.Registry == "" {
+	if c.Registry == "" {
 		log.Println("Registry location not set. Please use 'pcr registry set' to specify your private conda repo registry")
 		return false
 	}
@@ -75,7 +72,7 @@ func (c *Config) HasRegistry() bool {
 
 // Saves configuration to the config file
 func (c *Config) Save() {
-	out, err := yaml.Marshal(conf)
+	out, err := yaml.Marshal(c)
 	if err != nil {
 		log.Fatal(err)
 	}

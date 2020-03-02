@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"cli/config"
+	"cli/request"
 )
 
 func init() {
@@ -110,7 +111,7 @@ func (h *loginHandler) validateChannelCredentials(channel, password string) erro
 		"password": "%s"
 	}`, channel, password))
 
-	resp, err := http.Post(conf.Registry+"/user/check", "application/json", payload)
+	resp, err := request.Post(conf.Registry+"/user/check", "application/json", payload)
 	if err != nil {
 		return errors.Wrap(err, "could not check user information against server")
 	}

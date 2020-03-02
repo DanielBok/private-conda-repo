@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"cli/config"
 	"cli/registry"
 	"cli/upload"
 )
@@ -21,7 +22,7 @@ application. This tool is catered for package contributors.
 func main() {
 	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
 
-	rootCmd.AddCommand(registry.RootCmd, upload.RootCmd)
+	rootCmd.AddCommand(config.RootCmd, registry.RootCmd, upload.RootCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatalln(err)

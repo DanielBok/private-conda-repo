@@ -37,7 +37,7 @@ func FileHandler(mountFolder string) http.HandlerFunc {
 		}
 
 		switch {
-		case file == "current_repodata.json":
+		case file == "current_repodata.json" || file == "repodata.json":
 			log.Infof("requesting repodata from '%s/%s'", channel, platform)
 		case strings.HasSuffix(file, ".tar.bz2"):
 			p, err := getPackageDetail(file)

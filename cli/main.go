@@ -17,6 +17,7 @@ var rootCmd = &cobra.Command{
 Aids in various aspect of using the Private Conda Repository
 application. This tool is catered for package contributors.
 `,
+	Version: "2.2",
 }
 
 func main() {

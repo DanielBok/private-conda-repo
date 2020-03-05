@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 
 	"private-conda-repo/config"
 )
@@ -15,25 +14,13 @@ type Indexer interface {
 	Update() error
 }
 
-var creators = make(map[string]func() (Indexer, error))
-
-func Register(name string, creator func() (Indexer, error)) {
-	if _, dup := creators[name]; dup {
-		log.Fatalf("%s store type called twice.", name)
-	}
-	creators[name] = creator
-}
-
-func New() (Indexer, error) {
-	conf, err := config.New()
-	if err != nil {
-		return nil, err
-	}
-
-	name := strings.ToLower(strings.TrimSpace(conf.Conda.Use))
-	if creator, ok := creators[name]; !ok {
-		return nil, errors.Errorf("Unknown indexer: '%s'. Did you forget to '_ import'?", conf.Conda.Use)
-	} else {
-		return creator()
+func New(conf *config.AppConfig) (Indexer, error) {
+	switch strings.ToLower(conf.Conda.Type) {
+	case "docker":
+		return NewDockerIndexer(conf.Conda.ImageName)
+	case "shell":
+		return NewShellManager(), nil
+	default:
+		return nil, errors.Errorf("Unsupported Conda manager type: %s", conf.Conda.Type)
 	}
 }

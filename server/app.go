@@ -15,8 +15,6 @@ import (
 	"private-conda-repo/config"
 	"private-conda-repo/fileserver"
 	"private-conda-repo/indexer"
-	_ "private-conda-repo/indexer/docker"
-	_ "private-conda-repo/indexer/shell"
 )
 
 type App struct {
@@ -24,16 +22,12 @@ type App struct {
 	idleConnClosed chan struct{}
 }
 
-func NewApp() *App {
-	conf, err := config.New()
-	if err != nil {
-		log.Fatalln(err)
-	}
+func NewApp(conf *config.AppConfig) *App {
 	return &App{conf: conf}
 }
 
 func (a *App) updateIndexer() *App {
-	idx, err := indexer.New()
+	idx, err := indexer.New(a.conf)
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	"private-conda-repo/config"
@@ -16,15 +15,11 @@ type router struct {
 	*chi.Mux
 }
 
-func New() (*http.Server, error) {
-	conf, err := config.New()
-	if err != nil {
-		return nil, errors.Wrap(err, "could not start repository server due to issue with config")
-	}
+func New(conf *config.AppConfig) (*http.Server, error) {
 	addr := fmt.Sprintf(":%d", conf.FileServer.Port)
 	log.WithField("Address", addr).Info("Server details")
 
-	if err := initStore(); err != nil {
+	if err := initStore(conf); err != nil {
 		return nil, err
 	}
 

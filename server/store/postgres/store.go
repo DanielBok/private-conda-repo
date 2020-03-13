@@ -20,12 +20,8 @@ func init() {
 	store.Register("postgres", New)
 }
 
-func New() (store.Store, error) {
-	conf, err := config.New()
-	if err != nil {
-		return nil, err
-	}
-
+func New(conf *config.AppConfig) (store.Store, error) {
+	var err error
 	cs := conf.DB.ConnectionString()
 
 	// waiting for db to be ready
@@ -37,7 +33,6 @@ func New() (store.Store, error) {
 		}
 		wait += i
 		time.Sleep(time.Duration(wait) * time.Second)
-
 	}
 
 	return nil, errors.Wrapf(err, "could not connect to database with '%s'", cs)

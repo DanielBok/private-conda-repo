@@ -3,6 +3,7 @@ package storemock
 import (
 	"github.com/stretchr/testify/mock"
 
+	"private-conda-repo/config"
 	"private-conda-repo/store"
 )
 
@@ -14,7 +15,7 @@ func init() {
 	store.Register("mock", New)
 }
 
-func New() (store.Store, error) {
+func New(_ *config.AppConfig) (store.Store, error) {
 	s := &MockStore{}
 
 	// Returns are matched by the actual method

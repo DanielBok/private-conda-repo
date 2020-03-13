@@ -11,6 +11,7 @@ import (
 
 	_ "private-conda-repo/conda/condamocks"
 	"private-conda-repo/conda/condatypes"
+	"private-conda-repo/config"
 	_ "private-conda-repo/store/storemock"
 )
 
@@ -23,7 +24,11 @@ func init() {
 	viper.Set("conda.type", "mock")
 	viper.Set("decompressor.type", "mock")
 
-	if err := initStore(); err != nil {
+	conf, err := config.New()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if err := initStore(conf); err != nil {
 		log.Fatalln(err)
 	}
 }

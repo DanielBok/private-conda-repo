@@ -2,24 +2,18 @@ package decompressor
 
 import (
 	"io"
-
-	"private-conda-repo/config"
+	"strings"
 )
 
 type Decompressor interface {
 	RetrieveMetadata(file io.ReadCloser) (*Package, error)
 }
 
-func New() (Decompressor, error) {
-	conf, err := config.New()
-	if err != nil {
-		return nil, err
-	}
-
-	switch conf.Decompressor.Type {
+func New(decompressor string) Decompressor {
+	switch strings.ToLower(strings.TrimSpace(decompressor)) {
 	case "mock":
-		return &mockDecompressor{}, nil
+		return &mockDecompressor{}
 	default:
-		return &tarBz2Decompressor{}, nil
+		return &tarBz2Decompressor{}
 	}
 }

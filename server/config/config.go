@@ -11,7 +11,7 @@ import (
 
 type AppConfig struct {
 	Admin        adminProfile `mapstructure:"admin"`
-	Conda        condaConfig  `mapstructure:"conda"`
+	Conda        CondaConfig  `mapstructure:"conda"`
 	DB           database     `mapstructure:"db"`
 	UserConfig   userConfig   `mapstructure:"user"`
 	FileServer   server       `mapstructure:"fileserver"`

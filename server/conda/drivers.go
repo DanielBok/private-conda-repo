@@ -5,21 +5,13 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-
-	"private-conda-repo/config"
 )
 
 var drivers = make(map[string]Conda)
 
-func New() (Conda, error) {
-	conf, err := config.New()
-	if err != nil {
-		return nil, err
-	}
-
-	name := strings.ToLower(strings.TrimSpace(conf.Conda.Type))
-	if drv, ok := drivers[name]; !ok {
-		return nil, errors.Errorf("Unknown conda repository driver: '%s'", conf.Conda.Type)
+func New(condaDriver string) (Conda, error) {
+	if drv, ok := drivers[strings.ToLower(strings.TrimSpace(condaDriver))]; !ok {
+		return nil, errors.Errorf("Unknown conda repository driver: '%s'", condaDriver)
 	} else {
 		return drv, nil
 	}

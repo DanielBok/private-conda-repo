@@ -15,7 +15,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	indMgr, err = indexer.New(conf)
+	indMgr, err = indexer.New(conf.Conda)
 	if err != nil {
 		log.Fatal(err)
 	}

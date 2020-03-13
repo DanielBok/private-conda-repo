@@ -14,13 +14,13 @@ type Indexer interface {
 	Update() error
 }
 
-func New(conf *config.AppConfig) (Indexer, error) {
-	switch strings.ToLower(conf.Conda.Type) {
+func New(conf config.CondaConfig) (Indexer, error) {
+	switch strings.ToLower(conf.Use) {
 	case "docker":
-		return NewDockerIndexer(conf.Conda.ImageName)
+		return NewDockerIndexer(conf.ImageName)
 	case "shell":
 		return NewShellManager(), nil
 	default:
-		return nil, errors.Errorf("Unsupported Conda manager type: %s", conf.Conda.Type)
+		return nil, errors.Errorf("Unsupported Conda manager type: %s", conf.Use)
 	}
 }

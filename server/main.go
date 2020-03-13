@@ -10,11 +10,15 @@ import (
 )
 
 func main() {
-	setLogger()
-	listConfig()
-	initStore()
+	conf, err := config.New()
+	if err != nil {
+		log.Fatalf("error getting config: %v", err)
+	}
 
-	app := NewApp()
+	setLogger()
+	initStore(conf)
+
+	app := NewApp(conf)
 	app.updateIndexer()
 	<-app.runServers()
 }
@@ -27,15 +31,8 @@ func setLogger() {
 	})
 }
 
-func listConfig() {
-	_, err := config.New()
-	if err != nil {
-		log.Fatalf("error getting config: ", err)
-	}
-}
-
-func initStore() {
-	s, err := store.New()
+func initStore(conf *config.AppConfig) {
+	s, err := store.New(conf)
 	if err != nil {
 		log.Fatalln(err)
 	}

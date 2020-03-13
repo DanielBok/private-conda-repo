@@ -24,25 +24,20 @@ type Store interface {
 	RemovePackageCount(pkg *models.PackageCount) error
 }
 
-var stores = make(map[string]func() (Store, error))
+var stores = make(map[string]func(conf *config.AppConfig) (Store, error))
 
-func Register(name string, creator func() (Store, error)) {
+func Register(name string, creator func(conf *config.AppConfig) (Store, error)) {
 	if _, dup := stores[name]; dup {
 		log.Fatalf("%s store type called twice.", name)
 	}
 	stores[name] = creator
 }
 
-func New() (Store, error) {
-	conf, err := config.New()
-	if err != nil {
-		return nil, err
-	}
-
+func New(conf *config.AppConfig) (Store, error) {
 	name := strings.ToLower(strings.TrimSpace(conf.DB.Type))
 	if createStore, ok := stores[name]; !ok {
 		return nil, errors.Errorf("Unknown database driver: '%s'. Did you forget to '_ import'?", conf.DB.Type)
 	} else {
-		return createStore()
+		return createStore(conf)
 	}
 }

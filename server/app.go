@@ -27,7 +27,7 @@ func NewApp(conf *config.AppConfig) *App {
 }
 
 func (a *App) updateIndexer() *App {
-	idx, err := indexer.New(a.conf)
+	idx, err := indexer.New(a.conf.Conda)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -46,11 +46,11 @@ func (a *App) updateIndexer() *App {
 // Runs the servers. Returns a channel for graceful shutdown
 func (a *App) runServers() <-chan struct{} {
 	var _error error
-	fileSrv, err := fileserver.New()
+	fileSrv, err := fileserver.New(a.conf)
 	if err != nil {
 		_error = multierror.Append(_error, errors.Wrap(err, "Could not create file server"))
 	}
-	appSrv, err := application.New()
+	appSrv, err := application.New(a.conf)
 	if err != nil {
 		_error = multierror.Append(_error, errors.Wrap(err, "Could not create application server"))
 	}

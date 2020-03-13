@@ -1,8 +1,9 @@
 package config
 
 import (
-	"os"
 	"strings"
+
+	"private-conda-repo/libs"
 )
 
 type tls struct {
@@ -17,11 +18,11 @@ func (t *tls) HasCert() bool {
 		return false
 	}
 
-	if _, err := os.Stat(t.Cert); os.IsNotExist(err) {
+	if libs.PathExists(t.Cert) {
 		return false
 	}
 
-	if _, err := os.Stat(t.Key); os.IsNotExist(err) {
+	if libs.PathExists(t.Key) {
 		return false
 	}
 

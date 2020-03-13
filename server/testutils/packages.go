@@ -15,6 +15,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"private-conda-repo/conda/condatypes"
+	"private-conda-repo/libs"
 )
 
 type TestPackage struct {
@@ -50,7 +51,7 @@ func appendTestPackage(url string, wg *sync.WaitGroup, m *sync.Mutex) {
 	platform := parts[len(parts)-2]
 
 	pkgPath := filepath.Join(packageFolder(), filename)
-	if _, err := os.Stat(pkgPath); os.IsNotExist(err) {
+	if libs.PathExists(pkgPath) {
 		resp, err := http.Get(url)
 		if err != nil {
 			log.Fatalln(errors.Wrapf(err, "could not download '%s' from '%s'", filename, url))

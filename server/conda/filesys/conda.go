@@ -12,6 +12,7 @@ import (
 	"private-conda-repo/conda"
 	"private-conda-repo/conda/condatypes"
 	"private-conda-repo/config"
+	"private-conda-repo/libs"
 )
 
 type Conda struct {
@@ -48,7 +49,7 @@ func (c Conda) CreateChannel(channel string) (conda.Channel, error) {
 
 	for _, p := range platforms {
 		path := filepath.Join(chn.Dir(), string(p))
-		if _, err := os.Stat(path); os.IsNotExist(err) {
+		if libs.PathExists(path) {
 			err = os.MkdirAll(path, os.ModePerm)
 			if err != nil {
 				return nil, errors.Wrapf(err, "error creating platform '%s' for channel '%s'", p, channel)
@@ -64,7 +65,7 @@ func (c *Conda) GetChannel(channel string) (conda.Channel, error) {
 	if err != nil {
 		return nil, err
 	}
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+	if libs.PathExists(path) {
 		return nil, errors.Errorf("Channel '%s' does not exist", path)
 	}
 
@@ -77,7 +78,7 @@ func (c *Conda) RemoveChannel(channel string) error {
 		return err
 	}
 
-	if _, err := os.Stat(chn.Dir()); os.IsNotExist(err) {
+	if libs.PathExists(chn.Dir()) {
 		return errors.Errorf("channel '%s' does not exist", channel)
 	}
 
@@ -99,7 +100,7 @@ func (c *Conda) ChangeChannelName(oldChannel, newChannel string) (conda.Channel,
 	newFolder, err := c.getChannelPath(newChannel)
 	if err != nil {
 		_errors = multierror.Append(_errors, errors.Wrapf(err, "Invalid channel '%s'", newChannel))
-	} else if _, err := os.Stat(newFolder); !os.IsNotExist(err) {
+	} else if libs.PathExists(newFolder) {
 		_errors = multierror.Append(_errors, errors.Wrapf(err, "Channel '%s' already exists", newChannel))
 	}
 

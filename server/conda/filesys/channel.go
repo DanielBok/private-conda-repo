@@ -13,6 +13,7 @@ import (
 
 	"private-conda-repo/conda"
 	"private-conda-repo/conda/condatypes"
+	"private-conda-repo/libs"
 )
 
 type Channel struct {
@@ -161,10 +162,7 @@ func (c *Channel) packagePath(pkg *condatypes.Package) string {
 }
 
 func (c *Channel) packageExists(pkg *condatypes.Package) bool {
-	if _, err := os.Stat(c.packagePath(pkg)); os.IsNotExist(err) {
-		return false
-	}
-	return true
+	return libs.PathExists(c.packagePath(pkg))
 }
 
 // This should be called whenever an entire package is removed from the channel.

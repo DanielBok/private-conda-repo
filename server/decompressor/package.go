@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"private-conda-repo/conda/condatypes"
+	"private-conda-repo/libs"
 )
 
 type Package struct {
@@ -24,7 +25,7 @@ func (p *Package) Close() {
 		_ = p.file.Close()
 	}
 
-	if _, err := os.Stat(p.Filepath); !os.IsNotExist(err) {
+	if libs.PathExists(p.Filepath) {
 		_ = os.Remove(p.Filepath)
 	}
 }

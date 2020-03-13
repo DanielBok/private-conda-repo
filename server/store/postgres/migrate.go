@@ -12,6 +12,8 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/golang-migrate/migrate/v4/source/github"
 	"github.com/pkg/errors"
+
+	"private-conda-repo/libs"
 )
 
 func (s *Store) Migrate() error {
@@ -36,11 +38,6 @@ func (s *Store) Migrate() error {
 }
 
 func getMigrationSourceUrl() (string, error) {
-	pathExists := func(fp string) bool {
-		_, err := os.Stat(fp)
-		return !os.IsNotExist(err)
-	}
-
 	formatFolderPath := func(folder string) string {
 		sourceUrl := "file://" + folder
 		if runtime.GOOS == "windows" {
@@ -56,14 +53,14 @@ func getMigrationSourceUrl() (string, error) {
 		return "", err
 	}
 	mgDir := filepath.Join(filepath.Dir(root), "store", "migrations")
-	if pathExists(mgDir) {
+	if libs.PathExists(mgDir) {
 		return formatFolderPath(mgDir), nil
 	}
 
 	// search from local file path, (which is usually the case during development)
 	_, file, _, _ := runtime.Caller(0)
 	mgDir = filepath.Join(filepath.Dir(file), "..", "migrations")
-	if pathExists(mgDir) {
+	if libs.PathExists(mgDir) {
 		return formatFolderPath(mgDir), nil
 	}
 

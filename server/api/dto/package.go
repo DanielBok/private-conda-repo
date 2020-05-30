@@ -1,4 +1,4 @@
-package condatypes
+package dto
 
 import (
 	"fmt"
@@ -7,10 +7,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"private-conda-repo/store/models"
+	"private-conda-repo/domain/entity"
+	"private-conda-repo/domain/enum"
 )
 
-type Package struct {
+// Package details that is received from
+type PackageDto struct {
 	Name        string `json:"name"`
 	Version     string `json:"version"`
 	BuildString string `json:"build_string"`
@@ -19,22 +21,22 @@ type Package struct {
 }
 
 // Returns the package's full filename (i.e. perfana-0.0.6-py_0.tar.bz2)
-func (p *Package) Filename() string {
+func (p *PackageDto) Filename() string {
 	return fmt.Sprintf("%s-%s-%s_%d.tar.bz2", p.Name, p.Version, p.BuildString, p.BuildNumber)
 }
 
-func (p *Package) GetPlatform() Platform {
-	platform, _ := MapPlatform(p.Platform)
+func (p *PackageDto) GetPlatform() enum.Platform {
+	platform, _ := enum.MapPlatform(p.Platform)
 	return platform
 }
 
-func (p *Package) Validate() error {
+func (p *PackageDto) Validate() error {
 	p.Name = strings.TrimSpace(p.Name)
 	if p.Name == "" {
 		return errors.New("name cannot be empty")
 	}
 
-	_, err := MapPlatform(p.Platform)
+	_, err := enum.MapPlatform(p.Platform)
 	if err != nil {
 		return err
 	}
@@ -42,9 +44,9 @@ func (p *Package) Validate() error {
 	return nil
 }
 
-func (p *Package) ToPackageCount(channel string) *models.PackageCount {
-	return &models.PackageCount{
-		Channel:     channel,
+func (p *PackageDto) ToPackageCount(channelId int) *entity.PackageCount {
+	return &entity.PackageCount{
+		ChannelId:   channelId,
 		Package:     p.Name,
 		BuildString: p.BuildString,
 		BuildNumber: p.BuildNumber,

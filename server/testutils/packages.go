@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	"private-conda-repo/conda/condatypes"
+	"private-conda-repo/api/dto"
 	"private-conda-repo/libs"
 )
 
@@ -105,25 +105,21 @@ func GetTestPackages() map[string]TestPackage {
 }
 
 func GetPackageN(n int) (TestPackage, error) {
-	if n < 0 || n >= len(urls) {
-		return TestPackage{}, errors.Errorf("n must be between 0 and %d", len(urls)-1)
-	}
-
 	for _, v := range packages {
 		if n == 0 {
 			return v, nil
 		}
 		n -= 1
 	}
-	panic("This should not happen")
+	return TestPackage{}, errors.Errorf("n must be between 0 and %d", len(urls)-1)
 }
 
-func (t *TestPackage) ToPackage() *condatypes.Package {
+func (t *TestPackage) ToPackageDto() *dto.PackageDto {
 	re := regexp.MustCompile(`([\w\-]+)-([\w.]+)-(\w+)_(\d+)\.tar\.bz2`)
 	matches := re.FindStringSubmatch(t.Filename)
 	n, _ := strconv.Atoi(matches[4])
 
-	return &condatypes.Package{
+	return &dto.PackageDto{
 		Name:        matches[1],
 		Version:     matches[2],
 		BuildString: matches[3],

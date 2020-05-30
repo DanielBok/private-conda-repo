@@ -1,4 +1,4 @@
-package condatypes
+package enum
 
 import (
 	"testing"

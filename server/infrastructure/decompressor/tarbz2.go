@@ -13,13 +13,16 @@ import (
 	"github.com/mholt/archiver/v3"
 	"github.com/pkg/errors"
 
-	"private-conda-repo/conda/condatypes"
+	"private-conda-repo/api/dto"
+	"private-conda-repo/domain/enum"
 )
 
 type tarBz2Decompressor struct{}
 
-func (b *tarBz2Decompressor) RetrieveMetadata(f io.ReadCloser) (*Package, error) {
+// Retrieves MetaData from the .tar.bz2 file
+func (b *tarBz2Decompressor) RetrieveMetadata(f io.ReadCloser) (*MetaData, error) {
 	defer func() { _ = f.Close() }()
+
 	archive, err := b.savePackageToDisk(f)
 	if err != nil {
 		return nil, err
@@ -31,7 +34,7 @@ func (b *tarBz2Decompressor) RetrieveMetadata(f io.ReadCloser) (*Package, error)
 		return nil, errors.Wrap(err, "could not retrieve package details from index.json in package .tar.gz file")
 	}
 
-	return &Package{
+	return &MetaData{
 		Package:  pkg,
 		Filepath: archive.Name(),
 	}, nil
@@ -50,8 +53,10 @@ func (b *tarBz2Decompressor) savePackageToDisk(f io.ReadCloser) (*os.File, error
 	return tmpFile, err
 }
 
-func (b *tarBz2Decompressor) extractPackageDetail(archivePath string) (*condatypes.Package, error) {
-	var pkg *condatypes.Package
+// Walks through the unzipped .tar.bz2 package and extracts information from the various json files
+// within it. At the moment, only information from the info/index.json file is extracted
+func (b *tarBz2Decompressor) extractPackageDetail(archivePath string) (*dto.PackageDto, error) {
+	var pkg *dto.PackageDto
 	var err error
 
 	tarBz2 := archiver.NewTarBz2()
@@ -61,7 +66,7 @@ func (b *tarBz2Decompressor) extractPackageDetail(archivePath string) (*condatyp
 		if f.Header.(*tar.Header).Name == "info/index.json" {
 			defer func() { _ = f.Close() }()
 
-			pkg, err = b.packageDetail(f)
+			pkg, err = b.readDetailsFromInfoIndexJson(f)
 			if err != nil {
 				return err
 			}
@@ -75,10 +80,11 @@ func (b *tarBz2Decompressor) extractPackageDetail(archivePath string) (*condatyp
 	return pkg, nil
 }
 
-func (b *tarBz2Decompressor) packageDetail(f io.Reader) (*condatypes.Package, error) {
+// Reads package details from the info/index.json file which is bundled in the conda package
+func (b *tarBz2Decompressor) readDetailsFromInfoIndexJson(f io.Reader) (*dto.PackageDto, error) {
 	var err error
 	re := regexp.MustCompile(`"([\w\-]+)": "?([\w\-.]+)"?`)
-	pkg := &condatypes.Package{}
+	pkg := &dto.PackageDto{}
 
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
@@ -109,7 +115,7 @@ func (b *tarBz2Decompressor) packageDetail(f io.Reader) (*condatypes.Package, er
 				}
 
 			case "subdir":
-				if _, err := condatypes.MapPlatform(matches[2]); err != nil {
+				if _, err := enum.MapPlatform(matches[2]); err != nil {
 					return nil, errors.Wrapf(err, "invalid platform '%s' specified in package", matches[2])
 				}
 				pkg.Platform = strings.ToLower(strings.TrimSpace(matches[2]))

@@ -1,11 +1,11 @@
-package indexer_test
+package index_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	. "private-conda-repo/indexer"
+	. "private-conda-repo/infrastructure/conda/index"
 )
 
 // This is mostly a smoke test. Because if the image already exists
@@ -13,7 +13,7 @@ import (
 func TestIndexImage_UpdateImage(t *testing.T) {
 	assert := require.New(t)
 
-	mgr, err := NewDockerIndexer("danielbok/conda-repo-mgr")
+	mgr, err := NewDockerIndex("danielbok/conda-repo-mgr")
 	assert.NoError(err)
 	err = mgr.Update()
 	assert.NoError(err)
@@ -22,8 +22,7 @@ func TestIndexImage_UpdateImage(t *testing.T) {
 func TestManager_CheckDockerVersion(t *testing.T) {
 	assert := require.New(t)
 
-	mgr, err := NewDockerIndexer("danielbok/conda-repo-mgr")
+	mgr, err := NewDockerIndex("danielbok/conda-repo-mgr")
 	assert.NoError(err)
-	err = mgr.Check()
-	assert.NoError(err)
+	assert.IsType(&DockerIndex{}, mgr)
 }

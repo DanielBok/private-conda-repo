@@ -1,4 +1,4 @@
-package indexer
+package index
 
 import (
 	"os/exec"
@@ -10,24 +10,20 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type ShellManager struct {
+type ShellIndex struct {
 }
 
-func NewShellManager() *ShellManager {
-	return &ShellManager{}
-}
-
-func (m *ShellManager) Check() error {
+func NewShellIndex() (*ShellIndex, error) {
 	if version, err := exec.Command("conda", "--version").Output(); err != nil {
-		return errors.Wrapf(err, "conda not installed")
+		return nil, errors.Wrapf(err, "conda not installed")
 	} else {
 		log.Printf("Using: %s", version)
 	}
 
-	return nil
+	return &ShellIndex{}, nil
 }
 
-func (m *ShellManager) Index(dir string) error {
+func (s *ShellIndex) Index(dir string) error {
 	cmd := []string{"index", dir}
 
 	if _, err := exec.Command("conda", cmd...).Output(); err != nil {
@@ -36,20 +32,20 @@ func (m *ShellManager) Index(dir string) error {
 
 	return nil
 }
-func (m *ShellManager) Update() error {
-	exists, err := m.condaBuildExist()
+func (s *ShellIndex) Update() error {
+	exists, err := s.condaBuildExist()
 	if err != nil {
 		return errors.Wrap(err, " could not install conda build")
 	}
 
 	if !exists {
-		return m.installCondaBuild()
+		return s.installCondaBuild()
 	}
 
 	return nil
 }
 
-func (m *ShellManager) condaBuildExist() (bool, error) {
+func (s *ShellIndex) condaBuildExist() (bool, error) {
 	cmd := []string{"list", "-f", "conda-build"}
 	output, err := exec.Command("conda", cmd...).CombinedOutput()
 	if err != nil {
@@ -59,7 +55,7 @@ func (m *ShellManager) condaBuildExist() (bool, error) {
 	return regexp.MatchString("conda-build", strings.TrimSpace(string(output)))
 }
 
-func (m *ShellManager) installCondaBuild() error {
+func (s *ShellIndex) installCondaBuild() error {
 	cmd := []string{"install", "-y", "conda-build"}
 	if _, err := exec.Command("conda", cmd...).Output(); err != nil {
 		return errors.Wrap(err, "could not install conda-build package")

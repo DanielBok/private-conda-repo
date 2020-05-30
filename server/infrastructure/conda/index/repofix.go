@@ -18,7 +18,7 @@ import (
 // introduces. For example, conda index will unnecessarily create a dependency on
 // python_abi which is usually not what we want. This function maybe deprecated in
 // a future version after checking that conda index doesn't do anything weird.
-func fixRepoDataFiles(channelPath string) error {
+func fixRepoDataFiles(channelPath string, fixes []string) error {
 	if !libs.PathExists(channelPath) {
 		return errors.Errorf("channel path: '%s' does not exist", channelPath)
 	}
@@ -42,7 +42,7 @@ func fixRepoDataFiles(channelPath string) error {
 			}
 
 			fp := filepath.Join(folder, file)
-			data, hasChanges, err := FixRepoData(fp)
+			data, hasChanges, err := FixRepoData(fp, fixes)
 			if err != nil {
 				return err
 			}
@@ -58,6 +58,51 @@ func fixRepoDataFiles(channelPath string) error {
 	}
 
 	return nil
+}
+
+func FixRepoData(fp string, fixes []string) (repoData *condatypes.RepoData, hasChanges bool, err error) {
+	fixSet := make(map[string]bool)
+	for _, name := range fixes {
+		fixSet[strings.ToLower(strings.TrimSpace(name))] = true
+	}
+
+	if len(fixSet) == 0 {
+		return
+	}
+
+	dir, file := filepath.Split(fp)
+	path := filepath.Join(filepath.Base(dir), file) // return "informative: filepath. i.e. noarch/repodata.json
+
+	f, err := os.Open(fp)
+	if err != nil {
+		return nil, false, errors.Wrapf(err, "could not read %s", path)
+	}
+
+	err = json.NewDecoder(f).Decode(&repoData)
+	if err != nil {
+		return nil, false, errors.Wrapf(err, "could not decode %s", path)
+	}
+
+	for k, v := range repoData.Packages {
+		var depends []string
+		for _, dependency := range v.Depends {
+			dependency = strings.ToLower(dependency)
+
+			if fixSet["abi"] && strings.HasPrefix(dependency, "python_abi") {
+				// remove pesky python_abi which is caused when conda-build puts in a specific abi dependency
+				// when it is not needed thus rendering the package impossible to download.
+				hasChanges = true // do not add python_abi dependency
+				continue
+			}
+
+			depends = append(depends, dependency)
+
+		}
+
+		repoData.Packages[k].Depends = depends
+	}
+
+	return
 }
 
 func overwriteRepoDataFile(data *condatypes.RepoData, fp string) error {
@@ -78,45 +123,10 @@ func overwriteRepoDataFile(data *condatypes.RepoData, fp string) error {
 	return nil
 }
 
-func FixRepoData(fp string) (repoData *condatypes.RepoData, hasChanges bool, err error) {
-	dir, file := filepath.Split(fp)
-	path := filepath.Join(filepath.Base(dir), file) // return "informative: filepath. i.e. noarch/repodata.json
-
-	f, err := os.Open(fp)
-	if err != nil {
-		return nil, false, errors.Wrapf(err, "could not read %s", path)
-	}
-
-	err = json.NewDecoder(f).Decode(&repoData)
-	if err != nil {
-		return nil, false, errors.Wrapf(err, "could not decode %s", path)
-	}
-
-	for k, v := range repoData.Packages {
-		var depends []string
-		for _, dependency := range v.Depends {
-			dependency = strings.ToLower(dependency)
-
-			// remove pesky python_abi which is caused when conda-build puts in a specific abi dependency
-			// when it is not needed thus rendering the package impossible to download.
-			if strings.HasPrefix(dependency, "python_abi") {
-				hasChanges = true // do no add this dependency skip
-			} else {
-				depends = append(depends, dependency)
-			}
-
-		}
-
-		repoData.Packages[k].Depends = depends
-	}
-
-	return
+func (d *DockerIndex) FixRepoData(dir string, fixes []string) error {
+	return fixRepoDataFiles(dir, fixes)
 }
 
-func (d *DockerIndex) FixRepoData(dir string) error {
-	return fixRepoDataFiles(dir)
-}
-
-func (s *ShellIndex) FixRepoData(dir string) error {
-	return fixRepoDataFiles(dir)
+func (s *ShellIndex) FixRepoData(dir string, fixes []string) error {
+	return fixRepoDataFiles(dir, fixes)
 }

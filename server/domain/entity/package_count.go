@@ -1,10 +1,10 @@
-package models
+package entity
 
 import "time"
 
 type PackageCount struct {
 	Id          int       `json:"-"`
-	Channel     string    `json:"channel"` // this will be the channel name as well
+	ChannelId   int       `json:"-"`
 	Package     string    `json:"package"`
 	BuildString string    `json:"build_string"`
 	BuildNumber int       `json:"build_number"`

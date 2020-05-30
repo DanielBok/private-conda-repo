@@ -1,4 +1,4 @@
-package models
+package entity
 
 import (
 	"testing"
@@ -13,12 +13,12 @@ func TestUser_IsValid(t *testing.T) {
 	goodUsername := "good" // Must be >= 4 characters
 
 	tests := []struct {
-		user     User
+		user     Channel
 		domain   string
 		hasError bool
 	}{
 		{
-			User{
+			Channel{
 				Channel:  "bad",
 				Password: goodPassword,
 				Email:    goodEmail,
@@ -27,7 +27,7 @@ func TestUser_IsValid(t *testing.T) {
 			true,
 		},
 		{
-			User{
+			Channel{
 				Channel:  "A-really-long-name-with-valid-characters-but-is-more-than-the-limit-of-50-characters",
 				Password: goodPassword,
 				Email:    goodEmail,
@@ -36,7 +36,7 @@ func TestUser_IsValid(t *testing.T) {
 			true,
 		},
 		{
-			User{
+			Channel{
 				Channel:  goodUsername,
 				Password: "bad",
 				Email:    goodEmail,
@@ -45,7 +45,7 @@ func TestUser_IsValid(t *testing.T) {
 			true,
 		},
 		{
-			User{
+			Channel{
 				Channel:  goodUsername,
 				Password: goodPassword,
 				Email:    "badEmail",
@@ -54,7 +54,7 @@ func TestUser_IsValid(t *testing.T) {
 			true,
 		},
 		{
-			User{
+			Channel{
 				Channel:  goodUsername,
 				Password: goodPassword,
 				Email:    "email@bad-domain.com",
@@ -63,7 +63,7 @@ func TestUser_IsValid(t *testing.T) {
 			true,
 		},
 		{
-			User{
+			Channel{
 				Channel:  goodUsername,
 				Password: goodPassword,
 				Email:    goodEmail,
@@ -72,7 +72,7 @@ func TestUser_IsValid(t *testing.T) {
 			true,
 		},
 		{
-			User{
+			Channel{
 				Channel:  goodUsername,
 				Password: goodPassword,
 				Email:    goodEmail,
@@ -81,7 +81,7 @@ func TestUser_IsValid(t *testing.T) {
 			false,
 		},
 		{
-			User{
+			Channel{
 				Channel:  goodUsername,
 				Password: goodPassword,
 				Email:    goodEmail,
@@ -103,14 +103,12 @@ func TestUser_IsValid(t *testing.T) {
 }
 
 func TestUser_HasValidPassword(t *testing.T) {
-	viper.Set("salt", "test-salt")
+	salt := "salt"
 
-	u, err := NewUser("daniel", "good-password", "daniel@gmail.com")
-	require.NoError(t, err)
-
-	valid := u.HasValidPassword("bad-password")
+	c := NewChannel("daniel", "good-password", "daniel@gmail.com", salt)
+	valid := c.HasValidPassword("bad-password", salt)
 	require.False(t, valid)
 
-	valid = u.HasValidPassword("good-password")
+	valid = c.HasValidPassword("good-password", salt)
 	require.True(t, valid)
 }

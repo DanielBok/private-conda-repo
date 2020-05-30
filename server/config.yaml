@@ -20,7 +20,6 @@ db:
   user: user
   password: password
   dbname: pcrdb
-  type: postgres
 
 fileserver:
   port: 5050

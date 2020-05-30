@@ -7,7 +7,7 @@ conda-image:
 	docker image build -t danielbok/conda-repo-mgr -f conda.Dockerfile .
 	docker image prune -f
 
-start:
+start: stop
 	docker-compose -p $(PROJECT_NAME) up -d
 
 stop:

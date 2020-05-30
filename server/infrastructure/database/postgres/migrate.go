@@ -16,8 +16,8 @@ import (
 	"private-conda-repo/libs"
 )
 
-func (s *Store) Migrate() error {
-	driver, err := postgres.WithInstance(s.db.DB(), &postgres.Config{})
+func (p *Postgres) Migrate() error {
+	driver, err := postgres.WithInstance(p.db.DB(), &postgres.Config{})
 	if err != nil {
 		return errors.Wrap(err, "could not create database driver")
 	}
@@ -47,12 +47,12 @@ func getMigrationSourceUrl() (string, error) {
 		return sourceUrl
 	}
 
-	// search from source executable (which is usually the case for Docker images
+	// search from source executable (which is the case for Docker images
 	root, err := os.Executable()
 	if err != nil {
 		return "", err
 	}
-	mgDir := filepath.Join(filepath.Dir(root), "store", "migrations")
+	mgDir := filepath.Join(filepath.Dir(root), "infrastructure", "database", "migrations")
 	if libs.PathExists(mgDir) {
 		return formatFolderPath(mgDir), nil
 	}
@@ -67,6 +67,6 @@ func getMigrationSourceUrl() (string, error) {
 	username := "danielbok"
 	publicRepoReadonlyToken := ""
 	repo := "private-conda-repo"
-	folderPath := "server/store/migrations"
+	folderPath := "server/infrastructure/database/migrations"
 	return fmt.Sprintf("github://%s:%s@%s/%s/%s", username, publicRepoReadonlyToken, username, repo, folderPath), nil
 }

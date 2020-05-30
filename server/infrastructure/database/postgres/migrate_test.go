@@ -10,7 +10,7 @@ import (
 
 func TestStore_Migrate(t *testing.T) {
 	dktest.Run(t, imageName, postgresImageOptions, func(t *testing.T, info dktest.ContainerInfo) {
-		db, err := newTestDb()
+		db, err := newTestDb(info)
 		require.NoError(t, err)
 
 		for i := 0; i < 3; i++ {

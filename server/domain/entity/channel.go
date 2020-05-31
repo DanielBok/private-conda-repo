@@ -1,15 +1,15 @@
 package entity
 
 import (
+	"crypto/rand"
 	"crypto/sha256"
-	"errors"
 	"fmt"
-	"math/rand"
 	"regexp"
 	"strings"
 	"time"
 
 	"github.com/hashicorp/go-multierror"
+	"github.com/pkg/errors"
 
 	"private-conda-repo/config"
 )
@@ -88,7 +88,11 @@ func hashPassword(plainPassword, salt string) string {
 
 func generateSalt() string {
 	b := make([]byte, saltLen)
-	rand.Read(b)
+	_, err := rand.Read(b)
+	if err != nil {
+		panic(errors.Wrap(err, "This should not happen!"))
+	}
+
 	str := fmt.Sprintf("%x", b)
 	return str[:saltLen]
 }

@@ -2,11 +2,45 @@ package dto
 
 import (
 	"errors"
+	"regexp"
 	"strings"
+	"time"
+
+	"github.com/hashicorp/go-multierror"
 
 	"private-conda-repo/domain/condatypes"
 	"private-conda-repo/domain/entity"
 )
+
+type ChannelDto struct {
+	Id        int       `json:"id"`
+	Channel   string    `json:"channel"`
+	Password  string    `json:"password,omitempty"`
+	Email     string    `json:"email"`
+	CreatedOn time.Time `json:"created_on"`
+}
+
+func (c *ChannelDto) IsValid() error {
+	var err error
+	nameRegex := regexp.MustCompile(`^\w[\w\-]{2,50}$`)
+
+	c.Channel = strings.TrimSpace(c.Channel)
+	c.Password = strings.TrimSpace(c.Password)
+	c.Email = strings.TrimSpace(c.Email)
+
+	if !nameRegex.MatchString(c.Channel) {
+		err = multierror.Append(err, errors.New("channel name length must be between [2, 50] characters and can only be alphanumeric with dashes"))
+	}
+	if len(c.Password) < 4 {
+		err = multierror.Append(err, errors.New("password must be >= 4 characters"))
+	}
+
+	if !strings.Contains(c.Email, "@") {
+		err = multierror.Append(err, errors.New("email does not seem valid"))
+	}
+
+	return err
+}
 
 type ChannelData struct {
 	Channel     string   `json:"channel"`

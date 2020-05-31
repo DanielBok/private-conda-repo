@@ -14,7 +14,6 @@ type AppConfig struct {
 	Admin      *AdminProfile `mapstructure:"admin"`
 	Conda      *CondaConfig  `mapstructure:"conda"`
 	DB         *DbConfig     `mapstructure:"db"`
-	UserConfig *userConfig   `mapstructure:"user"`
 	FileServer *ServerConfig `mapstructure:"fileserver"`
 	AppServer  *ServerConfig `mapstructure:"api"`
 	TLS        *TLSConfig    `mapstructure:"TLSConfig"`
@@ -62,7 +61,6 @@ func New() (*AppConfig, error) {
 	var err error
 	for _, c := range []IConfig{
 		config.Conda,
-		config.UserConfig,
 	} {
 		err = multierror.Append(err, c.Init())
 	}

@@ -4,14 +4,10 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
-	"regexp"
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
-
-	"private-conda-repo/config"
 )
 
 type Channel struct {
@@ -21,7 +17,7 @@ type Channel struct {
 	Email     string    `json:"email"`
 	CreatedOn time.Time `json:"created_on"`
 
-	PackageCounts []PackageCount
+	PackageCounts []PackageCount `json:"package_counts"`
 }
 
 const (
@@ -32,31 +28,6 @@ const (
 func (c *Channel) HasValidPassword(password string) bool {
 	salt := strings.Split(c.Password, joinKey)[1]
 	return hashPassword(password, salt) == c.Password
-}
-
-func (c *Channel) IsValid() (err error) {
-	nameRegex := regexp.MustCompile(`^\w[\w\-]{2,50}$`)
-
-	conf, err := config.New()
-	if err != nil {
-		return err
-	}
-
-	c.Channel = strings.TrimSpace(c.Channel)
-	c.Password = strings.TrimSpace(c.Password)
-	c.Email = strings.TrimSpace(c.Email)
-
-	if !nameRegex.MatchString(c.Channel) {
-		err = multierror.Append(err, errors.New("user/channel name length must be between [2, 50] characters and can only be alphanumeric with dashes"))
-	}
-	if len(c.Password) < 4 {
-		err = multierror.Append(err, errors.New("password must be >= 4 characters"))
-	}
-	if !conf.UserConfig.ValidateEmail(c.Email) {
-		err = multierror.Append(err, errors.New("invalid email address"))
-	}
-
-	return
 }
 
 // This is the proper way to change the password. Setting the password directly on the struct field

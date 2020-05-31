@@ -17,6 +17,8 @@ const (
 	NOARCH  Platform = "noarch"
 )
 
+var Platforms = []Platform{LINUX32, LINUX64, WIN32, WIN64, OSX64, NOARCH}
+
 func MapPlatform(platform string) (Platform, error) {
 	switch strings.TrimSpace(strings.ToLower(platform)) {
 	case "linux32", "linux-32":

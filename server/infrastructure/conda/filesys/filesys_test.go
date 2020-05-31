@@ -11,6 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
+	"private-conda-repo/api/interfaces"
 	. "private-conda-repo/infrastructure/conda/filesys"
 	"private-conda-repo/infrastructure/conda/index"
 	"private-conda-repo/testutils"
@@ -39,7 +40,7 @@ func NewFileSys() *FileSys {
 	return New(tmpDir, &index.DockerIndex{Image: "danielbok/conda-repo-mgr:latest"})
 }
 
-func newPreloadedChannel(name string) (*Channel, error) {
+func newPreloadedChannel(name string) (interfaces.Channel, error) {
 	repo := NewFileSys()
 
 	chn, err := repo.CreateChannel(name)

@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 
+	"private-conda-repo/api/interfaces"
 	"private-conda-repo/domain/enum"
 	"private-conda-repo/libs"
 )
@@ -29,7 +30,7 @@ type Indexer interface {
 	// `python_abi` from the dependency lists. A list of instructions (fixes) must be provided
 	// to determine which fixes to apply. Presently the supported values are
 	//
-	// - abi : Removes "python_abi *" dependencies from the uploaded package
+	// - no-abi : Removes "python_abi *" dependencies from the uploaded package
 	FixRepoData(dir string, fixes []string) error
 }
 
@@ -52,7 +53,7 @@ func New(directory string, indexer Indexer) *FileSys {
 	}
 }
 
-func (f *FileSys) RenameChannel(oldName, newName string) (*Channel, error) {
+func (f *FileSys) RenameChannel(oldName, newName string) (interfaces.Channel, error) {
 	var errs error
 
 	oldChn, err := f.GetChannel(oldName)
@@ -79,7 +80,7 @@ func (f *FileSys) RenameChannel(oldName, newName string) (*Channel, error) {
 	return newChannel(newName, newFolder, f.ind)
 }
 
-func (f FileSys) CreateChannel(name string) (*Channel, error) {
+func (f FileSys) CreateChannel(name string) (interfaces.Channel, error) {
 	chn, err := newChannel(name, f.dir, f.ind)
 	if err != nil {
 		return nil, err
@@ -100,7 +101,7 @@ func (f FileSys) CreateChannel(name string) (*Channel, error) {
 	return chn, nil
 }
 
-func (f *FileSys) GetChannel(name string) (*Channel, error) {
+func (f *FileSys) GetChannel(name string) (interfaces.Channel, error) {
 	name = strings.TrimSpace(name)
 	path, err := f.getChannelPath(name)
 	if err != nil {
@@ -113,13 +114,13 @@ func (f *FileSys) GetChannel(name string) (*Channel, error) {
 	return newChannel(name, f.dir, f.ind)
 }
 
-func (f *FileSys) ListAllChannels() ([]*Channel, error) {
+func (f *FileSys) ListAllChannels() ([]interfaces.Channel, error) {
 	dirs, err := ioutil.ReadDir(f.dir)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not list channel directories")
 	}
 
-	var channels []*Channel
+	var channels []interfaces.Channel
 	for _, d := range dirs {
 		chn, err := f.GetChannel(d.Name())
 		if err != nil {

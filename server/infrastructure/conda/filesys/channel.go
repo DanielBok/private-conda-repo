@@ -67,7 +67,7 @@ func (c *Channel) AddPackage(file io.Reader, pkg *dto.PackageDto) (*dto.PackageD
 	return pkg, nil
 }
 
-// Absolute path of channel
+// Returns the absolute path of channel
 func (c *Channel) Directory() string {
 	return c.dir
 }
@@ -99,6 +99,10 @@ func (c *Channel) Index(fixes []string) error {
 	}
 
 	return c.ind.FixRepoData(c.Directory(), fixes)
+}
+
+func (c *Channel) Name() string {
+	return c.name
 }
 
 // Removes a single package from the channel

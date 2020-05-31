@@ -1,6 +1,6 @@
 module private-conda-repo
 
-go 1.13
+go 1.14
 
 require (
 	github.com/dhui/dktest v0.3.0
@@ -12,7 +12,7 @@ require (
 	github.com/mholt/archiver/v3 v3.3.0
 	github.com/pkg/errors v0.8.1
 	github.com/rs/cors v1.7.0
-	github.com/sirupsen/logrus v1.4.1
+	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.6.1
 	github.com/stretchr/testify v1.4.0
 	gopkg.in/yaml.v2 v2.2.7 // indirect

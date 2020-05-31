@@ -113,7 +113,7 @@ func overwriteRepoDataFile(data *condatypes.RepoData, fp string) error {
 	if err != nil {
 		return errors.Wrapf(err, "could not overwrite %s", path)
 	}
-	defer func() { _ = f.Close() }()
+	defer libs.IOCloser(f)
 
 	err = json.NewEncoder(f).Encode(&data)
 	if err != nil {

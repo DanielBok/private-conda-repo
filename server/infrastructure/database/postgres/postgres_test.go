@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	"private-conda-repo/config"
+	"private-conda-repo/libs"
 )
 
 const (
@@ -64,7 +65,7 @@ func dbReady(ctx context.Context, c dktest.ContainerInfo) bool {
 	if err != nil {
 		return false
 	}
-	defer func() { _ = db.Close() }()
+	defer libs.IOCloser(db)
 
 	return db.PingContext(ctx) == nil
 }

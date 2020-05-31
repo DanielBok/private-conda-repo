@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"private-conda-repo/libs"
 	"private-conda-repo/testutils"
 )
 
@@ -17,7 +18,7 @@ func TestTarBz2Decompressor_RetrieveMetadata(t *testing.T) {
 	test := func(details testutils.TestPackage) {
 		f, err := os.Open(details.Path)
 		assert.NoError(err)
-		defer func() { _ = f.Close() }()
+		defer libs.IOCloser(f)
 
 		pkg, err := dcp.RetrieveMetadata(f)
 		assert.NoError(err)

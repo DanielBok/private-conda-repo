@@ -15,19 +15,20 @@ import (
 
 	"private-conda-repo/api/dto"
 	"private-conda-repo/domain/enum"
+	"private-conda-repo/libs"
 )
 
 type tarBz2Decompressor struct{}
 
 // Retrieves MetaData from the .tar.bz2 file
 func (b *tarBz2Decompressor) RetrieveMetadata(f io.ReadCloser) (*MetaData, error) {
-	defer func() { _ = f.Close() }()
+	defer libs.IOCloser(f)
 
 	archive, err := b.savePackageToDisk(f)
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = archive.Close() }()
+	defer libs.IOCloser(archive)
 
 	pkg, err := b.extractPackageDetail(archive.Name())
 	if err != nil {
@@ -60,11 +61,11 @@ func (b *tarBz2Decompressor) extractPackageDetail(archivePath string) (*dto.Pack
 	var err error
 
 	tarBz2 := archiver.NewTarBz2()
-	defer func() { _ = tarBz2.Close() }()
+	defer libs.IOCloser(tarBz2)
 
 	err = tarBz2.Walk(archivePath, func(f archiver.File) error {
 		if f.Header.(*tar.Header).Name == "info/index.json" {
-			defer func() { _ = f.Close() }()
+			defer libs.IOCloser(f)
 
 			pkg, err = b.readDetailsFromInfoIndexJson(f)
 			if err != nil {

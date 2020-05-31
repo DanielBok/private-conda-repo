@@ -11,6 +11,8 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+
+	"private-conda-repo/libs"
 )
 
 type DockerIndex struct {
@@ -39,7 +41,7 @@ func NewDockerIndex(imageName string) (*DockerIndex, error) {
 }
 
 func (d *DockerIndex) Index(dir string) error {
-	cmd := []string{
+	args := []string{
 		"container",
 		"run",
 		"--rm",
@@ -49,7 +51,8 @@ func (d *DockerIndex) Index(dir string) error {
 		"index",
 	}
 
-	if _, err := exec.Command("docker", cmd...).Output(); err != nil {
+	cmd := exec.Command("docker", args...)
+	if err := cmd.Run(); err != nil {
 		return errors.Wrapf(err, "could not index channel '%s'", filepath.Base(dir))
 	}
 
@@ -133,7 +136,7 @@ func (d *DockerIndex) checkLatestVersion() (int, error) {
 	if err != nil {
 		return -1, errors.Wrapf(err, "could not fetch latest Image tags for '%s' from docker hub", d.Image)
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer libs.IOCloser(resp.Body)
 
 	type ImageInfo struct {
 		Results []struct {

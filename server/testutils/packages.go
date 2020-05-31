@@ -56,13 +56,13 @@ func appendTestPackage(url string, wg *sync.WaitGroup, m *sync.Mutex) {
 		if err != nil {
 			log.Fatalln(errors.Wrapf(err, "could not download '%s' from '%s'", filename, url))
 		}
-		defer func() { _ = resp.Body.Close() }()
+		defer libs.IOCloser(resp.Body)
 
 		file, err := os.Create(pkgPath)
 		if err != nil {
 			log.Fatalln(errors.Wrapf(err, "could not create '%s' to path '%s'", filename, pkgPath))
 		}
-		defer func() { _ = file.Close() }()
+		defer libs.IOCloser(file)
 
 		_, err = io.Copy(file, resp.Body)
 		if err != nil {

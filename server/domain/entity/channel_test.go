@@ -9,7 +9,7 @@ import (
 
 func TestUser_IsValid(t *testing.T) {
 	goodEmail := "daniel@gmail.com"
-	goodPassword := "good" // Must be >= 4 characters
+	goodPassword := "good" // Must be >= 2 characters
 	goodUsername := "good" // Must be >= 4 characters
 
 	tests := []struct {
@@ -19,7 +19,7 @@ func TestUser_IsValid(t *testing.T) {
 	}{
 		{
 			Channel{
-				Channel:  "bad",
+				Channel:  "b", // too short a name
 				Password: goodPassword,
 				Email:    goodEmail,
 			},
@@ -103,12 +103,10 @@ func TestUser_IsValid(t *testing.T) {
 }
 
 func TestUser_HasValidPassword(t *testing.T) {
-	salt := "salt"
-
-	c := NewChannel("daniel", "good-password", "daniel@gmail.com", salt)
-	valid := c.HasValidPassword("bad-password", salt)
+	c := NewChannel("daniel", "good-password", "daniel@gmail.com")
+	valid := c.HasValidPassword("bad-password")
 	require.False(t, valid)
 
-	valid = c.HasValidPassword("good-password", salt)
+	valid = c.HasValidPassword("good-password")
 	require.True(t, valid)
 }

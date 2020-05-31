@@ -1,6 +1,8 @@
 package postgres
 
-import "github.com/hashicorp/go-multierror"
+import (
+	"github.com/hashicorp/go-multierror"
+)
 
 func joinErrors(errors []error) error {
 	if len(errors) == 1 {

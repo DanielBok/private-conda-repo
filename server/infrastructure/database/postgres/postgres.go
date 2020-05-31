@@ -11,11 +11,10 @@ import (
 )
 
 type Postgres struct {
-	db   *gorm.DB
-	salt string
+	db *gorm.DB
 }
 
-func New(config *config.DbConfig, salt string) (*Postgres, error) {
+func New(config *config.DbConfig) (*Postgres, error) {
 	var err error
 
 	// waiting for db to be ready
@@ -24,10 +23,7 @@ func New(config *config.DbConfig, salt string) (*Postgres, error) {
 		db, err := gorm.Open("postgres", config.ConnectionString())
 		if err == nil {
 			db.SingularTable(true)
-			return &Postgres{
-				db:   db,
-				salt: salt,
-			}, nil
+			return &Postgres{db: db}, nil
 		}
 		wait += i
 		time.Sleep(time.Duration(wait) * time.Second)

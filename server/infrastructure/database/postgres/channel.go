@@ -8,7 +8,7 @@ import (
 )
 
 func (p *Postgres) CreateChannel(channel, password, email string) (*entity.Channel, error) {
-	chn := entity.NewChannel(channel, password, email, p.salt)
+	chn := entity.NewChannel(channel, password, email)
 
 	if errs := p.db.Create(chn).GetErrors(); len(errs) > 0 {
 		return nil, joinErrors(errs)
@@ -46,7 +46,7 @@ func (p *Postgres) RemoveChannel(channel, password string) error {
 		return joinErrors(errs)
 	}
 
-	if !chn.HasValidPassword(password, p.salt) {
+	if !chn.HasValidPassword(password) {
 		return errors.New("incorrect credentials supplied to delete chn")
 	}
 

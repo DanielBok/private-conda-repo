@@ -10,8 +10,8 @@ import (
 	"private-conda-repo/domain/entity"
 )
 
-func TestStore_UserOperations(t *testing.T) {
-	channel := "daniel"
+func TestPostgres_ChannelOperations(t *testing.T) {
+	name := "daniel"
 	password := "Password123"
 	email := "daniel@gmail.com"
 
@@ -20,25 +20,32 @@ func TestStore_UserOperations(t *testing.T) {
 		store, err := newTestDb(info)
 		assert.NoError(err)
 
-		chn, err := store.GetChannel(channel)
+		chn, err := store.GetChannel(name)
 		assert.EqualError(err, gorm.ErrRecordNotFound.Error())
 
-		chn, err = store.CreateChannel(channel, password, email)
+		chn, err = store.CreateChannel(name, password, email)
 		assert.NoError(err)
 		assert.IsType(*chn, entity.Channel{})
-		assert.Equal(chn.Channel, channel)
+		assert.Equal(chn.Channel, name)
 		assert.NotEqual(chn.Password, password)
-		assert.True(chn.HasValidPassword(password, store.salt))
-		assert.False(chn.HasValidPassword(password+"abc", store.salt))
+		assert.True(chn.HasValidPassword(password))
+		assert.False(chn.HasValidPassword(password + "abc"))
 
-		chn2, err := store.GetChannel(channel)
+		chn2, err := store.GetChannel(name)
 		assert.NoError(err)
 		assert.Equal(chn.Id, chn2.Id)
 
-		err = store.RemoveChannel(channel, "BadPassword")
-		assert.EqualError(err, "incorrect credentials supplied to delete chn")
+		err = store.RemoveChannel(0)
+		assert.Error(err, "invalid name id")
 
-		err = store.RemoveChannel(channel, password)
+		err = store.RemoveChannel(99999)
+		assert.Error(err, "name with id does not exist")
+
+		err = store.RemoveChannel(chn.Id)
 		assert.NoError(err)
+
+		chn, err = store.GetChannel(name)
+		assert.Error(err)
+		assert.Nil(chn)
 	})
 }

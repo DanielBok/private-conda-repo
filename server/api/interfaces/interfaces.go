@@ -14,7 +14,7 @@ type DataAccessLayer interface {
 
 	CreateChannel(channel, password, email string) (*entity.Channel, error)
 	GetChannel(channel string) (*entity.Channel, error)
-	RemoveChannel(channel, password string) error
+	RemoveChannel(id int) error
 	GetAllChannels() ([]*entity.Channel, error)
 
 	GetPackageCounts(channelId int, name string) ([]*entity.PackageCount, error)

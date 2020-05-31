@@ -9,7 +9,7 @@ import (
 	"private-conda-repo/domain/entity"
 )
 
-func TestStore_PackageCountOperations(t *testing.T) {
+func TestPostgres_PackageCountOperations(t *testing.T) {
 	assert := require.New(t)
 	packageName := "perfana"
 	platform := "noarch"

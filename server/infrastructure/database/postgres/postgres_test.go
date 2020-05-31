@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	salt   = "salt"
 	dbUid  = "user"
 	dbPwd  = "password"
 	dbName = "pcrdb"
@@ -76,7 +75,7 @@ func newTestDb(c dktest.ContainerInfo) (*Postgres, error) {
 		return nil, errors.Wrap(err, "could not create connection string from docker info")
 	}
 
-	store, err := New(conf, salt)
+	store, err := New(conf)
 	if err != nil {
 		return nil, err
 	}

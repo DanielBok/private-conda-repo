@@ -37,20 +37,19 @@ func (p *Postgres) GetChannel(channel string) (*entity.Channel, error) {
 	return &chn, nil
 }
 
-func (p *Postgres) RemoveChannel(channel, password string) error {
-	var chn entity.Channel
-	if errs := p.db.
-		Where("channel = ?", strings.ToLower(channel)).
-		First(&chn).
-		GetErrors(); len(errs) > 0 {
-		return joinErrors(errs)
+func (p *Postgres) RemoveChannel(id int) error {
+	if id <= 0 {
+		return errors.New("invalid channel id")
 	}
 
-	if !chn.HasValidPassword(password) {
-		return errors.New("incorrect credentials supplied to delete chn")
+	var channel entity.Channel
+	err := p.db.First(&channel, id).Error
+	if err != nil {
+		return err
 	}
 
-	if errs := p.db.Delete(&chn).GetErrors(); len(errs) > 0 {
+	errs := p.db.Delete(&channel).GetErrors()
+	if len(errs) > 0 {
 		return joinErrors(errs)
 	}
 

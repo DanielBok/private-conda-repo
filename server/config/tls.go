@@ -6,12 +6,12 @@ import (
 	"private-conda-repo/libs"
 )
 
-type tls struct {
+type TLSConfig struct {
 	Cert string `mapstructure:"cert"`
 	Key  string `mapstructure:"key"`
 }
 
-func (t *tls) HasCert() bool {
+func (t *TLSConfig) HasCert() bool {
 	t.Cert = strings.TrimSpace(t.Cert)
 	t.Key = strings.TrimSpace(t.Key)
 	if t.Cert == "" || t.Key == "" {

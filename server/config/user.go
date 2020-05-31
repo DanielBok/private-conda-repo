@@ -8,12 +8,11 @@ import (
 )
 
 type userConfig struct {
-	Salt        string         `mapstructure:"salt"`
 	EmailDomain string         `mapstructure:"email_domain"`
 	domainRegex *regexp.Regexp `mapstructure:"-"`
 }
 
-func (u *userConfig) init() error {
+func (u *userConfig) Init() error {
 	u.EmailDomain = strings.TrimSpace(u.EmailDomain)
 	if u.EmailDomain == "" {
 		u.domainRegex = nil

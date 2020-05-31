@@ -7,9 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var defaultKeyValue = map[string]string{
-	"decompressor.type": ".tar.bz2",
-}
+var defaultKeyValue = map[string]string{}
 
 var defaultKeyValueMap = map[string]map[string]interface{}{
 	"conda.mount_folder": {

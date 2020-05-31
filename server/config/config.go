@@ -5,32 +5,32 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
 
 type AppConfig struct {
-	Admin        adminProfile `mapstructure:"admin"`
-	Conda        CondaConfig  `mapstructure:"conda"`
-	DB           database     `mapstructure:"db"`
-	UserConfig   userConfig   `mapstructure:"user"`
-	FileServer   server       `mapstructure:"fileserver"`
-	AppServer    server       `mapstructure:"application"`
-	Decompressor decompressor `mapstructure:"decompressor"`
-	TLS          tls          `mapstructure:"tls"`
+	Admin      *AdminProfile `mapstructure:"admin"`
+	Conda      *CondaConfig  `mapstructure:"conda"`
+	DB         *DbConfig     `mapstructure:"db"`
+	UserConfig *userConfig   `mapstructure:"user"`
+	FileServer *ServerConfig `mapstructure:"fileserver"`
+	AppServer  *ServerConfig `mapstructure:"api"`
+	TLS        *TLSConfig    `mapstructure:"TLSConfig"`
 }
 
-type adminProfile struct {
+type IConfig interface {
+	Init() error
+}
+
+type AdminProfile struct {
 	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
 }
 
-type server struct {
+type ServerConfig struct {
 	Port int `mapstructure:"port"`
-}
-
-type decompressor struct {
-	Type string `mapstructure:"type"`
 }
 
 const prefix = "PCR"
@@ -58,7 +58,15 @@ func New() (*AppConfig, error) {
 		return nil, errors.Wrap(err, "could not unmarshal config")
 	}
 
-	if err := config.UserConfig.init(); err != nil {
+	// Check all configurations are valid
+	var err error
+	for _, c := range []IConfig{
+		config.Conda,
+		config.UserConfig,
+	} {
+		err = multierror.Append(err, c.Init())
+	}
+	if err != nil {
 		return nil, err
 	}
 
@@ -74,7 +82,7 @@ func setConfigDirectory() error {
 	switch runtime.GOOS {
 	case "windows":
 		viper.AddConfigPath("C:/Projects/private-conda-repo")
-		viper.AddConfigPath("C:/Projects/private-conda-repo/server")
+		viper.AddConfigPath("C:/Projects/private-conda-repo/ServerConfig")
 	case "linux":
 		viper.AddConfigPath("/var/private-conda-repo")
 

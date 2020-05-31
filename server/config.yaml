@@ -12,7 +12,6 @@ conda:
   # if using docker, the image name and mount folder options can be specified
   image_name: danielbok/conda-repo-mgr
   mount_folder:  # leave empty for the application to automatically set path based on OS
-  type: filesys
 
 db:
   host: postgres
@@ -27,13 +26,8 @@ fileserver:
 application:
   port: 5060
 
-decompressor:
-  type: .tar.bz2  # leave this as the default, only used for testing purposes
-
 # user checks and validation validation
 user:
-  # salt is used for password hashing so we don't save plaintext passwords in the database
-  salt: "It is best to set this from the environment variable (PCR_USER.SALT=)"
   # email domain is the ending regex used to specify if you want a user/channel to come from a
   # certain domain. For example, if you want to only accept gmail only, you could use "gmail\..*$",
   # if you want gmail and hotmail you could use "(gmail|hotmail)\..*". Leave blank if you accept

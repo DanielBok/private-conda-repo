@@ -88,7 +88,7 @@ func FixRepoData(fp string, fixes []string) (repoData *condatypes.RepoData, hasC
 		for _, dependency := range v.Depends {
 			dependency = strings.ToLower(dependency)
 
-			if fixSet["abi"] && strings.HasPrefix(dependency, "python_abi") {
+			if fixSet["no-abi"] && strings.HasPrefix(dependency, "python_abi") {
 				// remove pesky python_abi which is caused when conda-build puts in a specific abi dependency
 				// when it is not needed thus rendering the package impossible to download.
 				hasChanges = true // do not add python_abi dependency

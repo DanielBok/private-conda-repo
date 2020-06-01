@@ -24,13 +24,13 @@ type TarBz2Decompressor struct{}
 func (b *TarBz2Decompressor) RetrieveMetadata(f io.ReadCloser) (*MetaData, error) {
 	defer libs.IOCloser(f)
 
-	archive, err := b.savePackageToDisk(f)
+	archive, err := savePackageToDisk(f)
 	if err != nil {
 		return nil, err
 	}
 	defer libs.IOCloser(archive)
 
-	pkg, err := b.extractPackageDetail(archive.Name())
+	pkg, err := extractPackageDetail(archive.Name())
 	if err != nil {
 		return nil, errors.Wrap(err, "could not retrieve package details from index.json in package .tar.gz file")
 	}
@@ -41,7 +41,8 @@ func (b *TarBz2Decompressor) RetrieveMetadata(f io.ReadCloser) (*MetaData, error
 	}, nil
 }
 
-func (b *TarBz2Decompressor) savePackageToDisk(f io.ReadCloser) (*os.File, error) {
+// Saves the incoming file (usually from a HTTP form post to the disk
+func savePackageToDisk(f io.ReadCloser) (*os.File, error) {
 	tmpFile, err := ioutil.TempFile("", "conda-package-*.tar.bz2")
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create temp file")
@@ -56,7 +57,7 @@ func (b *TarBz2Decompressor) savePackageToDisk(f io.ReadCloser) (*os.File, error
 
 // Walks through the unzipped .tar.bz2 package and extracts information from the various json files
 // within it. At the moment, only information from the info/index.json file is extracted
-func (b *TarBz2Decompressor) extractPackageDetail(archivePath string) (*dto.PackageDto, error) {
+func extractPackageDetail(archivePath string) (*dto.PackageDto, error) {
 	var pkg *dto.PackageDto
 	var err error
 
@@ -67,7 +68,7 @@ func (b *TarBz2Decompressor) extractPackageDetail(archivePath string) (*dto.Pack
 		if f.Header.(*tar.Header).Name == "info/index.json" {
 			defer libs.IOCloser(f)
 
-			pkg, err = b.readDetailsFromInfoIndexJson(f)
+			pkg, err = readDetailsFromInfoIndexJson(f)
 			if err != nil {
 				return err
 			}
@@ -82,7 +83,7 @@ func (b *TarBz2Decompressor) extractPackageDetail(archivePath string) (*dto.Pack
 }
 
 // Reads package details from the info/index.json file which is bundled in the conda package
-func (b *TarBz2Decompressor) readDetailsFromInfoIndexJson(f io.Reader) (*dto.PackageDto, error) {
+func readDetailsFromInfoIndexJson(f io.Reader) (*dto.PackageDto, error) {
 	var err error
 	re := regexp.MustCompile(`"([\w\-]+)": "?([\w\-.]+)"?`)
 	pkg := &dto.PackageDto{}

@@ -3,11 +3,12 @@ package config
 import "fmt"
 
 type DbConfig struct {
-	Host     string `mapstructure:"host"`
-	Port     int    `mapstructure:"port"`
-	User     string `mapstructure:"user"`
-	Password string `mapstructure:"password"`
-	DbName   string `mapstructure:"dbname"`
+	Host        string `mapstructure:"host"`
+	Port        int    `mapstructure:"port"`
+	User        string `mapstructure:"user"`
+	Password    string `mapstructure:"password"`
+	DbName      string `mapstructure:"dbname"`
+	AutoMigrate bool   `mapstructure:"auto_migrate"`
 }
 
 func (d *DbConfig) ConnectionString() string {

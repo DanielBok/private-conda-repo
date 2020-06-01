@@ -24,14 +24,17 @@ db:
   user: user
   password: password
   dbname: pcrdb
+  # if true, automatically migrates the database to the latest schema. Otherwise, migration has to
+  # be handled by the user manually
+  auto_migrate: True
 
 fileserver:
   port: 5050
 
-application:
+api:
   port: 5060
 
 # if valid key and cert files are provided, server runs in HTTPS mode automatically
 tls:
-  cert:  # path to TLS certificate  (public key)
-  key:  # path to TLS key (private key)
+  cert: "" # path to TLS certificate  (public key)
+  key: "" # path to TLS key (private key)

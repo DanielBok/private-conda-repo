@@ -4,8 +4,8 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
+	"strings"
 
-	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
@@ -16,7 +16,7 @@ type AppConfig struct {
 	DB         *DbConfig      `mapstructure:"db"`
 	FileServer *ServerConfig  `mapstructure:"fileserver"`
 	AppServer  *ServerConfig  `mapstructure:"api"`
-	TLS        *TLSConfig     `mapstructure:"TLSConfig"`
+	TLS        *TLSConfig     `mapstructure:"tls"`
 }
 
 type IConfig interface {
@@ -32,7 +32,7 @@ type ServerConfig struct {
 	Port int `mapstructure:"port"`
 }
 
-const prefix = "PCR"
+const prefix = "pcr"
 
 func New() (*AppConfig, error) {
 	if err := setConfigDirectory(); err != nil {
@@ -41,7 +41,9 @@ func New() (*AppConfig, error) {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
+
 	viper.SetEnvPrefix(prefix)
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -58,14 +60,13 @@ func New() (*AppConfig, error) {
 	}
 
 	// Check all configurations are valid
-	var err error
 	for _, c := range []IConfig{
 		config.Indexer,
 	} {
-		err = multierror.Append(err, c.Init())
-	}
-	if err != nil {
-		return nil, err
+		err := c.Init()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &config, nil
@@ -80,7 +81,7 @@ func setConfigDirectory() error {
 	switch runtime.GOOS {
 	case "windows":
 		viper.AddConfigPath("C:/Projects/private-conda-repo")
-		viper.AddConfigPath("C:/Projects/private-conda-repo/ServerConfig")
+		viper.AddConfigPath("C:/Projects/private-conda-repo/server")
 	case "linux":
 		viper.AddConfigPath("/var/private-conda-repo")
 

@@ -11,12 +11,12 @@ import (
 )
 
 type AppConfig struct {
-	Admin      *AdminProfile `mapstructure:"admin"`
-	Conda      *CondaConfig  `mapstructure:"conda"`
-	DB         *DbConfig     `mapstructure:"db"`
-	FileServer *ServerConfig `mapstructure:"fileserver"`
-	AppServer  *ServerConfig `mapstructure:"api"`
-	TLS        *TLSConfig    `mapstructure:"TLSConfig"`
+	Admin      *AdminProfile  `mapstructure:"admin"`
+	Indexer    *IndexerConfig `mapstructure:"indexer"`
+	DB         *DbConfig      `mapstructure:"db"`
+	FileServer *ServerConfig  `mapstructure:"fileserver"`
+	AppServer  *ServerConfig  `mapstructure:"api"`
+	TLS        *TLSConfig     `mapstructure:"TLSConfig"`
 }
 
 type IConfig interface {
@@ -60,7 +60,7 @@ func New() (*AppConfig, error) {
 	// Check all configurations are valid
 	var err error
 	for _, c := range []IConfig{
-		config.Conda,
+		config.Indexer,
 	} {
 		err = multierror.Append(err, c.Init())
 	}

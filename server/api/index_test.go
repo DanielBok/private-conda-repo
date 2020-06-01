@@ -18,8 +18,8 @@ func NewIndexHandler() *IndexHandler {
 	return &IndexHandler{
 		Conf: &config.AppConfig{
 			Admin: nil,
-			Conda: &config.CondaConfig{
-				Use:       "shell",
+			Indexer: &config.IndexerConfig{
+				Type:      "shell",
 				ImageName: "",
 			},
 			DB:         nil,

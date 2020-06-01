@@ -6,20 +6,21 @@ import (
 	"github.com/pkg/errors"
 )
 
-type CondaConfig struct {
-	Use         string `mapstructure:"use"`
+type IndexerConfig struct {
+	Type        string `mapstructure:"type"`
 	ImageName   string `mapstructure:"image_name"`
 	MountFolder string `mapstructure:"mount_folder"`
+	Update      bool   `mapstructure:"update"`
 }
 
-func (c *CondaConfig) Init() error {
-	c.Use = strings.TrimSpace(strings.ToLower(c.Use))
+func (c *IndexerConfig) Init() error {
+	c.Type = strings.TrimSpace(strings.ToLower(c.Type))
 
-	if !(c.Use == "docker" || c.Use == "shell") {
-		return errors.Errorf("Unsupported conda indexer: %s", c.Use)
+	if !(c.Type == "docker" || c.Type == "shell") {
+		return errors.Errorf("Unsupported conda indexer: %s", c.Type)
 	}
 
-	if c.Use == "shell" {
+	if c.Type == "shell" {
 		c.ImageName = ""
 	}
 

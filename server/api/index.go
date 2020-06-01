@@ -28,8 +28,8 @@ func (h *IndexHandler) MetaInfo() http.HandlerFunc {
 		}
 
 		meta := dto.ApiMetaInfo{
-			Indexer:    h.Conf.Conda.Use,
-			Image:      h.Conf.Conda.ImageName,
+			Indexer:    h.Conf.Indexer.Type,
+			Image:      h.Conf.Indexer.ImageName,
 			Registry:   fmt.Sprintf("%s://%s:%d", schema, domain, h.Conf.AppServer.Port),
 			Repository: fmt.Sprintf("%s://%s:%d", schema, domain, h.Conf.FileServer.Port),
 		}

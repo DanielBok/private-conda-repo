@@ -47,5 +47,5 @@ func (m *MasterHandler) addFileServer(conf *config.AppConfig) {
 		DB: m.DB,
 	}
 
-	m.Get("/*", handler.Server(conf.Conda.MountFolder))
+	m.Get("/*", handler.Server(conf.Indexer.MountFolder))
 }

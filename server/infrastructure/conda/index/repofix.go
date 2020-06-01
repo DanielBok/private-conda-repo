@@ -37,11 +37,11 @@ func fixRepoDataFiles(channelPath string, fixes []string) error {
 		}
 
 		for _, file := range []string{"current_repodata.json", "repodata.json"} {
-			if !libs.PathExists(file) {
+			fp := filepath.Join(folder, file)
+			if !libs.PathExists(fp) {
 				continue
 			}
 
-			fp := filepath.Join(folder, file)
 			data, hasChanges, err := FixRepoData(fp, fixes)
 			if err != nil {
 				return err

@@ -1,25 +1,22 @@
 package main
 
 import (
-	"os"
-
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
 	setLogger()
 
+	log.Info("Initalizing application")
 	app, err := NewApp()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Fatal error encountered during application startup", err)
 	}
 
-	<-app.runServers()
+	<-app.RunServers()
 }
 
 func setLogger() {
-	log.SetOutput(os.Stdout)
-	log.SetReportCaller(true)
 	log.SetFormatter(&log.TextFormatter{
 		FullTimestamp: true,
 	})

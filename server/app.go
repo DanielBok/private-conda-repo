@@ -37,6 +37,15 @@ func NewApp() (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	if conf.DB.AutoMigrate {
+		err = db.Migrate()
+		if err != nil {
+			return nil, err
+		}
+		log.Info("Database is at the latest migration")
+	} else {
+		log.Info("Migrations were not applied onto the database")
+	}
 
 	var indexer interfaces.Indexer
 	switch conf.Indexer.Type {
@@ -54,6 +63,9 @@ func NewApp() (*App, error) {
 		if err != nil {
 			return nil, err
 		}
+		log.Info("The conda folder indexer is at the latest version")
+	} else {
+		log.Info("The conda folder indexer was not updated")
 	}
 
 	fs := filesys.New(conf.Indexer.MountFolder, indexer)
@@ -77,7 +89,7 @@ func NewApp() (*App, error) {
 }
 
 // Runs the servers. Returns a channel for graceful shutdown
-func (a *App) runServers() <-chan struct{} {
+func (a *App) RunServers() <-chan struct{} {
 	go func() {
 		sigint := make(chan os.Signal, 1)
 		signal.Notify(sigint, os.Interrupt, syscall.SIGTERM)

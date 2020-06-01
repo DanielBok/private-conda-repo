@@ -36,7 +36,7 @@ func (h *ChannelHandler) ListChannels() http.HandlerFunc {
 func (h *ChannelHandler) CreateChannel() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// get channel details from json request
-		d, err := h.getChannelDto(r)
+		d, err := h.getChannelDto(r, true)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -91,7 +91,7 @@ func (h *ChannelHandler) GetChannelInfo() http.HandlerFunc {
 
 func (h *ChannelHandler) RemoveChannel() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		c, err := h.getChannel(r)
+		c, err := h.getChannel(r, false)
 		if errors.Is(err, ErrInvalidCredential) {
 			http.Error(w, err.Error(), http.StatusForbidden)
 		} else if err != nil {
@@ -116,7 +116,7 @@ func (h *ChannelHandler) RemoveChannel() http.HandlerFunc {
 
 func (h *ChannelHandler) CheckChannel() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_, err := h.getChannel(r)
+		_, err := h.getChannel(r, false)
 		if errors.Is(err, ErrInvalidCredential) {
 			http.Error(w, err.Error(), http.StatusForbidden)
 			return
@@ -129,8 +129,8 @@ func (h *ChannelHandler) CheckChannel() http.HandlerFunc {
 	}
 }
 
-func (h *ChannelHandler) getChannel(r *http.Request) (*entity.Channel, error) {
-	d, err := h.getChannelDto(r)
+func (h *ChannelHandler) getChannel(r *http.Request, validateDto bool) (*entity.Channel, error) {
+	d, err := h.getChannelDto(r, validateDto)
 	if err != nil {
 		return nil, err
 	}
@@ -147,15 +147,17 @@ func (h *ChannelHandler) getChannel(r *http.Request) (*entity.Channel, error) {
 	return c, nil
 }
 
-func (h *ChannelHandler) getChannelDto(r *http.Request) (*dto.ChannelDto, error) {
+func (h *ChannelHandler) getChannelDto(r *http.Request, validateDto bool) (*dto.ChannelDto, error) {
 	var d *dto.ChannelDto
 	if err := readJson(r, &d); err != nil {
 		return nil, err
 	}
 
-	// validate that request payload is okay
-	if err := d.IsValid(); err != nil {
-		return nil, err
+	if validateDto {
+		// validate that request payload is okay
+		if err := d.IsValid(); err != nil {
+			return nil, err
+		}
 	}
 
 	return d, nil

@@ -51,8 +51,10 @@ func NewApp() (*App, error) {
 	switch conf.Indexer.Type {
 	case "docker":
 		indexer, err = index.NewDockerIndex(conf.Indexer.ImageName)
+		log.Infof("Using DockerIndex on %s", conf.Indexer.MountFolder)
 	case "shell":
 		indexer, err = index.NewShellIndex()
+		log.Infof("Using ShellIndex on %s", conf.Indexer.MountFolder)
 	}
 	if err != nil {
 		return nil, err

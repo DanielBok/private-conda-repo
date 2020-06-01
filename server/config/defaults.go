@@ -10,7 +10,7 @@ import (
 var defaultKeyValue = map[string]string{}
 
 var defaultKeyValueMap = map[string]map[string]interface{}{
-	"conda.mount_folder": {
+	"indexer.mount_folder": {
 		"win": "C:/temp/condapkg",
 		"lin": "/var/condapkg",
 	},

@@ -1,4 +1,4 @@
-package decompressor
+package decompressor_test
 
 import (
 	"os"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	. "private-conda-repo/infrastructure/decompressor"
 	"private-conda-repo/libs"
 	"private-conda-repo/testutils"
 )
@@ -13,7 +14,7 @@ import (
 func TestTarBz2Decompressor_RetrieveMetadata(t *testing.T) {
 	t.Parallel()
 	assert := require.New(t)
-	dcp := tarBz2Decompressor{}
+	dcp := TarBz2Decompressor{}
 
 	test := func(details testutils.TestPackage) {
 		f, err := os.Open(details.Path)

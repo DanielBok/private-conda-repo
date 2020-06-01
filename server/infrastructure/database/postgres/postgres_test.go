@@ -1,4 +1,4 @@
-package postgres
+package postgres_test
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	"private-conda-repo/config"
+	. "private-conda-repo/infrastructure/database/postgres"
 	"private-conda-repo/libs"
 )
 

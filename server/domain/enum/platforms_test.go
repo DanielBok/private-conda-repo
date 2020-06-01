@@ -1,9 +1,11 @@
-package enum
+package enum_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	. "private-conda-repo/domain/enum"
 )
 
 func TestMapPlatform(t *testing.T) {

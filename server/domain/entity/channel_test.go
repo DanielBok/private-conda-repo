@@ -1,9 +1,11 @@
-package entity
+package entity_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	. "private-conda-repo/domain/entity"
 )
 
 func TestChannel_HasValidPassword(t *testing.T) {

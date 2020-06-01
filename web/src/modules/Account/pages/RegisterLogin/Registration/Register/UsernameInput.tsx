@@ -7,26 +7,26 @@ import { useFormContext } from "./hooks";
 
 export default () => {
   const {
-    form: { getFieldDecorator, getFieldError },
-    validateStatus
+    form: { getFieldError },
+    validateStatus,
   } = useFormContext();
   const [validator] = useUserValidator();
 
   return (
     <Form.Item
+      name={CONST.USERNAME}
       validateStatus={
         getFieldError(CONST.USERNAME) !== undefined ? "error" : validateStatus
       }
       hasFeedback
+      validateFirst
+      rules={[
+        { required: true, message: "Username is required" },
+        { min: 4, message: "Username must have at least 4 character" },
+        { validator },
+      ]}
     >
-      {getFieldDecorator(CONST.USERNAME, {
-        validateFirst: true,
-        rules: [
-          { required: true, message: "Username is required" },
-          { min: 4, message: "Username is at least 4 character long" },
-          { validator }
-        ]
-      })(<Input placeholder="Username" />)}
+      <Input placeholder="Username" />
     </Form.Item>
   );
 };

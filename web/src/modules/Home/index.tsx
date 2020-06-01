@@ -4,6 +4,6 @@ export default [
   {
     component: Main,
     path: "/",
-    title: "Homepage"
-  }
+    title: "Homepage",
+  },
 ] as ModuleRoute[];

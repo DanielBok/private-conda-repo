@@ -3,6 +3,7 @@ export type Store = MetaInfo & {
 };
 
 export type MetaInfo = {
+  indexer: "shell" | "docker";
   image: string;
   registry: string;
   repository: string;

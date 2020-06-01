@@ -15,12 +15,12 @@ export const fetchAllPackages = (): ThunkFunctionAsync => async (
   const { data, status } = await api.Get<PackageType.PackageMetaInfo[]>("p", {
     beforeRequest: () =>
       dispatch(PackageAction.fetchAllPackagesAsync.request()),
-    onError: e => {
+    onError: (e) => {
       notification.error({
         message: `Could not retrieve package data. Reason: ${e.data}`,
-        duration: 8
+        duration: 8,
       });
-    }
+    },
   });
 
   if (status === 200) {
@@ -44,7 +44,7 @@ export const fetchPackageDetail = (
     `p/${channel}/${pkg}`,
     {
       beforeRequest: () => dispatch(PackageAction.fetchPackageDetail.request()),
-      onError: () => dispatch(PackageAction.fetchPackageDetail.failure())
+      onError: () => dispatch(PackageAction.fetchPackageDetail.failure()),
     }
   );
   if (status === 200) dispatch(PackageAction.fetchPackageDetail.success(data));
@@ -62,7 +62,7 @@ export const fetchChannelPackages = (
   const { status: status1, data: packages } = await api.Get<
     PackageType.PackageMetaInfo[]
   >(`p/${channel}`, {
-    beforeRequest: () => dispatch(PackageAction.fetchUserPackages.request())
+    beforeRequest: () => dispatch(PackageAction.fetchUserPackages.request()),
   });
 
   if (status1 !== 200) return;
@@ -70,7 +70,7 @@ export const fetchChannelPackages = (
   const { status: status2, data: userData } = await api.Get<
     Omit<PackageType.ChannelPackages<string>, "packages">
   >(`user/${channel}`, {
-    onError: () => dispatch(PackageAction.fetchUserPackages.failure())
+    onError: () => dispatch(PackageAction.fetchUserPackages.failure()),
   });
 
   if (status2 === 200) {
@@ -93,7 +93,7 @@ export const removePackage = (
 ): ThunkFunctionAsync => async (dispatch, getState) => {
   const {
     user,
-    package: { loading }
+    package: { loading },
   } = getState();
   if (loading.details === "REQUEST") return;
 
@@ -102,11 +102,11 @@ export const removePackage = (
   const payload: PackageType.RemovePackagePayload = {
     channel,
     password: user.password,
-    package: detail
+    package: detail,
   };
   const { status } = await api.Delete<void>("p", payload, {
     beforeRequest: () => dispatch(PackageAction.removePackageDetail.request()),
-    onError: () => dispatch(PackageAction.removePackageDetail.failure())
+    onError: () => dispatch(PackageAction.removePackageDetail.failure()),
   });
 
   if (status === 200) {

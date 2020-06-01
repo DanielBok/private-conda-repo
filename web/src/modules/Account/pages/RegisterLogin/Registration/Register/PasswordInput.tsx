@@ -5,33 +5,33 @@ import { useFormContext } from "./hooks";
 
 export default () => {
   const {
-    getFieldDecorator,
     getFieldError,
     getFieldValue,
     isFieldTouched,
-    validateFields
+    validateFields,
   } = useFormContext().form;
 
   return (
-    <Form.Item validateStatus={status()} hasFeedback>
-      {getFieldDecorator(CONST.PASSWORD, {
-        rules: [
-          {
-            required: true,
-            message: "Password cannot be empty"
-          },
-          {
-            validator(_, value, callback) {
-              if (value && isFieldTouched(CONST.PASSWORD)) {
-                validateFields([CONST.CONFIRM], {
-                  force: true
-                });
-              }
-              callback();
+    <Form.Item
+      name={CONST.PASSWORD}
+      validateStatus={status()}
+      hasFeedback
+      rules={[
+        {
+          required: true,
+          message: "Password cannot be empty",
+        },
+        {
+          validator(_, value, callback) {
+            if (value && isFieldTouched(CONST.PASSWORD)) {
+              validateFields([CONST.CONFIRM]);
             }
-          }
-        ]
-      })(<Input placeholder="Password" type="password" />)}
+            callback();
+          },
+        },
+      ]}
+    >
+      <Input placeholder="Password" type="password" />
     </Form.Item>
   );
 

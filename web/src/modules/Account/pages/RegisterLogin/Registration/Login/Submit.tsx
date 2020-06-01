@@ -7,7 +7,7 @@ import styles from "./styles.less";
 export default () => {
   const {
     form: { getFieldsError: E, isFieldTouched: T },
-    submit
+    submit,
   } = useLoginContext();
   const touched = T(CONST.USERNAME) && T(CONST.PASSWORD);
 

@@ -3,12 +3,12 @@ import axios, {
   AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
-  AxiosTransformer
+  AxiosTransformer,
 } from "axios";
 import { Action } from "redux";
 import { ThunkDispatch } from "redux-thunk";
-import * as ApiTypes from "./types";
 import * as T from "./transformers";
+import * as ApiTypes from "./types";
 
 const apiUrl = !!process.env.REACT_APP_API_URL
   ? process.env.REACT_APP_API_URL
@@ -22,11 +22,11 @@ export class API {
       baseURL = apiUrl,
       transformRequest = [
         T.SnakeCaseKeysTransformer,
-        ...(axios.defaults.transformRequest as AxiosTransformer[])
+        ...(axios.defaults.transformRequest as AxiosTransformer[]),
       ],
       transformResponse = [
         ...(axios.defaults.transformResponse as AxiosTransformer[]),
-        T.CamelCaseKeysTransformer
+        T.CamelCaseKeysTransformer,
       ],
       ...rest
     } = config || {};
@@ -35,7 +35,7 @@ export class API {
       baseURL,
       transformRequest,
       transformResponse,
-      ...rest
+      ...rest,
     });
   }
 
@@ -135,7 +135,7 @@ function runFunctionHandlers(
   if (typeof funcs === "function") {
     funcs();
   } else {
-    funcs.forEach(f => runFunctionHandlers(f));
+    funcs.forEach((f) => runFunctionHandlers(f));
   }
 }
 
@@ -148,7 +148,7 @@ function runSuccessHandlers<R>(
   if (typeof funcs === "function") {
     funcs(data);
   } else {
-    funcs.forEach(f => runSuccessHandlers(data, f));
+    funcs.forEach((f) => runSuccessHandlers(data, f));
   }
 }
 
@@ -161,7 +161,7 @@ function runErrorHandlers(
   if (typeof funcs === "function") {
     funcs(error);
   } else {
-    funcs.forEach(f => runErrorHandlers(error, f));
+    funcs.forEach((f) => runErrorHandlers(error, f));
   }
 }
 
@@ -188,7 +188,7 @@ function wrapErrorResponse(e?: AxiosResponse) {
       config: {},
       headers: {},
       request: {},
-      statusText: ""
+      statusText: "",
     };
   return e;
 }

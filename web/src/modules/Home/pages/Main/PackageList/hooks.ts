@@ -5,7 +5,7 @@ export const SearchContext = React.createContext<{
   setSearch: (v: string) => void;
 }>({
   search: "",
-  setSearch: () => {}
+  setSearch: () => {},
 });
 
 export const useSearchContext = () => useContext(SearchContext);

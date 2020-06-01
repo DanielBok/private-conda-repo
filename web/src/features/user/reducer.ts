@@ -1,19 +1,19 @@
 import AllActions from "@/infrastructure/rootAction";
 import produce from "immer";
 import { getType } from "typesafe-actions";
+import * as UserAction from "./actions";
 
 import * as UserType from "./types";
-import * as UserAction from "./actions";
 
 const defaultState: UserType.Store = {
   username: "",
   password: "",
   validated: false,
-  loading: "SUCCESS"
+  loading: "SUCCESS",
 };
 
 export default (state = defaultState, action: AllActions) =>
-  produce(state, draft => {
+  produce(state, (draft) => {
     switch (action.type) {
       case getType(UserAction.createUserAsync.request):
       case getType(UserAction.fetchUserCredentialsAsync.request):

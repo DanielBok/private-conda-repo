@@ -20,7 +20,7 @@ class ErrorBoundary extends Component<Props, State> {
     super(props);
 
     this.state = {
-      hasError: false
+      hasError: false,
     };
 
     props.history.listen(() => {
@@ -54,7 +54,7 @@ class ErrorBoundary extends Component<Props, State> {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  goto: (path: string) => dispatch(push(path))
+  goto: (path: string) => dispatch(push(path)),
 });
 
 export default connect(null, mapDispatchToProps)(withRouter(ErrorBoundary));

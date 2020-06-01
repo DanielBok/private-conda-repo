@@ -1,6 +1,12 @@
 import { PackageSelector } from "@/features/package";
 import { timeSinceUpload } from "@/libs/date";
-import { Card, Icon } from "antd";
+import { Card } from "antd";
+import ProfileOutlined from "@ant-design/icons/ProfileOutlined";
+import DownloadOutlined from "@ant-design/icons/DownloadOutlined";
+import CalendarOutlined from "@ant-design/icons/CalendarOutlined";
+import HomeOutlined from "@ant-design/icons/HomeOutlined";
+import CodeOutlined from "@ant-design/icons/CodeOutlined";
+import FileWordOutlined from "@ant-design/icons/FileWordOutlined";
 import React from "react";
 import { useSelector } from "react-redux";
 import styles from "./styles.less";
@@ -14,7 +20,7 @@ export default () => {
     <Card className={styles.mainCard}>
       {license && (
         <div className={styles.topCard}>
-          <Icon type="profile" />
+          <ProfileOutlined />
           <span>License: </span>
           <a
             href={`https://opensource.org/search/node/${license}`}
@@ -27,14 +33,14 @@ export default () => {
       )}
 
       {([
-        [home, "Home", "home"],
-        [devUrl, "Development", "code"],
-        [docUrl, "Documentation", "file-word"]
-      ] as [string | null, string, string][]).map(
+        [home, "Home", <HomeOutlined />],
+        [devUrl, "Development", <CodeOutlined />],
+        [docUrl, "Documentation", <FileWordOutlined />],
+      ] as [string | null, string, JSX.Element][]).map(
         ([link, title, icon]) =>
           link && (
-            <div className={styles.topCard} key={icon}>
-              <Icon type={icon} />
+            <div className={styles.topCard} key={title}>
+              {icon}
               <span>{title}: </span>
               <a href={link} rel="noopener noreferrer" target="_blank">
                 {link}
@@ -44,12 +50,12 @@ export default () => {
       )}
 
       <div className={styles.topCard}>
-        <Icon type="download" />
+        <DownloadOutlined />
         <span>{downloads} total downloads</span>
       </div>
 
       <div className={styles.topCard}>
-        <Icon type="calendar" />
+        <CalendarOutlined />
         <span>Last Upload: {timeSinceUpload(timestamp)}</span>
       </div>
     </Card>

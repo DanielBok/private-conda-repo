@@ -14,7 +14,7 @@ export const timeSinceUpload = (timestamp: number | Moment) => {
     ["years", duration.years()],
     ["months", duration.months()],
     ["days", duration.days()],
-    ["hours", duration.hours()]
+    ["hours", duration.hours()],
   ]
     .filter(([_, v]) => v !== 0)
     .slice(0, 2) as [string, number][];

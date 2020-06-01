@@ -5,29 +5,28 @@ import { useLoginContext } from "./hooks";
 
 export default () => {
   const {
-    form: { getFieldDecorator, getFieldError, isFieldTouched },
+    form: { getFieldError, isFieldTouched },
     submit,
-    valid
+    valid,
   } = useLoginContext();
 
   return (
-    <Form.Item hasFeedback validateStatus={status()}>
-      {getFieldDecorator(CONST.PASSWORD, {
-        rules: [
-          {
-            required: true,
-            message: "password is required"
-          }
-        ]
-      })(
-        <Input
-          placeholder="Password"
-          type="password"
-          onKeyPress={e => {
-            if (e.key === "Enter") submit();
-          }}
-        />
-      )}
+    <Form.Item
+      name={CONST.PASSWORD}
+      hasFeedback
+      validateStatus={status()}
+      rules={[
+        { required: true, message: "password is required" },
+        { min: 4, message: "password needs to have at least 4 characters" },
+      ]}
+    >
+      <Input
+        placeholder="Password"
+        type="password"
+        onKeyPress={(e) => {
+          if (e.key === "Enter") submit();
+        }}
+      />
     </Form.Item>
   );
 

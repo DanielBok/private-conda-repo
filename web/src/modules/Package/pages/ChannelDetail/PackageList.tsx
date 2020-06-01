@@ -1,11 +1,12 @@
 import { PackageSelector } from "@/features/package";
 import { timeSinceUpload } from "@/libs/date";
-import { Card, Icon, List } from "antd";
+import Logo from "@/resource/conda.svg";
+import QuestionCircleOutlined from "@ant-design/icons/QuestionCircleOutlined";
+import { Card, List } from "antd";
 import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import styles from "./styles.less";
-import Logo from "@/resource/conda.svg";
 
 export default () => {
   const { channel, packages } = useSelector(PackageSelector.channelPackages);
@@ -18,7 +19,7 @@ export default () => {
             className={styles.iconLink}
             href="https://docs.anaconda.com/anaconda-cloud/user-guide/tasks/work-with-packages/"
           >
-            <Icon type="question-circle" />
+            <QuestionCircleOutlined />
           </a>
           Packages
         </span>
@@ -28,7 +29,7 @@ export default () => {
       <List
         itemLayout="horizontal"
         dataSource={packages}
-        renderItem={item => (
+        renderItem={(item) => (
           <List.Item className={styles.listItem}>
             <img src={Logo} alt="" />
             <Link to={`/p/${channel}/${item.name}`}>{item.name}</Link>

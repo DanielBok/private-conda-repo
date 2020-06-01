@@ -1,7 +1,8 @@
-import { Card, Icon, Tooltip } from "antd";
+import QuestionCircleFilled from "@ant-design/icons/QuestionCircleFilled";
+import { Card, Tooltip } from "antd";
 import React from "react";
-import PlatformGuide from "./PlatformGuide";
 import CommandGuide from "./CommandGuide";
+import PlatformGuide from "./PlatformGuide";
 import styles from "./styles.less";
 
 export default () => (
@@ -14,7 +15,7 @@ export default () => (
         title="Learn more about the conda install process"
         overlayClassName={styles.tooltip}
       >
-        <Icon type="question-circle" theme="filled" />
+        <QuestionCircleFilled />
       </Tooltip>
     </div>
 

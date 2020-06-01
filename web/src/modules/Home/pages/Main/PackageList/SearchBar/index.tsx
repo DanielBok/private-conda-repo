@@ -1,4 +1,5 @@
-import { Form, Icon, Input } from "antd";
+import SearchOutlined from "@ant-design/icons/SearchOutlined";
+import { Form, Input } from "antd";
 import React from "react";
 import { useSearchContext } from "../hooks";
 import styles from "./styles.less";
@@ -10,10 +11,10 @@ export default () => {
     <Form.Item className={styles.searchBox}>
       <Input
         value={search}
-        onChange={e => setSearch(e.target.value)}
+        onChange={(e) => setSearch(e.target.value)}
         placeholder="Search Private Conda Repo"
         size="large"
-        addonAfter={<Icon type="search" />}
+        addonAfter={<SearchOutlined />}
       />
     </Form.Item>
   );

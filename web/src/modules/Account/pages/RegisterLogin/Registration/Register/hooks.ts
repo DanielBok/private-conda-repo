@@ -4,7 +4,7 @@ import { RegistrationForm } from "./types";
 export const FormContext = React.createContext<RegistrationForm>({
   form: {} as any,
   validateStatus: "",
-  setValidateStatus: () => {}
+  setValidateStatus: () => {},
 });
 
 export const useFormContext = () => useContext(FormContext);

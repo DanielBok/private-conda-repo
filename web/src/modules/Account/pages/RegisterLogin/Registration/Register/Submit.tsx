@@ -12,7 +12,7 @@ export default () => {
 
   const {
     form: { getFieldsError: E, isFieldTouched: T, getFieldValue: G },
-    validateStatus
+    validateStatus,
   } = useFormContext();
   const touched =
     T(CONST.USERNAME) &&

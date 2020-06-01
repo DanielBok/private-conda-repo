@@ -220,7 +220,7 @@ type MockChannel struct {
 	channel string
 }
 
-func (m *MockChannel) AddPackage(_ io.Reader, pkg *dto.PackageDto) (*dto.PackageDto, error) {
+func (m *MockChannel) AddPackage(_ io.Reader, pkg *dto.PackageDto, _ []string) (*dto.PackageDto, error) {
 	return pkg, nil
 }
 

@@ -48,7 +48,7 @@ type Indexer interface {
 
 type Channel interface {
 	// Adds a package to the channel
-	AddPackage(file io.Reader, pkg *dto.PackageDto) (*dto.PackageDto, error)
+	AddPackage(file io.Reader, pkg *dto.PackageDto, fixes []string) (*dto.PackageDto, error)
 
 	// Returns the absolute path of channel
 	Directory() string

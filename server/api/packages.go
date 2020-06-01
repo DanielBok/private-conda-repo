@@ -227,15 +227,9 @@ func (h *PackageHandler) UploadPackage() http.HandlerFunc {
 		defer pkg.Close()
 
 		// save package to disk
-		p, err := chn.AddPackage(f, pkg.Package)
+		p, err := chn.AddPackage(f, pkg.Package, fixes)
 		if err != nil {
 			return nil, ErrSavingPackageToDisk
-		}
-
-		// reindex channel
-		err = chn.Index(fixes)
-		if err != nil {
-			return nil, err
 		}
 
 		return p, nil

@@ -54,7 +54,7 @@ func newPreloadedChannel(name string) (interfaces.Channel, error) {
 			return nil, err
 		}
 
-		_, err = chn.AddPackage(f, details.ToPackageDto())
+		_, err = chn.AddPackage(f, details.ToPackageDto(), nil)
 		if err != nil {
 			return nil, err
 		}

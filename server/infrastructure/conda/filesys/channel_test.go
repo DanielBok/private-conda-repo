@@ -26,7 +26,7 @@ func TestChannel_CRUDPackage(t *testing.T) {
 	assert.NoError(err)
 	defer libs.IOCloser(file)
 
-	pkg, err := chn.AddPackage(file, testPkg.ToPackageDto())
+	pkg, err := chn.AddPackage(file, testPkg.ToPackageDto(), nil)
 	assert.NoError(err)
 
 	channelData, err := chn.GetChannelData()

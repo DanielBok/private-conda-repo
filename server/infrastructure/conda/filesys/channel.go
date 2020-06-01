@@ -38,7 +38,7 @@ func newChannel(name, dir string, indexer Indexer) (*Channel, error) {
 }
 
 // Adds a package to the channel
-func (c *Channel) AddPackage(file io.Reader, pkg *dto.PackageDto) (*dto.PackageDto, error) {
+func (c *Channel) AddPackage(file io.Reader, pkg *dto.PackageDto, fixes []string) (*dto.PackageDto, error) {
 	if c.packageExists(pkg) {
 		err := c.RemoveSinglePackage(pkg)
 		if err != nil {
@@ -59,7 +59,7 @@ func (c *Channel) AddPackage(file io.Reader, pkg *dto.PackageDto) (*dto.PackageD
 		return nil, errors.Wrapf(err, "error saving package '%s' in channel '%s' for platform '%s' to disk", pkg.Name, c.name, pkg.Platform)
 	}
 
-	err = c.Index(nil)
+	err = c.Index(fixes)
 	if err != nil {
 		return nil, err
 	}

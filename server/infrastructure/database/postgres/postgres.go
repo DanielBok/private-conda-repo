@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 
 	"private-conda-repo/config"
 )
@@ -26,6 +27,7 @@ func New(config *config.DbConfig) (*Postgres, error) {
 			return &Postgres{db: db}, nil
 		}
 		wait += i
+		log.Infof("waiting %d seconds to retry connection with database at %s", wait, config.Host)
 		time.Sleep(time.Duration(wait) * time.Second)
 	}
 

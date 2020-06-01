@@ -9,17 +9,20 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	"private-conda-repo/conda/condatypes"
-	"private-conda-repo/store/models"
+	"private-conda-repo/api/interfaces"
+	"private-conda-repo/domain/entity"
+	"private-conda-repo/domain/enum"
 )
 
 var nameRegex = regexp.MustCompile(`([\w\-_]+)-([\w.]+)-(\w+)_(\d+).tar.bz2`)
 
-func FileHandler(mountFolder string) http.HandlerFunc {
+type FileHandler struct {
+	DB interfaces.DataAccessLayer
+}
+
+func (h *FileHandler) Server(mountFolder string) http.HandlerFunc {
 	root := http.Dir(mountFolder)
 	fs := http.FileServer(root)
-
-	log.WithField("Repository mount folder used to serve packages", root).Info()
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		components := strings.Split(strings.Trim(r.RequestURI, "/"), "/")
@@ -31,7 +34,7 @@ func FileHandler(mountFolder string) http.HandlerFunc {
 		channel := components[0]
 		platform := components[1]
 		file := components[2]
-		if _, err := condatypes.MapPlatform(platform); err != nil {
+		if _, err := enum.MapPlatform(platform); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -40,21 +43,9 @@ func FileHandler(mountFolder string) http.HandlerFunc {
 		case file == "current_repodata.json" || file == "repodata.json":
 			log.Infof("requesting repodata from '%s/%s'", channel, platform)
 		case strings.HasSuffix(file, ".tar.bz2"):
-			p, err := getPackageDetail(file)
+			err := h.updateCount(channel, file, platform)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
-				return
-			}
-
-			if _, err := db.IncreasePackageCount(&models.PackageCount{
-				Channel:     channel,
-				Package:     p.Name,
-				BuildString: p.BuildString,
-				BuildNumber: p.BuildNumber,
-				Version:     p.Version,
-				Platform:    platform,
-			}); err != nil {
-				http.Error(w, errors.Wrap(err, "could not increment package count").Error(), http.StatusInternalServerError)
+				http.Error(w, "could not update package count", http.StatusBadRequest)
 				return
 			}
 			log.Infof("serving '%s' to remote '%s'", file, r.RemoteAddr)
@@ -67,21 +58,29 @@ func FileHandler(mountFolder string) http.HandlerFunc {
 	}
 }
 
-func getPackageDetail(file string) (*condatypes.Package, error) {
+func (h *FileHandler) updateCount(channel, file, platform string) error {
+	chn, err := h.DB.GetChannel(channel)
+	if err != nil {
+		return err
+	}
+
 	m := nameRegex.FindStringSubmatch(file)
 	if len(m) != 5 {
-		return nil, errors.Errorf("could not parse package name from '%s'", file)
+		return errors.Errorf("could not parse package name from '%s'", file)
 	}
 
-	bNo, err := strconv.Atoi(m[4])
+	buildNo, err := strconv.Atoi(m[4])
 	if err != nil {
-		return nil, errors.Errorf("could not parse build number from '%s'", file)
+		return errors.Errorf("could not parse build number from '%s'", file)
 	}
 
-	return &condatypes.Package{
-		Name:        m[1],
+	_, err = h.DB.IncreasePackageCount(&entity.PackageCount{
+		ChannelId:   chn.Id,
+		Package:     m[1],
 		Version:     m[2],
 		BuildString: m[3],
-		BuildNumber: bNo,
-	}, nil
+		BuildNumber: buildNo,
+		Platform:    platform,
+	})
+	return err
 }

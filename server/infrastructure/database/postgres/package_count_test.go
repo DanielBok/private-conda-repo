@@ -34,10 +34,11 @@ func TestPostgres_PackageCountOperations(t *testing.T) {
 			Platform:    platform,
 		})
 		assert.NoError(err)
+		assert.Equal(0, pkg.Count)
 
-		count, err := store.IncreasePackageCount(pkg)
+		pkg, err = store.IncreasePackageCount(pkg)
 		assert.NoError(err)
-		assert.EqualValues(1, count.Count)
+		assert.EqualValues(1, pkg.Count)
 
 		counts, err = store.GetPackageCounts(chn.Id, packageName)
 		assert.NoError(err)

@@ -40,7 +40,7 @@ func newChannel(name, dir string, indexer Indexer) (*Channel, error) {
 // Adds a package to the channel
 func (c *Channel) AddPackage(file io.Reader, pkg *dto.PackageDto, fixes []string) (*dto.PackageDto, error) {
 	if c.packageExists(pkg) {
-		err := c.RemoveSinglePackage(pkg)
+		err := c.removePackage(pkg)
 		if err != nil {
 			return nil, errors.New("could not remove existing package")
 		}
@@ -107,16 +107,9 @@ func (c *Channel) Name() string {
 
 // Removes a single package from the channel
 func (c *Channel) RemoveSinglePackage(pkg *dto.PackageDto) error {
-	if !c.packageExists(pkg) {
-		return errors.New("package specified does not exist")
-	}
-
-	if err := os.Remove(c.packagePath(pkg)); err != nil {
-		return errors.Wrapf(err, "error removing package '%+v'", pkg)
-	}
-
-	if err := os.Remove(c.channelDataFilePath()); err != nil {
-		return errors.Wrap(err, "could not replace channeldata and refresh Index")
+	err := c.removePackage(pkg)
+	if err != nil {
+		return err
 	}
 
 	if err := c.Index(nil); err != nil {
@@ -231,4 +224,21 @@ func (c *Channel) retrievePackageFamily(name string) ([]string, error) {
 		}
 	}
 	return packages, nil
+}
+
+// Removes the package without indexing the channel
+func (c *Channel) removePackage(pkg *dto.PackageDto) error {
+	if !c.packageExists(pkg) {
+		return ErrPackageNotFound
+	}
+
+	if err := os.Remove(c.packagePath(pkg)); err != nil {
+		return errors.Wrapf(err, "error removing package '%+v'", pkg)
+	}
+
+	if err := os.Remove(c.channelDataFilePath()); err != nil {
+		return errors.Wrap(err, "could not replace channeldata.json")
+	}
+
+	return nil
 }

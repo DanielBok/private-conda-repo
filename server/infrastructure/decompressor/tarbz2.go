@@ -20,6 +20,10 @@ import (
 
 type TarBz2Decompressor struct{}
 
+func New() *TarBz2Decompressor {
+	return &TarBz2Decompressor{}
+}
+
 // Retrieves MetaData from the .tar.bz2 file
 func (b *TarBz2Decompressor) RetrieveMetadata(f io.ReadCloser) (*MetaData, error) {
 	defer libs.IOCloser(f)

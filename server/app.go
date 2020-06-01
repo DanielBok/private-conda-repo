@@ -7,59 +7,77 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	"private-conda-repo/application"
+	"private-conda-repo/api"
+	"private-conda-repo/api/interfaces"
 	"private-conda-repo/config"
 	"private-conda-repo/fileserver"
-	"private-conda-repo/indexer"
+	"private-conda-repo/infrastructure/conda/filesys"
+	"private-conda-repo/infrastructure/conda/index"
+	"private-conda-repo/infrastructure/database/postgres"
+	"private-conda-repo/infrastructure/decompressor"
 )
 
 type App struct {
+	ApiServer      *http.Server
+	FileServer     *http.Server
 	conf           *config.AppConfig
 	idleConnClosed chan struct{}
 }
 
-func NewApp(conf *config.AppConfig) *App {
-	return &App{conf: conf}
-}
-
-func (a *App) updateIndexer() *App {
-	idx, err := indexer.New(a.conf.Conda)
+func NewApp() (*App, error) {
+	conf, err := config.New()
 	if err != nil {
-		log.Fatalln(err)
+		return nil, errors.Wrap(err, "error getting config")
 	}
 
-	if err := idx.Check(); err != nil {
-		log.Fatalln("indexer does not exist. ", err)
+	db, err := postgres.New(conf.DB)
+	if err != nil {
+		return nil, err
 	}
 
-	if err := idx.Update(); err != nil {
-		log.Fatalln("Could not update indexer")
+	var indexer interfaces.Indexer
+	switch conf.Indexer.Type {
+	case "docker":
+		indexer, err = index.NewDockerIndex(conf.Indexer.ImageName)
+	case "shell":
+		indexer, err = index.NewShellIndex()
+	}
+	if err != nil {
+		return nil, err
 	}
 
-	return a
+	if conf.Indexer.Update {
+		err = indexer.Update()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	fs := filesys.New(conf.Indexer.MountFolder, indexer)
+
+	app := &App{
+		conf:           conf,
+		idleConnClosed: make(chan struct{}),
+	}
+
+	app.FileServer, err = fileserver.New(conf, db)
+	if err != nil {
+		return nil, err
+	}
+
+	app.ApiServer, err = api.New(conf, db, decompressor.New(), fs)
+	if err != nil {
+		return nil, err
+	}
+
+	return app, nil
 }
 
 // Runs the servers. Returns a channel for graceful shutdown
 func (a *App) runServers() <-chan struct{} {
-	var _error error
-	fileSrv, err := fileserver.New(a.conf)
-	if err != nil {
-		_error = multierror.Append(_error, errors.Wrap(err, "Could not create file server"))
-	}
-	appSrv, err := application.New(a.conf)
-	if err != nil {
-		_error = multierror.Append(_error, errors.Wrap(err, "Could not create application server"))
-	}
-
-	if _error != nil {
-		log.Fatalln(_error)
-	}
-
-	a.idleConnClosed = make(chan struct{})
 	go func() {
 		sigint := make(chan os.Signal, 1)
 		signal.Notify(sigint, os.Interrupt, syscall.SIGTERM)
@@ -67,11 +85,11 @@ func (a *App) runServers() <-chan struct{} {
 
 		log.WithField("signal", sig.String()).Info("Shutting down servers")
 
-		if err := fileSrv.Shutdown(context.Background()); err != nil {
+		if err := a.FileServer.Shutdown(context.Background()); err != nil {
 			log.WithField("cause", err).Error("error shutting down file server")
 		}
-		if err := appSrv.Shutdown(context.Background()); err != nil {
-			log.WithField("cause", err).Error("error shutting down application server")
+		if err := a.ApiServer.Shutdown(context.Background()); err != nil {
+			log.WithField("cause", err).Error("error shutting down api server")
 		}
 		close(a.idleConnClosed)
 	}()
@@ -91,8 +109,8 @@ func (a *App) runServers() <-chan struct{} {
 		}
 	}
 
-	go runServer(fileSrv)
-	go runServer(appSrv)
+	go runServer(a.FileServer)
+	go runServer(a.ApiServer)
 
 	return a.idleConnClosed
 }

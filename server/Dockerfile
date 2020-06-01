@@ -8,7 +8,7 @@ RUN go build -o pcr .
 FROM continuumio/miniconda3:latest
 RUN conda config --set always_yes true && \
     conda update --all && \
-    conda install conda-build && \
+    conda install conda-build conda-verify && \
     conda clean --all
 
 RUN mkdir -p /var/condapkg

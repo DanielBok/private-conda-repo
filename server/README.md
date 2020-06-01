@@ -4,18 +4,10 @@ PCR Server
 The PCR server is used as an interface to create channels, upload packages and
 provide any meta-data api for downstream users such as the web application.
 
-By default, the application server runs on port 5060 and the repository runs on
-port 5050. 
-
-The application server is used to handle things such as user creation, meta information api, package upload etc. So the web interface and the 
-CLI tool mainly touches this server.
-
-The repository server is the one that is used whenever you do a `conda install`. 
-
-## Nomenclature
-
-Users and channels are used interchangeably in this application. The username
-is also the channel name from which you install or upload your packages
+By default, the application (registry) server runs on port 5060 and the repository runs 
+on port 5050. The application server handles things such as channel creation, meta 
+information api, package upload etc. The web interface and CLI tool mainly touches this
+layer. The repository server is the one that is used whenever you do a `conda install`. 
 
 ## API
 
@@ -38,9 +30,9 @@ type Output = {
 }
 ``` 
 
-### `/user` [GET]
+### `/channel` [GET]
 
-Returns a list of all the users / channels
+Returns a list of all the channels
 
 ```typescript
 type Output = {
@@ -50,9 +42,9 @@ type Output = {
 }[]
 ```
 
-### `/user/{name} [GET]
+### `/channel/{name} [GET]
 
-Gets information about the single channel / user
+Gets information about the specified channel
 
 ```typescript
 type Output = {
@@ -62,9 +54,10 @@ type Output = {
 }
 ```
 
-### `/user [POST]
+### `/channel [POST]
 
-Creates a channel. The credentials are used later to upload/remove packages
+Creates a channel. The credentials specified are used for validation when 
+uploading/removing packages
 
 ```typescript
 type Input = {
@@ -80,13 +73,13 @@ type Output = {
 }
 ```
 
-### `/user/check [POST]
+### `/channel/check [POST]
 
-Used to validate a user. 
+Used to validate a sign in as channel owner. 
 
 Returns status code:
-  - **200** if the user is valid
-  - **403** if user / password do not match
+  - **200** if the credentials are valid
+  - **403** if credentials are invalid
   - **400** any other errors
 
 ```typescript
@@ -96,10 +89,10 @@ type Input = {
 }
 ```
 
-### `/user` [DELETE]
+### `/channel` [DELETE]
 
-Removes a user and channel from the repository. This will also delete
-all packages that the user uploaded previously.
+Removes a channel from the repository. This will also delete all packages that 
+have been uploaded onto the channel.
 
 Returns:
   - **200** if deleted successfully 
@@ -132,9 +125,9 @@ type Output = {
 }[]
 ```
 
-### `/p/{user}` [GET]
+### `/p/{channel}` [GET]
 
-Get a list of all packages that the specified user has uploaded
+Get a list of all packages in the specified channel
 
 ```typescript
 type Output = {
@@ -152,9 +145,9 @@ type Output = {
 }[]
 ```
 
-### `/p/{user}/{package}` [GET]
+### `/p/{channel}/{package}` [GET]
 
-Get meta information about the specific package that the user has uploaded.
+Get meta information about the specific package in the channel
 
 ```typescript
 type Output = {

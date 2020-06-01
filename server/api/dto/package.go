@@ -55,3 +55,13 @@ func (p *PackageDto) ToPackageCount(channelId int) *entity.PackageCount {
 		UploadDate:  time.Now(),
 	}
 }
+
+// A DTO giving information about the package in the channel. For example, the channel can be
+// 'EISR' and the package can be 'numpy'. This DTO will then provide all the details for this
+// specification for all versions of the package.
+type PackageDetails struct {
+	Channel string                 `json:"channel"`
+	Package string                 `json:"package"`
+	Details []*entity.PackageCount `json:"details"`
+	Latest  *ChannelData           `json:"latest"`
+}

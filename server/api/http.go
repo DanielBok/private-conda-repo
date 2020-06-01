@@ -1,4 +1,4 @@
-package application
+package api
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 )
 
 func toJson(w http.ResponseWriter, object interface{}) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "api/json")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(object); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

@@ -42,6 +42,18 @@ func (c *ChannelDto) IsValid() error {
 	return err
 }
 
+// Creates a new ChannelDto object from the channel entity where the password is automatically masked
+func NewChannelDto(channel *entity.Channel) *ChannelDto {
+	return &ChannelDto{
+		Id:        channel.Id,
+		Channel:   channel.Channel,
+		Email:     channel.Email,
+		CreatedOn: channel.CreatedOn,
+	}
+}
+
+// Contains information about the channel in general. This file is located at the root of the channel
+// folder. It does not inform anything about packages in the channel
 type ChannelData struct {
 	Channel     string   `json:"channel"`
 	Platforms   []string `json:"platforms"`
@@ -78,23 +90,12 @@ func ToChannelDataDto(channelData *condatypes.ChannelData, channel string) []*Ch
 	return output
 }
 
-type ChannelPackageDetails struct {
-	Channel string                 `json:"channel"`
-	Package string                 `json:"package"`
-	Details []*entity.PackageCount `json:"details"`
-	Latest  *ChannelData           `json:"latest"`
-}
-
-type ChannelDetails struct {
+// A DTO containing the channel's credentials and an optional package specification
+// This DTO is used for removal of packages. If 'package' is not specified, it'll means
+// to remove all packages in the channel. If 'package' is specified, it means to remove
+// the specific package (version, build, etc) in the channel.
+type ChannelPackage struct {
 	Channel  string      `json:"channel"`
 	Password string      `json:"password"`
-	Package  *PackageDto `json:"package"`
-}
-
-func (c *ChannelDetails) Validate() error {
-	c.Channel = strings.TrimSpace(c.Channel)
-	if c.Channel == "" {
-		return errors.New("channel name cannot be empty or whitespaces")
-	}
-	return nil
+	Package  *PackageDto `json:"package,omitempty"`
 }

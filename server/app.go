@@ -110,6 +110,7 @@ func (a *App) RunServers() <-chan struct{} {
 
 	runServer := func(srv *http.Server) {
 		tls := a.conf.TLS
+		log.Info(tls.HasCert())
 		if tls.HasCert() {
 			log.Info("Running server in HTTPS mode")
 			if err := srv.ListenAndServeTLS(tls.Cert, tls.Key); err != http.ErrServerClosed {

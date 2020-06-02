@@ -18,11 +18,11 @@ func (t *TLSConfig) HasCert() bool {
 		return false
 	}
 
-	if libs.PathExists(t.Cert) {
+	if !libs.PathExists(t.Cert) {
 		return false
 	}
 
-	if libs.PathExists(t.Key) {
+	if !libs.PathExists(t.Key) {
 		return false
 	}
 

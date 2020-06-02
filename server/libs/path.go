@@ -1,12 +1,12 @@
 package libs
 
-import "os"
+import (
+	"os"
+)
 
-// Checks that path or file exists
+// Check that path or file exists. This is a simple check and should suffice
+// for most use cases.
 func PathExists(path string) bool {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return false
-	} else {
-		return err == nil
-	}
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }

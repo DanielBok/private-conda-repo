@@ -6,20 +6,20 @@ import packageRoutes from "@/modules/Package";
 const routeMap: Record<string, ModuleRoutes> = {
   "/": {
     clusterName: "Home",
-    routes: homeRoutes
+    routes: homeRoutes,
   },
   "/account": {
     clusterName: "Account",
-    routes: accountRoutes
+    routes: accountRoutes,
   },
   "/help": {
     clusterName: "Help",
-    routes: helpRoutes
+    routes: helpRoutes,
   },
   "/p": {
     clusterName: "Package",
-    routes: packageRoutes
-  }
+    routes: packageRoutes,
+  },
 };
 
 export default routeMap;

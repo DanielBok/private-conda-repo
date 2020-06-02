@@ -18,6 +18,10 @@ import (
 	"cli/request"
 )
 
+func init() {
+	RootCmd.Flags().Bool("no-abi", false, "If true, removes the 'python_abi' dependency for the channel")
+}
+
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:     "upload",
@@ -26,7 +30,7 @@ var RootCmd = &cobra.Command{
 	Example: "pcr upload dist/noarch/numpy-0.1.1-py_0.tar.bz",
 	Run: func(cmd *cobra.Command, args []string) {
 		file := args[0]
-		handler := newUploadHandler()
+		handler := newUploadHandler(cmd)
 
 		err := handler.verifyPackage(file)
 		if err != nil {
@@ -34,7 +38,13 @@ var RootCmd = &cobra.Command{
 			return
 		}
 
-		pkg, err := handler.uploadPackage()
+		payload, err := handler.createPayload()
+		if err != nil {
+			cmd.PrintErr(err)
+			return
+		}
+
+		pkg, err := handler.upload(payload)
 		if err != nil {
 			cmd.PrintErr(err)
 			return
@@ -51,7 +61,7 @@ Details
 	},
 }
 
-type uploadHandler struct {
+type Handler struct {
 	cmd         *cobra.Command
 	url         string
 	channel     string
@@ -59,10 +69,15 @@ type uploadHandler struct {
 	packagePath string
 }
 
-func newUploadHandler() uploadHandler {
+type Payload struct {
+	Body        *bytes.Buffer
+	ContentType string
+}
+
+func newUploadHandler(cmd *cobra.Command) Handler {
 	conf := config.New()
-	h := uploadHandler{
-		cmd:      nil,
+	h := Handler{
+		cmd:      cmd,
 		url:      conf.Registry + "/p",
 		channel:  conf.Channel.Channel,
 		password: conf.Channel.Password,
@@ -70,7 +85,7 @@ func newUploadHandler() uploadHandler {
 	return h
 }
 
-func (h *uploadHandler) verifyPackage(file string) error {
+func (h *Handler) verifyPackage(file string) error {
 	if !strings.HasSuffix(file, ".tar.bz2") {
 		return errors.New("expect conda package should have extension '.tar.bz2'")
 	}
@@ -93,17 +108,30 @@ func (h *uploadHandler) verifyPackage(file string) error {
 	return errors.New("package does not exist")
 }
 
-func (h *uploadHandler) uploadPackage() (*Package, error) {
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
+func (h *Handler) createPayload() (*Payload, error) {
+	var body bytes.Buffer
+	w := multipart.NewWriter(&body)
 
-	if err := writer.WriteField("channel", h.channel); err != nil {
+	err := w.WriteField("channel", h.channel)
+	if err != nil {
 		return nil, err
 	}
-	if err := writer.WriteField("password", h.password); err != nil {
+
+	err = w.WriteField("password", h.password)
+	if err != nil {
 		return nil, err
 	}
-	parts, err := writer.CreateFormFile("file", filepath.Base(h.packagePath))
+
+	fixes, err := h.getFixFlags()
+	if err != nil {
+		return nil, err
+	}
+	err = w.WriteField("fixes", fixes)
+	if err != nil {
+		return nil, err
+	}
+
+	parts, err := w.CreateFormFile("file", filepath.Base(h.packagePath))
 	if err != nil {
 		return nil, err
 	}
@@ -117,11 +145,30 @@ func (h *uploadHandler) uploadPackage() (*Package, error) {
 		return nil, errors.New("could not copy file to form payload")
 	}
 
-	if err := writer.Close(); err != nil {
+	if err := w.Close(); err != nil {
 		return nil, errors.New("could not close form for upload")
 	}
 
-	resp, err := request.Post(h.url, writer.FormDataContentType(), body)
+	return &Payload{
+		Body:        &body,
+		ContentType: w.FormDataContentType(),
+	}, nil
+}
+
+func (h *Handler) getFixFlags() (string, error) {
+	var flags []string
+
+	if noAbi, err := h.cmd.Flags().GetBool("no-abi"); err != nil {
+		return "", err
+	} else if noAbi {
+		flags = append(flags, "no-abi")
+	}
+
+	return strings.Join(flags, ","), nil
+}
+
+func (h *Handler) upload(payload *Payload) (*Package, error) {
+	resp, err := request.Post(h.url, payload.ContentType, payload.Body)
 	if err != nil {
 		return nil, errors.Wrap(err, "package upload failed")
 	}

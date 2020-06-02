@@ -14,7 +14,8 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	"private-conda-repo/conda/condatypes"
+	"private-conda-repo/api/dto"
+	"private-conda-repo/libs"
 )
 
 type TestPackage struct {
@@ -50,18 +51,18 @@ func appendTestPackage(url string, wg *sync.WaitGroup, m *sync.Mutex) {
 	platform := parts[len(parts)-2]
 
 	pkgPath := filepath.Join(packageFolder(), filename)
-	if _, err := os.Stat(pkgPath); os.IsNotExist(err) {
+	if libs.PathExists(pkgPath) {
 		resp, err := http.Get(url)
 		if err != nil {
 			log.Fatalln(errors.Wrapf(err, "could not download '%s' from '%s'", filename, url))
 		}
-		defer func() { _ = resp.Body.Close() }()
+		defer libs.IOCloser(resp.Body)
 
 		file, err := os.Create(pkgPath)
 		if err != nil {
 			log.Fatalln(errors.Wrapf(err, "could not create '%s' to path '%s'", filename, pkgPath))
 		}
-		defer func() { _ = file.Close() }()
+		defer libs.IOCloser(file)
 
 		_, err = io.Copy(file, resp.Body)
 		if err != nil {
@@ -104,25 +105,21 @@ func GetTestPackages() map[string]TestPackage {
 }
 
 func GetPackageN(n int) (TestPackage, error) {
-	if n < 0 || n >= len(urls) {
-		return TestPackage{}, errors.Errorf("n must be between 0 and %d", len(urls)-1)
-	}
-
 	for _, v := range packages {
 		if n == 0 {
 			return v, nil
 		}
 		n -= 1
 	}
-	panic("This should not happen")
+	return TestPackage{}, errors.Errorf("n must be between 0 and %d", len(urls)-1)
 }
 
-func (t *TestPackage) ToPackage() *condatypes.Package {
+func (t *TestPackage) ToPackageDto() *dto.PackageDto {
 	re := regexp.MustCompile(`([\w\-]+)-([\w.]+)-(\w+)_(\d+)\.tar\.bz2`)
 	matches := re.FindStringSubmatch(t.Filename)
 	n, _ := strconv.Atoi(matches[4])
 
-	return &condatypes.Package{
+	return &dto.PackageDto{
 		Name:        matches[1],
 		Version:     matches[2],
 		BuildString: matches[3],

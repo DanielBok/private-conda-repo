@@ -1,15 +1,5 @@
 import { AxiosTransformer } from "axios";
 import camelCaseKeys from "camelcase-keys";
-import snakeCaseKeys from "snakecase-keys";
-
-export const SnakeCaseKeysTransformer: AxiosTransformer = (data, headers) => {
-  if (!isJson(headers)) return data;
-
-  if (typeof data === "object" && !(data instanceof FormData)) {
-    return snakeCaseKeys(data, { deep: true });
-  }
-  return data;
-};
 
 export const CamelCaseKeysTransformer: AxiosTransformer = (data, headers) => {
   if (!isJson(headers)) return data;

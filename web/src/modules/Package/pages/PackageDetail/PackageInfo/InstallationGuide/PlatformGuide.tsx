@@ -1,8 +1,10 @@
 import { PackageSelector } from "@/features/package";
-import { Icon } from "antd";
+import AndroidOutlined from "@ant-design/icons/AndroidOutlined";
+import AppleOutlined from "@ant-design/icons/AppleOutlined";
+import WindowsOutlined from "@ant-design/icons/WindowsOutlined";
+import React from "react";
 import { useSelector } from "react-redux";
 import styles from "./styles.less";
-import React from "react";
 
 export default () => {
   const { latest } = useSelector(PackageSelector.packageDetail);
@@ -20,11 +22,11 @@ const PlatformTags = () => {
     windows: 2,
     apple: 1,
     android: 3,
-    noarch: 4
+    noarch: 4,
   };
 
-  const platforms: (keyof typeof order)[] = usePlatforms()
-    .map(e => {
+  const platforms = usePlatforms()
+    .map((e) => {
       switch (e) {
         case "win-64":
           return "windows";
@@ -36,20 +38,28 @@ const PlatformTags = () => {
           return "noarch";
       }
     })
-    .sort((x, y) => order[x] - order[y]);
+    .sort((x, y) => order[x] - order[y])
+    .map((e, i) => {
+      switch (e) {
+        case "windows":
+          return <WindowsOutlined key={i} />;
+        case "apple":
+          return <AppleOutlined key={i} />;
+        case "android":
+          return <AndroidOutlined key={i} />;
+        default:
+          return <span key={i}>noarch</span>;
+      }
+    });
 
-  return (
-    <span className={styles.tags}>
-      {platforms.map(p => (p === "noarch" ? p : <Icon type={p} key={p} />))}
-    </span>
-  );
+  return <span className={styles.tags}>{platforms}</span>;
 };
 
 const usePlatforms = () => {
   const { details, latest } = useSelector(PackageSelector.packageDetail);
   const platforms = details
-    .filter(d => d.version === latest.version)
-    .map(e => e.platform);
+    .filter((d) => d.version === latest.version)
+    .map((e) => e.platform);
 
   if (platforms.length === 0) return latest.platforms;
   return platforms;

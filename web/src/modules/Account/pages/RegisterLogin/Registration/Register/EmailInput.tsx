@@ -1,29 +1,37 @@
 import { Form, Input } from "antd";
 import React from "react";
-import * as CONST from "./constants";
-import { useFormContext } from "./hooks";
+import Errors from "./Errors";
+import { useRegistrationContext, useStatus, useSubmit } from "./hooks";
 
 export default () => {
   const {
-    getFieldDecorator,
-    getFieldError,
-    isFieldTouched
-  } = useFormContext().form;
+    state: { email, disabled },
+    dispatch,
+  } = useRegistrationContext();
 
-  const status = isFieldTouched(CONST.EMAIL)
-    ? getFieldError(CONST.EMAIL) === undefined
-      ? "success"
-      : "error"
-    : "";
+  const status = useStatus("email");
+  const submit = useSubmit();
 
   return (
-    <Form.Item validateStatus={status} hasFeedback>
-      {getFieldDecorator(CONST.EMAIL, {
-        rules: [
-          { required: true, message: "Email is required" },
-          { type: "email", message: "Invalid email" }
-        ]
-      })(<Input placeholder="Email" type="email" />)}
+    <Form.Item
+      validateStatus={status}
+      hasFeedback
+      help={<Errors field="email" />}
+    >
+      <Input
+        value={email}
+        placeholder="Email"
+        type="email"
+        onChange={(e) =>
+          dispatch({
+            type: "SET_EMAIL",
+            payload: { email: e.target.value },
+          })
+        }
+        onKeyPress={(e) => {
+          if (e.key === "Enter" && !disabled) submit();
+        }}
+      />
     </Form.Item>
   );
 };

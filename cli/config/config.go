@@ -27,7 +27,7 @@ var (
 func New() *Config {
 	home, err := homedir.Dir()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 
 	viper.AddConfigPath(home)
@@ -35,12 +35,12 @@ func New() *Config {
 	viper.SetConfigName(".pcrrc")
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalln(errors.Wrap(err, "could not read in config"))
+		log.Fatal(errors.Wrap(err, "could not read in config"))
 	}
 
 	var conf Config
 	if err := viper.Unmarshal(&conf); err != nil {
-		log.Fatalln(errors.Wrap(err, "could not unmarshal config"))
+		log.Fatal(errors.Wrap(err, "could not unmarshal config"))
 	}
 	conf.Registry = strings.TrimSpace(strings.TrimRight(conf.Registry, "/"))
 	return &conf
@@ -49,14 +49,14 @@ func New() *Config {
 func init() {
 	home, err := homedir.Dir()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 
 	configFilePath = filepath.Join(home, ".pcrrc.yaml")
 	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
 		file, err := os.Create(configFilePath)
 		if err != nil {
-			log.Fatalln(errors.Wrap(err, "could not write config"))
+			log.Fatal(errors.Wrap(err, "could not write config"))
 		}
 		_ = file.Close()
 	}
@@ -64,7 +64,7 @@ func init() {
 
 func (c *Config) HasRegistry() bool {
 	if c.Registry == "" {
-		log.Println("Registry location not set. Please use 'pcr registry set' to specify your private conda repo registry")
+		log.Print("Registry location not set. Please use 'pcr registry set' to specify your private conda repo registry")
 		return false
 	}
 	return true

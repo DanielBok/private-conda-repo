@@ -1,8 +1,8 @@
+import Logo from "@/resource/conda.svg";
 import { Layout } from "antd";
 import { push } from "connected-react-router";
 import React from "react";
 import { useDispatch } from "react-redux";
-import Logo from "@/resource/conda.svg";
 import UserManager from "./Manager";
 
 import styles from "./styles.less";

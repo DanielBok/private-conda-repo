@@ -4,10 +4,10 @@ import { ContextType } from "./types";
 export const FileContext = React.createContext<ContextType>({
   filters: {
     platform: "All",
-    version: "All,"
+    version: "All,",
   },
   setFilters: () => {},
-  isAdmin: false
+  isAdmin: false,
 });
 
 export const useFileContext = () => useContext(FileContext);

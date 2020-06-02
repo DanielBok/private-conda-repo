@@ -1,13 +1,13 @@
 import { PackageSelector, PackageType } from "@/features/package";
 import { Col, List, Row } from "antd";
 import Fuse from "fuse.js";
+import sortBy from "lodash/sortBy";
 import React from "react";
 import { useSelector } from "react-redux";
-import Link from "./Link";
 import { useSearchContext } from "../hooks";
-import Tag from "./Tag";
+import Link from "./Link";
 import styles from "./styles.less";
-import sortBy from "lodash/sortBy";
+import Tag from "./Tag";
 
 export default () => {
   const list = useResultList();
@@ -16,7 +16,7 @@ export default () => {
     list.length <= 10
       ? false
       : {
-          pageSize: 10
+          pageSize: 10,
         };
 
   return (
@@ -41,7 +41,7 @@ export default () => {
                 />
               </Col>
               <Col span={6}>
-                {item.platforms.map(p => (
+                {item.platforms.map((p) => (
                   <Tag platform={p} key={p} />
                 ))}
               </Col>
@@ -66,9 +66,9 @@ const useResultList = () => {
   const fuse = useFuse(packages);
 
   if (search.length > 0) {
-    return fuse.search(search).map(e => e.item);
+    return fuse.search(search).map((e) => e.item);
   } else {
-    return sortBy(packages, e => [e.channel, e.name]);
+    return sortBy(packages, (e) => [e.channel, e.name]);
   }
 };
 
@@ -80,7 +80,7 @@ const useFuse = (packages: PackageType.PackageMetaInfo[]) => {
     { name: "name", weight: 0.6 },
     { name: "description", weight: 0.25 },
     { name: "channel", weight: 0.1 },
-    { name: "summary", weight: 0.05 }
+    { name: "summary", weight: 0.05 },
   ];
 
   return new Fuse(packages, {
@@ -92,6 +92,6 @@ const useFuse = (packages: PackageType.PackageMetaInfo[]) => {
     distance: 100,
     maxPatternLength: 32,
     minMatchCharLength: 1,
-    keys
+    keys,
   });
 };

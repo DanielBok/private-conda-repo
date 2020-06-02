@@ -3,6 +3,7 @@ package registry
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -17,10 +18,19 @@ var setCmd = &cobra.Command{
 	Short: "Sets the package registry",
 	Long: `Verifies the package registry and sets it if successful. The registry needs to be specified
 for the cli to work correctly`,
-	Args: cobra.ExactArgs(1),
+	Example: "pcr registry set http://localhost:5060",
+	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		handler := setHandler{cmd: cmd}
-		err := handler.fetchMeta(args[0])
+		handler := SetHandler{cmd: cmd}
+		url := args[0]
+
+		err := handler.verifyUrl(url)
+		if err != nil {
+			cmd.PrintErr(err)
+			return
+		}
+
+		err = handler.fetchMeta(url)
 		if err != nil {
 			cmd.PrintErr(err)
 			return
@@ -38,7 +48,7 @@ for the cli to work correctly`,
 	},
 }
 
-type setHandler struct {
+type SetHandler struct {
 	cmd *cobra.Command
 	registryMeta
 }
@@ -48,7 +58,20 @@ type registryMeta struct {
 	Repository string `json:"repository"`
 }
 
-func (h *setHandler) fetchMeta(host string) error {
+func (h *SetHandler) verifyUrl(host string) error {
+	re, err := regexp.Compile(`https?://\w+`)
+	if err != nil {
+		return err
+	}
+
+	if !re.MatchString(host) {
+		return errors.New("invalid registry address")
+	}
+
+	return nil
+}
+
+func (h *SetHandler) fetchMeta(host string) error {
 	resp, err := request.Get(host + "/meta")
 	if err != nil {
 		return errors.Wrap(err, "could not fetch meta information from registry. Is this a valid Private Conda Repo?")

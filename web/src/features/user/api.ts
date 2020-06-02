@@ -17,14 +17,14 @@ export const createUser = (
 
   const payload: UserType.UserInfo = {
     channel: username,
-    password
+    password,
   };
 
   const { status } = await api.Post(
-    "/user",
+    "/channel",
     { ...payload, email },
     {
-      beforeRequest: () => dispatch(UserAction.createUserAsync.request())
+      beforeRequest: () => dispatch(UserAction.createUserAsync.request()),
     }
   );
 
@@ -32,7 +32,7 @@ export const createUser = (
     dispatch(UserAction.createUserAsync.success(payload));
     UserStorage.save(payload);
     notification.success({
-      message: `User: ${payload.channel} created. Looking forward to your contributions!`
+      message: `User: ${payload.channel} created. Looking forward to your contributions!`,
     });
   } else {
     dispatch(UserAction.createUserAsync.failure());
@@ -43,7 +43,7 @@ export const createUser = (
 /**
  * Loads user details from local storage
  */
-export const loadUser = (): ThunkFunctionAsync => async dispatch => {
+export const loadUser = (): ThunkFunctionAsync => async (dispatch) => {
   const user = UserStorage.load();
   if (user) {
     await dispatch(validateUser(user.channel, user.password));
@@ -60,12 +60,12 @@ export const validateUser = (
   if (getState().user.loading === "REQUEST") return false;
   const payload: UserType.UserInfo = {
     channel: username,
-    password
+    password,
   };
 
-  const { status } = await api.Post("/user/check", payload, {
+  const { status } = await api.Post("/channel/check", payload, {
     beforeRequest: () =>
-      dispatch(UserAction.fetchUserCredentialsAsync.request())
+      dispatch(UserAction.fetchUserCredentialsAsync.request()),
   });
 
   if (status === 200) {
@@ -81,7 +81,7 @@ export const validateUser = (
 /**
  * Logs the user out
  */
-export const logout = (): ThunkFunction => dispatch => {
+export const logout = (): ThunkFunction => (dispatch) => {
   UserStorage.clear();
   dispatch(UserAction.logoutUser());
 };
@@ -91,9 +91,9 @@ export const logout = (): ThunkFunction => dispatch => {
  * @param username name to check
  */
 export const isUsernameAvailable = async (username: string) => {
-  const { status, data } = await api.Post<string>("/user/check", {
+  const { status, data } = await api.Post<string>("/channel/check", {
     channel: username,
-    password: ""
+    password: "",
   });
 
   return status === 400 && data.trim() === "record not found";

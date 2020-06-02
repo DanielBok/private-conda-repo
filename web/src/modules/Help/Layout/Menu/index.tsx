@@ -1,14 +1,14 @@
 import { useRouter } from "@/infrastructure/hooks";
+import cx from "classnames";
 import React from "react";
 import { Link } from "react-router-dom";
-import cx from "classnames";
 
 import styles from "./styles.less";
 
 const routes = {
   "Getting Started": {
-    Overview: "/"
-  }
+    Overview: "/",
+  },
 };
 
 export default () => {

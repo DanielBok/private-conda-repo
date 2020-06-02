@@ -1,6 +1,6 @@
 import { PackageType } from "@/features/package";
-import React from "react";
 import { Tag } from "antd";
+import React from "react";
 
 type Props = {
   platform: PackageType.Platform;

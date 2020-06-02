@@ -1,9 +1,11 @@
 package registry
 
 import (
-	"fmt"
+	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/manifoldco/promptui"
@@ -22,104 +24,156 @@ func init() {
 
 var registerCmd = &cobra.Command{
 	Use:   "register",
-	Short: "Registers a new channel account",
+	Short: "Registers a new channel",
 	Long:  `Creates a new account and logs the cli tool with the channel's credentials.`,
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, _ []string) {
-		handler := registerHandler{cmd: cmd}
-		channel, err := handler.getValue("channel", 0)
+		handler := RegisterHandler{cmd: cmd}
+
+		payload, err := handler.getAllInputs()
 		if err != nil {
 			cmd.PrintErr(err)
 			return
 		}
 
-		password, err := handler.getValue("password", '*')
-		if err != nil {
-			cmd.PrintErr(err)
-			return
-		}
-
-		email, err := handler.getValue("email", 0)
-		if err != nil {
-			cmd.PrintErr(err)
-			return
-		}
-
-		err = handler.registerChannel(channel, password, email)
+		err = handler.registerChannel(payload)
 		if err != nil {
 			cmd.PrintErr(err)
 			return
 		}
 
 		conf := config.New()
-		conf.Channel.Channel = channel
-		conf.Channel.Password = password
+		conf.Channel.Channel = payload.Channel
+		conf.Channel.Password = payload.Password
 
 		conf.Save()
-		cmd.Printf("Created and logged in as channel '%s'", channel)
+		cmd.Printf("Created and logged into channel '%s'", payload.Channel)
 	},
 }
 
-type registerHandler struct {
+type RegisterHandler struct {
 	cmd *cobra.Command
 }
 
-func (h *registerHandler) getValue(flag string, mask rune) (string, error) {
-	value, err := h.getFlag(flag)
-	if err != nil {
-		return "", err
-	} else if value != "" {
-		return value, nil
-	}
-
-	return h.promptValue(strings.Title(flag), mask)
+type SignUpPayload struct {
+	Channel  string `json:"channel"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 
-func (h *registerHandler) getFlag(flag string) (string, error) {
+func (h *RegisterHandler) getAllInputs() (*SignUpPayload, error) {
+	var errs []string
+
+	channel, err := h.getChannel()
+	if err != nil {
+		errs = append(errs, err.Error())
+	}
+
+	password, err := h.getPassword()
+	if err != nil {
+		errs = append(errs, err.Error())
+	}
+
+	email, err := h.getEmail()
+	if err != nil {
+		errs = append(errs, err.Error())
+	}
+
+	if len(errs) != 0 {
+		return nil, errors.Errorf("Invalid values: \n%s", strings.Join(errs, "\n"))
+	}
+
+	return &SignUpPayload{
+		Channel:  channel,
+		Password: password,
+		Email:    email,
+	}, nil
+}
+
+func (h *RegisterHandler) getChannel() (string, error) {
+	return h.getValue("channel", 0, func(input string) error {
+		input = strings.TrimSpace(input)
+		if input == "" {
+			return errors.New("Channel cannot be empty")
+		}
+		if len(input) < 2 {
+			return errors.New("Channel length must be >= 2 characters")
+		}
+		return nil
+	})
+}
+
+func (h *RegisterHandler) getPassword() (string, error) {
+	return h.getValue("password", '*', func(input string) error {
+		if input == "" {
+			return errors.New("Password cannot be empty")
+		}
+		if len(input) < 4 {
+			return errors.New("Password length must be >= 4 characters")
+		}
+		return nil
+	})
+}
+
+func (h *RegisterHandler) getEmail() (string, error) {
+	re, err := regexp.Compile(`^[^@\s]+@[^@\s]+$`)
+	if err != nil {
+		return "", err
+	}
+
+	return h.getValue("email", 0, func(input string) error {
+		input = strings.TrimSpace(input)
+
+		if !re.MatchString(input) {
+			return errors.New("invalid email address")
+		}
+		return nil
+	})
+}
+
+func (h *RegisterHandler) getValue(flag string, mask rune, validateFunc promptui.ValidateFunc) (string, error) {
 	value, err := h.cmd.Flags().GetString(flag)
 	if err != nil {
 		return "", errors.Wrapf(err, "could not get %s flag value", flag)
 	}
 
-	return strings.TrimSpace(value), nil
-}
-
-func (h *registerHandler) promptValue(label string, mask rune) (string, error) {
-	prompt := promptui.Prompt{
-		Label: label,
-		Validate: func(input string) error {
-			input = strings.TrimSpace(input)
-			if input == "" {
-				return errors.Errorf("%s cannot be empty", label)
-			}
-			if len(input) < 4 {
-				return errors.Errorf("%s length must be >= 4 characters", label)
-			}
-			return nil
-		},
-		Mask: mask,
+	// checks and returns a value if flags are specified
+	if value != "" {
+		err = validateFunc(value)
+		if err != nil {
+			return "", err
+		}
+		return value, nil
 	}
 
-	value, err := prompt.Run()
+	// value is unspecified from flags, prompt user instead
+	label := strings.Title(flag)
+	prompt := promptui.Prompt{
+		Label:    label,
+		Validate: validateFunc,
+		Mask:     mask,
+	}
+
+	value, err = prompt.Run()
 	if err != nil {
 		return "", err
 	}
 	return value, nil
 }
 
-func (h *registerHandler) registerChannel(channel, password, email string) error {
+func (h *RegisterHandler) registerChannel(payload *SignUpPayload) error {
 	conf := config.New()
 	if !conf.HasRegistry() {
 		return nil
 	}
 
-	payload := strings.NewReader(fmt.Sprintf(`{
-		"channel": "%s",
-		"password": "%s",
-		"email": "%s"
-	}`, channel, password, email))
+	var buf bytes.Buffer
+	err := json.NewEncoder(&buf).Encode(payload)
+	if err != nil {
+		return err
+	}
 
-	resp, err := request.Post(conf.Registry+"/user", "application/json", payload)
+	resp, err := request.Post(conf.Registry+"/channel", "application/json", &buf)
 	if err != nil {
 		return errors.Wrap(err, "could not create account")
 	}

@@ -1,7 +1,8 @@
 import { MetaSelector } from "@/features/meta";
 import { PackageSelector } from "@/features/package";
 import { timeSinceUpload } from "@/libs/date";
-import { Icon, Table } from "antd";
+import CalendarOutlined from "@ant-design/icons/CalendarOutlined";
+import { Table } from "antd";
 import { ColumnProps } from "antd/es/table";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -20,7 +21,7 @@ export default () => {
     data.length > pageSize
       ? {
           style: { marginRight: 20 },
-          pageSize
+          pageSize,
         }
       : false;
 
@@ -51,36 +52,38 @@ const useColumns = (): ColumnProps<DataRow>[] => {
             {filename}
           </a>
         );
-      }
+      },
     },
     {
       title: "Uploaded",
       dataIndex: "uploaded",
-      render: text => (
+      render: (text) => (
         <>
-          <Icon type="calender" />
+          <CalendarOutlined />
           {text}
         </>
-      )
+      ),
     },
     {
       title: "Downloads",
       dataIndex: "downloads",
-      render: text => <b>{text}</b>
+      render: (text) => <b>{text}</b>,
     },
     {
       title: "Action",
       key: "action",
-      render: (_, r) => <DeleteAction channel={r.channel} package={r.package} />
-    }
+      render: (_, r) => (
+        <DeleteAction channel={r.channel} package={r.package} />
+      ),
+    },
   ];
 };
 
 const useDataSource = () => {
   const { filters } = useFileContext();
-  const { details } = useSelector(PackageSelector.packageDetail);
+  const { details, channel } = useSelector(PackageSelector.packageDetail);
   return details
-    .filter(d => {
+    .filter((d) => {
       if (filters.version !== "All" && d.version !== filters.version)
         return false;
       return !(filters.platform !== "All" && d.platform !== filters.platform);
@@ -89,17 +92,17 @@ const useDataSource = () => {
       (d, i) =>
         ({
           key: i,
-          name: `${d.channel}/${d.platform}/${d.package}-${d.version}-${d.buildString}_${d.buildNumber}.tar.bz2`,
+          name: `${channel}/${d.platform}/${d.package}-${d.version}-${d.buildString}_${d.buildNumber}.tar.bz2`,
           uploaded: timeSinceUpload(d.uploadDate),
           downloads: d.count,
-          channel: d.channel,
+          channel,
           package: {
             name: d.package,
             version: d.version,
             platform: d.platform,
             buildNumber: d.buildNumber,
-            buildString: d.buildString
-          }
+            buildString: d.buildString,
+          },
         } as DataRow)
     );
 };

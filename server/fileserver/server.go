@@ -6,48 +6,46 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
+	"private-conda-repo/api/interfaces"
 	"private-conda-repo/config"
 )
 
-type router struct {
+type MasterHandler struct {
+	DB interfaces.DataAccessLayer
 	*chi.Mux
 }
 
-func New() (*http.Server, error) {
-	conf, err := config.New()
-	if err != nil {
-		return nil, errors.Wrap(err, "could not start repository server due to issue with config")
-	}
+func New(conf *config.AppConfig, db interfaces.DataAccessLayer) (*http.Server, error) {
 	addr := fmt.Sprintf(":%d", conf.FileServer.Port)
 	log.WithField("Address", addr).Info("Server details")
 
-	if err := initStore(); err != nil {
-		return nil, err
-	}
-
-	r := router{
+	m := MasterHandler{
 		Mux: chi.NewRouter(),
+		DB:  db,
 	}
 
-	r.attachMiddleware()
-	r.addFileServer(conf)
+	m.attachMiddleware()
+	m.addFileServer(conf)
 
 	return &http.Server{
 		Addr:    addr,
-		Handler: r,
+		Handler: m,
 	}, nil
 }
 
-func (r *router) attachMiddleware() {
-	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
+func (m *MasterHandler) attachMiddleware() {
+	m.Use(middleware.RequestID)
+	m.Use(middleware.RealIP)
+	m.Use(middleware.Logger)
+	m.Use(middleware.Recoverer)
 }
 
-func (r *router) addFileServer(conf *config.AppConfig) {
-	r.Get("/*", FileHandler(conf.Conda.MountFolder))
+func (m *MasterHandler) addFileServer(conf *config.AppConfig) {
+	handler := &FileHandler{
+		DB: m.DB,
+	}
+
+	m.Get("/*", handler.Server(conf.Indexer.MountFolder))
 }

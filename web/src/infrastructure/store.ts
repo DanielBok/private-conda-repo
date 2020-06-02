@@ -28,7 +28,7 @@ async function initializeStore(store: Store) {
   await Promise.all([
     dispatch(PackageApi.fetchAllPackages()),
     dispatch(UserApi.loadUser()),
-    dispatch(MetaApi.fetchMetaInfo())
+    dispatch(MetaApi.fetchMetaInfo()),
   ]);
 }
 

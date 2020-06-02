@@ -10,7 +10,7 @@ const defaultState: PackageType.Store = {
   loading: {
     details: "SUCCESS",
     packages: "SUCCESS",
-    channelPackages: "SUCCESS"
+    channelPackages: "SUCCESS",
   },
   packageDetail: {
     channel: "",
@@ -27,19 +27,19 @@ const defaultState: PackageType.Store = {
       license: "",
       summary: "",
       timestamp: 0,
-      name: ""
-    }
+      name: "",
+    },
   },
   channelPackages: {
     channel: "",
     email: "",
     joinDate: moment(),
-    packages: []
-  }
+    packages: [],
+  },
 };
 
 export default (state = defaultState, action: AllActions) =>
-  produce(state, draft => {
+  produce(state, (draft) => {
     switch (action.type) {
       case getType(Action.fetchAllPackagesAsync.request):
         draft.loading.packages = "REQUEST";
@@ -72,10 +72,10 @@ export default (state = defaultState, action: AllActions) =>
           details: details
             .map(({ uploadDate, ...rest }) => ({
               ...rest,
-              uploadDate: moment.utc(uploadDate)
+              uploadDate: moment.utc(uploadDate),
             }))
             .sort((x, y) => (x.uploadDate.isAfter(y.uploadDate) ? -1 : 1)),
-          ...rest
+          ...rest,
         };
         break;
       }
@@ -85,13 +85,13 @@ export default (state = defaultState, action: AllActions) =>
 
         // remove same item from list of package details
         draft.packageDetail.details = draft.packageDetail.details.filter(
-          d =>
+          (d) =>
             ![
               p.version === d.version,
               p.buildNumber === d.buildNumber,
               p.buildString === d.buildString,
               p.platform === d.platform,
-              p.name === d.package
+              p.name === d.package,
             ].reduce((a, e) => a && e, true)
         );
 
@@ -99,20 +99,20 @@ export default (state = defaultState, action: AllActions) =>
         break;
       }
 
-      case getType(Action.fetchUserPackages.request):
+      case getType(Action.fetchChannelPackages.request):
         draft.loading.channelPackages = "REQUEST";
         break;
 
-      case getType(Action.fetchUserPackages.failure):
+      case getType(Action.fetchChannelPackages.failure):
         draft.loading.channelPackages = "FAILURE";
         break;
 
-      case getType(Action.fetchUserPackages.success): {
+      case getType(Action.fetchChannelPackages.success): {
         draft.loading.channelPackages = "SUCCESS";
         const { joinDate, ...rest } = action.payload;
         draft.channelPackages = {
           ...rest,
-          joinDate: moment.utc(joinDate)
+          joinDate: moment.utc(joinDate),
         };
         break;
       }
@@ -120,7 +120,7 @@ export default (state = defaultState, action: AllActions) =>
         draft.loading = {
           channelPackages: "SUCCESS",
           details: "SUCCESS",
-          packages: "SUCCESS"
+          packages: "SUCCESS",
         };
         break;
     }

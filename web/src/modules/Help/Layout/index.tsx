@@ -1,8 +1,8 @@
 import { Col, Row } from "antd";
 import React, { FC } from "react";
-import styles from "./styles.less";
 
 import Menu from "./Menu";
+import styles from "./styles.less";
 
 const Layout: FC = ({ children }) => (
   <div className={styles.main}>

@@ -19,17 +19,17 @@ const Markdown: FC<IProps> = ({
     ...{
       h1: {
         component: Typography.Title,
-        props: { level: 2 }
+        props: { level: 2 },
       },
       h2: {
         component: Typography.Title,
-        props: { level: 3 }
+        props: { level: 3 },
       },
       div: {
-        component: Typography.Paragraph
-      }
+        component: Typography.Paragraph,
+      },
     },
-    ...overrides
+    ...overrides,
   };
 
   return (

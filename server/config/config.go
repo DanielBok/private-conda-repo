@@ -4,36 +4,35 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
 
 type AppConfig struct {
-	Admin        adminProfile `mapstructure:"admin"`
-	Conda        condaConfig  `mapstructure:"conda"`
-	DB           database     `mapstructure:"db"`
-	UserConfig   userConfig   `mapstructure:"user"`
-	FileServer   server       `mapstructure:"fileserver"`
-	AppServer    server       `mapstructure:"application"`
-	Decompressor decompressor `mapstructure:"decompressor"`
-	TLS          tls          `mapstructure:"tls"`
+	Admin      *AdminProfile  `mapstructure:"admin"`
+	Indexer    *IndexerConfig `mapstructure:"indexer"`
+	DB         *DbConfig      `mapstructure:"db"`
+	FileServer *ServerConfig  `mapstructure:"fileserver"`
+	AppServer  *ServerConfig  `mapstructure:"api"`
+	TLS        *TLSConfig     `mapstructure:"tls"`
 }
 
-type adminProfile struct {
+type IConfig interface {
+	Init() error
+}
+
+type AdminProfile struct {
 	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
 }
 
-type server struct {
+type ServerConfig struct {
 	Port int `mapstructure:"port"`
 }
 
-type decompressor struct {
-	Type string `mapstructure:"type"`
-}
-
-const prefix = "PCR"
+const prefix = "pcr"
 
 func New() (*AppConfig, error) {
 	if err := setConfigDirectory(); err != nil {
@@ -42,7 +41,9 @@ func New() (*AppConfig, error) {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
+
 	viper.SetEnvPrefix(prefix)
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -58,8 +59,14 @@ func New() (*AppConfig, error) {
 		return nil, errors.Wrap(err, "could not unmarshal config")
 	}
 
-	if err := config.UserConfig.init(); err != nil {
-		return nil, err
+	// Check all configurations are valid
+	for _, c := range []IConfig{
+		config.Indexer,
+	} {
+		err := c.Init()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &config, nil

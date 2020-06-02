@@ -13,14 +13,14 @@ const moduleMap = Object.entries(routeMap).reduce(
       routes: routes.map(({ path, exact, ...r }) => ({
         ...r,
         exact: oc(exact)(true),
-        path: (prefix + path).replace("//{2,}/g", "'/")
-      }))
-    }
+        path: (prefix + path).replace("//{2,}/g", "'/"),
+      })),
+    },
   }),
   {} as Record<string, ModuleRoutes>
 );
 
-const routeList = Object.values(moduleMap).flatMap(module =>
+const routeList = Object.values(moduleMap).flatMap((module) =>
   module.routes.map((r, i) => (
     <Route path={r.path} exact={r.exact} component={r.component} key={i} />
   ))

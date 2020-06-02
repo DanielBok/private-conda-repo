@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -19,23 +18,25 @@ var setConfCmd = &cobra.Command{
 		}
 
 		if len(args) != 2 {
-			log.Fatal("set values must be pairs or separated by '='. Example, 'ssl_verify=true' or 'ssl_verify true'")
+			cmd.PrintErr("set values must be pairs or separated by '='. Example, 'ssl_verify=true' or 'ssl_verify true'")
+			return
 		}
 
-		handler := setHandler{cmd: cmd}
+		handler := SetHandler{cmd: cmd}
 		conf, err := handler.Set(args[0], args[1])
 		if err != nil {
-			log.Fatal(err)
+			cmd.PrintErr(err)
+			return
 		}
 		conf.Save()
 	},
 }
 
-type setHandler struct {
+type SetHandler struct {
 	cmd *cobra.Command
 }
 
-func (s *setHandler) Set(key, value string) (*Config, error) {
+func (s *SetHandler) Set(key, value string) (*Config, error) {
 	key = strings.ToLower(strings.TrimSpace(key))
 	value = strings.ToLower(strings.TrimSpace(value))
 	conf := New()

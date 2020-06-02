@@ -4,16 +4,16 @@ import { Col, Row } from "antd";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect, RouteComponentProps, withRouter } from "react-router-dom";
-import Profile from "./Profile";
 import PackageList from "./PackageList";
+import Profile from "./Profile";
 import styles from "./styles.less";
 
 type Props = RouteComponentProps<{ channel: string }>;
 
 const ChannelDetail = ({
   match: {
-    params: { channel }
-  }
+    params: { channel },
+  },
 }: Props) => {
   const dispatch = useDispatch();
 

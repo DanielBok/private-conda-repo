@@ -9,7 +9,7 @@ import { Filter } from "./types";
 export default () => {
   const [filters, setFilters] = useState<Filter>({
     platform: "All",
-    version: "All"
+    version: "All",
   });
   const isAdmin = useSelector(PackageSelector.isUserChannelAdmin);
 
@@ -19,7 +19,7 @@ export default () => {
         isAdmin,
         filters,
         setFilters: (f: Partial<Filter>) =>
-          setFilters(prev => ({ ...prev, ...f }))
+          setFilters((prev) => ({ ...prev, ...f })),
       }}
     >
       <Filters />

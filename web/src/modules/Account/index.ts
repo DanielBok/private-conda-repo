@@ -4,6 +4,6 @@ export default [
   {
     component: RegisterLogin,
     path: "/",
-    title: "Register or Login"
-  }
+    title: "Register or Login",
+  },
 ] as ModuleRoute[];

@@ -1,39 +1,38 @@
 import { Form, Input } from "antd";
-import React from "react";
-import * as CONST from "./constants";
-import { useLoginContext } from "./hooks";
+import React, { FC } from "react";
+import { useLoginContext, useStatus, useSubmit } from "./hooks";
+import Errors from "./Errors";
 
-export default () => {
+const PasswordInput: FC = () => {
   const {
-    form: { getFieldDecorator, getFieldError, isFieldTouched },
-    submit,
-    valid
+    state: { password, disabled },
+    dispatch,
   } = useLoginContext();
+  const submit = useSubmit();
+  const status = useStatus("password");
 
   return (
-    <Form.Item hasFeedback validateStatus={status()}>
-      {getFieldDecorator(CONST.PASSWORD, {
-        rules: [
-          {
-            required: true,
-            message: "password is required"
-          }
-        ]
-      })(
-        <Input
-          placeholder="Password"
-          type="password"
-          onKeyPress={e => {
-            if (e.key === "Enter") submit();
-          }}
-        />
-      )}
+    <Form.Item
+      hasFeedback
+      validateStatus={status}
+      help={<Errors field="password" />}
+    >
+      <Input
+        placeholder="Password"
+        type="password"
+        value={password}
+        onChange={(e) => {
+          dispatch({
+            type: "SET_PASSWORD",
+            payload: { password: e.target.value },
+          });
+        }}
+        onKeyPress={(e) => {
+          if (e.key === "Enter" && !disabled) submit();
+        }}
+      />
     </Form.Item>
   );
-
-  function status() {
-    if (!isFieldTouched(CONST.PASSWORD)) return "";
-    if (!valid || getFieldError(CONST.PASSWORD) !== undefined) return "error";
-    return "success";
-  }
 };
+
+export default PasswordInput;

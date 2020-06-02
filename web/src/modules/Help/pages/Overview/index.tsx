@@ -1,8 +1,7 @@
+import Markdown from "@/components/Markdown";
 import { metaInfo } from "@/features/meta/selectors";
 import { Typography } from "antd";
 import React from "react";
-
-import Markdown from "@/components/Markdown";
 import { useSelector } from "react-redux";
 import Layout from "../../Layout";
 
@@ -19,7 +18,7 @@ export default () => {
             <Typography.Paragraph code={true}>
               pcr registry set {registry}
             </Typography.Paragraph>
-          )
+          ),
         }}
       />
     </Layout>

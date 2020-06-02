@@ -1,8 +1,8 @@
 import { PackageApi } from "@/features/package";
-import styles from "@/modules/Package/pages/PackageDetail/Files/Table/styles.less";
 import { Popconfirm } from "antd";
 import React from "react";
 import { useDispatch } from "react-redux";
+import styles from "./styles.less";
 import { DataRow } from "./types";
 
 type Props = Pick<DataRow, "channel" | "package">;

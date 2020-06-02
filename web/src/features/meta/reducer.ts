@@ -5,14 +5,15 @@ import * as MetaAction from "./actions";
 import * as MetaType from "./types";
 
 const defaultState: MetaType.Store = {
+  indexer: "shell",
   image: "",
   loading: "SUCCESS",
   registry: "",
-  repository: ""
+  repository: "",
 };
 
 export default (state = defaultState, action: AllActions) =>
-  produce(state, draft => {
+  produce(state, (draft) => {
     switch (action.type) {
       case getType(MetaAction.fetchMetaInfoAsync.request):
         draft.loading = "REQUEST";
@@ -24,6 +25,7 @@ export default (state = defaultState, action: AllActions) =>
 
       case getType(MetaAction.fetchMetaInfoAsync.success):
         draft.loading = "SUCCESS";
+        draft.indexer = action.payload.indexer;
         draft.image = action.payload.image;
         draft.registry = action.payload.registry;
         draft.repository = action.payload.repository;

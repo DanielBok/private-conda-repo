@@ -1,48 +1,39 @@
 import { Form, Input } from "antd";
 import React from "react";
-import * as CONST from "./constants";
-import { useFormContext } from "./hooks";
+import Errors from "./Errors";
+import { useRegistrationContext, useStatus, useSubmit } from "./hooks";
 
-export default () => {
+const PasswordInput = () => {
   const {
-    getFieldDecorator,
-    getFieldError,
-    getFieldValue,
-    isFieldTouched,
-    validateFields
-  } = useFormContext().form;
+    state: { password, disabled },
+    dispatch,
+  } = useRegistrationContext();
+
+  const status = useStatus("password");
+  const submit = useSubmit();
 
   return (
-    <Form.Item validateStatus={status()} hasFeedback>
-      {getFieldDecorator(CONST.PASSWORD, {
-        rules: [
-          {
-            required: true,
-            message: "Password cannot be empty"
-          },
-          {
-            validator(_, value, callback) {
-              if (value && isFieldTouched(CONST.PASSWORD)) {
-                validateFields([CONST.CONFIRM], {
-                  force: true
-                });
-              }
-              callback();
-            }
-          }
-        ]
-      })(<Input placeholder="Password" type="password" />)}
+    <Form.Item
+      validateStatus={status}
+      hasFeedback
+      help={<Errors field="password" />}
+    >
+      <Input
+        value={password}
+        placeholder="Password"
+        type="password"
+        onChange={(e) =>
+          dispatch({
+            type: "SET_PASSWORD",
+            payload: { password: e.target.value },
+          })
+        }
+        onKeyPress={(e) => {
+          if (e.key === "Enter" && !disabled) submit();
+        }}
+      />
     </Form.Item>
   );
-
-  function status() {
-    if (!isFieldTouched(CONST.PASSWORD)) return "";
-    if (getFieldError(CONST.PASSWORD) !== undefined) return "error";
-
-    if (!isFieldTouched(CONST.CONFIRM)) return "";
-    if (getFieldValue(CONST.PASSWORD) !== getFieldValue(CONST.CONFIRM))
-      return "error";
-
-    return "success";
-  }
 };
+
+export default PasswordInput;

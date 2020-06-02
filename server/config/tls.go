@@ -1,27 +1,28 @@
 package config
 
 import (
-	"os"
 	"strings"
+
+	"private-conda-repo/libs"
 )
 
-type tls struct {
+type TLSConfig struct {
 	Cert string `mapstructure:"cert"`
 	Key  string `mapstructure:"key"`
 }
 
-func (t *tls) HasCert() bool {
+func (t *TLSConfig) HasCert() bool {
 	t.Cert = strings.TrimSpace(t.Cert)
 	t.Key = strings.TrimSpace(t.Key)
 	if t.Cert == "" || t.Key == "" {
 		return false
 	}
 
-	if _, err := os.Stat(t.Cert); os.IsNotExist(err) {
+	if libs.PathExists(t.Cert) {
 		return false
 	}
 
-	if _, err := os.Stat(t.Key); os.IsNotExist(err) {
+	if libs.PathExists(t.Key) {
 		return false
 	}
 

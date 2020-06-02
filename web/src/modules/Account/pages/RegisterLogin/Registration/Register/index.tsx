@@ -1,36 +1,29 @@
-import { Form, Typography } from "antd";
-import { WrappedFormUtils } from "antd/es/form/Form";
-import React, { useState } from "react";
-import ConfirmPasswordInput from "./ConfirmPasswordInput";
-import { FormContext } from "./hooks";
+import { Typography } from "antd";
+import React, { FC } from "react";
+import ConfirmInput from "./ConfirmInput";
+import EmailInput from "./EmailInput";
+import { RegistrationContext } from "./hooks";
 import PasswordInput from "./PasswordInput";
+import { useRegistrationReducer } from "./reducer";
 import styles from "./styles.less";
 import Submit from "./Submit";
-import { ValidateStatus } from "./types";
 import UsernameInput from "./UsernameInput";
-import EmailInput from "./EmailInput";
 
-type Props = {
-  form: WrappedFormUtils;
-};
-
-const LoginForm = ({ form }: Props) => {
-  const [validateStatus, setValidateStatus] = useState<ValidateStatus>("");
+const RegistrationForm: FC = () => {
+  const [state, dispatch] = useRegistrationReducer();
 
   return (
-    <FormContext.Provider value={{ form, validateStatus, setValidateStatus }}>
+    <RegistrationContext.Provider value={{ state, dispatch }}>
       <Typography.Paragraph className={styles.welcome}>
         New to Private Conda Repo? Register a channel for yourself!
       </Typography.Paragraph>
       <UsernameInput />
       <PasswordInput />
-      <ConfirmPasswordInput />
+      <ConfirmInput />
       <EmailInput />
       <Submit />
-    </FormContext.Provider>
+    </RegistrationContext.Provider>
   );
 };
 
-export default Form.create({
-  name: "login-form"
-})(LoginForm);
+export default RegistrationForm;

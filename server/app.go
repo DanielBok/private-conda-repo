@@ -7,65 +7,91 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	"private-conda-repo/application"
+	"private-conda-repo/api"
+	"private-conda-repo/api/interfaces"
 	"private-conda-repo/config"
 	"private-conda-repo/fileserver"
-	"private-conda-repo/indexer"
-	_ "private-conda-repo/indexer/docker"
-	_ "private-conda-repo/indexer/shell"
+	"private-conda-repo/infrastructure/conda/filesys"
+	"private-conda-repo/infrastructure/conda/index"
+	"private-conda-repo/infrastructure/database/postgres"
+	"private-conda-repo/infrastructure/decompressor"
 )
 
 type App struct {
+	ApiServer      *http.Server
+	FileServer     *http.Server
 	conf           *config.AppConfig
 	idleConnClosed chan struct{}
 }
 
-func NewApp() *App {
+func NewApp() (*App, error) {
 	conf, err := config.New()
 	if err != nil {
-		log.Fatalln(err)
+		return nil, errors.Wrap(err, "error getting config")
 	}
-	return &App{conf: conf}
-}
 
-func (a *App) updateIndexer() *App {
-	idx, err := indexer.New()
+	db, err := postgres.New(conf.DB)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
+	}
+	if conf.DB.AutoMigrate {
+		err = db.Migrate()
+		if err != nil {
+			return nil, err
+		}
+		log.Info("Database is at the latest migration")
+	} else {
+		log.Info("Migrations were not applied onto the database")
 	}
 
-	if err := idx.Check(); err != nil {
-		log.Fatalln("indexer does not exist. ", err)
+	var indexer interfaces.Indexer
+	switch conf.Indexer.Type {
+	case "docker":
+		indexer, err = index.NewDockerIndex(conf.Indexer.ImageName)
+		log.Infof("Using DockerIndex on %s", conf.Indexer.MountFolder)
+	case "shell":
+		indexer, err = index.NewShellIndex()
+		log.Infof("Using ShellIndex on %s", conf.Indexer.MountFolder)
+	}
+	if err != nil {
+		return nil, err
 	}
 
-	if err := idx.Update(); err != nil {
-		log.Fatalln("Could not update indexer")
+	if conf.Indexer.Update {
+		err = indexer.Update()
+		if err != nil {
+			return nil, err
+		}
+		log.Info("The conda folder indexer is at the latest version")
+	} else {
+		log.Info("The conda folder indexer was not updated")
 	}
 
-	return a
+	fs := filesys.New(conf.Indexer.MountFolder, indexer)
+
+	app := &App{
+		conf:           conf,
+		idleConnClosed: make(chan struct{}),
+	}
+
+	app.FileServer, err = fileserver.New(conf, db)
+	if err != nil {
+		return nil, err
+	}
+
+	app.ApiServer, err = api.New(conf, db, decompressor.New(), fs)
+	if err != nil {
+		return nil, err
+	}
+
+	return app, nil
 }
 
 // Runs the servers. Returns a channel for graceful shutdown
-func (a *App) runServers() <-chan struct{} {
-	var _error error
-	fileSrv, err := fileserver.New()
-	if err != nil {
-		_error = multierror.Append(_error, errors.Wrap(err, "Could not create file server"))
-	}
-	appSrv, err := application.New()
-	if err != nil {
-		_error = multierror.Append(_error, errors.Wrap(err, "Could not create application server"))
-	}
-
-	if _error != nil {
-		log.Fatalln(_error)
-	}
-
-	a.idleConnClosed = make(chan struct{})
+func (a *App) RunServers() <-chan struct{} {
 	go func() {
 		sigint := make(chan os.Signal, 1)
 		signal.Notify(sigint, os.Interrupt, syscall.SIGTERM)
@@ -73,11 +99,11 @@ func (a *App) runServers() <-chan struct{} {
 
 		log.WithField("signal", sig.String()).Info("Shutting down servers")
 
-		if err := fileSrv.Shutdown(context.Background()); err != nil {
+		if err := a.FileServer.Shutdown(context.Background()); err != nil {
 			log.WithField("cause", err).Error("error shutting down file server")
 		}
-		if err := appSrv.Shutdown(context.Background()); err != nil {
-			log.WithField("cause", err).Error("error shutting down application server")
+		if err := a.ApiServer.Shutdown(context.Background()); err != nil {
+			log.WithField("cause", err).Error("error shutting down api server")
 		}
 		close(a.idleConnClosed)
 	}()
@@ -97,8 +123,8 @@ func (a *App) runServers() <-chan struct{} {
 		}
 	}
 
-	go runServer(fileSrv)
-	go runServer(appSrv)
+	go runServer(a.FileServer)
+	go runServer(a.ApiServer)
 
 	return a.idleConnClosed
 }

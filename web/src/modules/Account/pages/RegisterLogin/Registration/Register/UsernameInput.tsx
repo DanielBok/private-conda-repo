@@ -1,52 +1,58 @@
 import { UserApi } from "@/features/user";
 import { Form, Input } from "antd";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import * as CONST from "./constants";
-import { useFormContext } from "./hooks";
+import Errors from "./Errors";
+import { useRegistrationContext, useStatus, useSubmit } from "./hooks";
 
-export default () => {
+const UsernameInput = () => {
   const {
-    form: { getFieldDecorator, getFieldError },
-    validateStatus
-  } = useFormContext();
-  const [validator] = useUserValidator();
+    state: { username, disabled },
+    dispatch,
+  } = useRegistrationContext();
+
+  const check = useUsernameAvailableCheck();
+  const status = useStatus("username");
+  const submit = useSubmit();
+
+  useEffect(() => {
+    check(username);
+  }, [check, username]);
 
   return (
     <Form.Item
-      validateStatus={
-        getFieldError(CONST.USERNAME) !== undefined ? "error" : validateStatus
-      }
+      validateStatus={status}
       hasFeedback
+      help={<Errors field="username" />}
     >
-      {getFieldDecorator(CONST.USERNAME, {
-        validateFirst: true,
-        rules: [
-          { required: true, message: "Username is required" },
-          { min: 4, message: "Username is at least 4 character long" },
-          { validator }
-        ]
-      })(<Input placeholder="Username" />)}
+      <Input
+        autoFocus
+        value={username}
+        placeholder="Username / Channel"
+        onChange={(e) =>
+          dispatch({
+            type: "SET_USERNAME",
+            payload: { username: e.target.value },
+          })
+        }
+        onKeyPress={(e) => {
+          if (e.key === "Enter" && !disabled) submit();
+        }}
+      />
     </Form.Item>
   );
 };
 
-const useUserValidator = () => {
-  const { setValidateStatus } = useFormContext();
+const useUsernameAvailableCheck = () => {
+  const { dispatch } = useRegistrationContext();
+  const [cb] = useDebouncedCallback(async (username: string) => {
+    if (username.length < 2) return;
 
-  return useDebouncedCallback(
-    async (_, value: string, callback: (error?: string) => void) => {
-      if (!value || value.length < 4) return;
-      setValidateStatus("validating");
-      const available = await UserApi.isUsernameAvailable(value);
-      if (!available) {
-        setValidateStatus("error");
-        callback(`'${value}' is already taken.`);
-        return;
-      }
-      setValidateStatus("success");
-      callback();
-    },
-    500
-  );
+    const available = await UserApi.isUsernameAvailable(username);
+    dispatch({ type: "USERNAME_AVAILABILITY", payload: { available } });
+  }, 500);
+
+  return cb;
 };
+
+export default UsernameInput;

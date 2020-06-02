@@ -1,5 +1,6 @@
 import { UserApi, UserSelector } from "@/features/user";
-import { Icon, Menu } from "antd";
+import UserOutlined from "@ant-design/icons/UserOutlined";
+import { Menu } from "antd";
 import { push } from "connected-react-router";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,7 +25,7 @@ export default () => {
         <Menu.SubMenu
           title={
             <span className={styles.user}>
-              <Icon type="user" className={styles.userLogo} />
+              <UserOutlined />
               {user.username}
             </span>
           }

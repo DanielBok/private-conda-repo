@@ -23,6 +23,8 @@ services:
     ports:
       - "5050:5050"
       - "5060:5060"
+    environment: 
+      PCR_INDEXER.TYPE: shell
     volumes: 
       - C:/temp/condapkg:/var/condapkg
       # if overriding default config file

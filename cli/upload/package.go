@@ -5,8 +5,8 @@ import "fmt"
 type Package struct {
 	Name        string `json:"name"`
 	Version     string `json:"version"`
-	BuildString string `json:"build_string"`
-	BuildNumber int    `json:"build_number"`
+	BuildString string `json:"buildString"`
+	BuildNumber int    `json:"buildNumber"`
 	Platform    string `json:"platform"`
 }
 

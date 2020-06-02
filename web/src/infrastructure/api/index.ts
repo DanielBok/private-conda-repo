@@ -21,7 +21,6 @@ export class API {
     const {
       baseURL = apiUrl,
       transformRequest = [
-        T.SnakeCaseKeysTransformer,
         ...(axios.defaults.transformRequest as AxiosTransformer[]),
       ],
       transformResponse = [

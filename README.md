@@ -64,3 +64,23 @@ from you shell
 ```bash
 conda install -c https://my-server.com:5050/pikachu numpy
 ```
+
+## FAQ
+
+Below are a list of errors I encountered while using it in my firm and the solutions for them.
+
+### Built and published package correctly but keep getting "inflexible solves" during conda install
+
+The likely reason this happens is due to your meta.yaml recipe setup. The simple solution is to run `pcr upload --no-abi path/to/package`.
+
+If you build packages where you need to compile C code, you should know that you need to build this package for every platform you need 
+to support. However, if you build a noarch package, technically, you don't have to. But that's technically, because there are instances
+where you use a 3.8 feature that is not available in 3.7. Thus when conda indexes the channel, it'll add the `python_abi 3.x*` as one of
+the package's dependencies. This may or may not happen based on how you build your package.
+
+Since it's really tedious to solve, if you think you've done everything correctly and that your package does not need to be locked onto a
+specific python version or ABI, then I've provided the `--no-abi` flag in the upload command. Basically, it'll read through the 
+`current_repodata.json` and `repodata.json` file and remove all `python_abi` dependencies.
+
+Note that it removes for all the packages in the channel and not the specific channel. I may come back in the future to make it a little
+more specific when I've got the time.

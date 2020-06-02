@@ -43,8 +43,11 @@ const PackageDetail = ({
           activeKey={tab}
           onChange={(e) => setTab(e as typeof tab)}
           className={styles.tabBar}
+          tabBarStyle={{
+            backgroundColor: "rgba(63,165,39,.3)",
+          }}
         >
-          <TabPane tab={<span>Conda</span>} key="conda">
+          <TabPane tab="Conda" key="conda">
             <PackageInfo />
           </TabPane>
           <TabPane tab="Files" key="files">

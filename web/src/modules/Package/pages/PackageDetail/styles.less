@@ -7,24 +7,29 @@
   .tab-bar {
     margin: 16px 0;
 
-    :global(.ant-tabs-nav-container) {
-      background-color: @primary-color-light;
-      color: white;
-    }
-
+    //:global(.ant-tabs-nav-list) {
+    //  background-color: @primary-color-light;
+    //  color: white;
+    //}
+    //
     :global(.ant-tabs-tab) {
       margin: 0;
       width: 300px;
-      text-align: center;
+      justify-content: center;
+      color: white;
 
       &:hover {
-        color: #3e3e3e;
+        background-color: rgba(63, 165, 39, 0.5);
       }
     }
 
     :global(.ant-tabs-tab-active) {
       color: white;
       background-color: @primary-color;
+
+      &:hover {
+        background-color: @primary-color;
+      }
     }
 
     :global(.ant-tabs-ink-bar) {

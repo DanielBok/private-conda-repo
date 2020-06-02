@@ -20,7 +20,7 @@ export default () => {
     <Card className={styles.mainCard}>
       {license && (
         <div className={styles.topCard}>
-          <ProfileOutlined />
+          <ProfileOutlined className={styles.icon} />
           <span>License: </span>
           <a
             href={`https://opensource.org/search/node/${license}`}
@@ -33,9 +33,9 @@ export default () => {
       )}
 
       {([
-        [home, "Home", <HomeOutlined />],
-        [devUrl, "Development", <CodeOutlined />],
-        [docUrl, "Documentation", <FileWordOutlined />],
+        [home, "Home", <HomeOutlined className={styles.icon} />],
+        [devUrl, "Development", <CodeOutlined className={styles.icon} />],
+        [docUrl, "Documentation", <FileWordOutlined className={styles.icon} />],
       ] as [string | null, string, JSX.Element][]).map(
         ([link, title, icon]) =>
           link && (
@@ -50,12 +50,12 @@ export default () => {
       )}
 
       <div className={styles.topCard}>
-        <DownloadOutlined />
+        <DownloadOutlined className={styles.icon} />
         <span>{downloads} total downloads</span>
       </div>
 
       <div className={styles.topCard}>
-        <CalendarOutlined />
+        <CalendarOutlined className={styles.icon} />
         <span>Last Upload: {timeSinceUpload(timestamp)}</span>
       </div>
     </Card>

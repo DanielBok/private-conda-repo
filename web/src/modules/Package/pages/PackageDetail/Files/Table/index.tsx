@@ -81,7 +81,7 @@ const useColumns = (): ColumnProps<DataRow>[] => {
 
 const useDataSource = () => {
   const { filters } = useFileContext();
-  const { details } = useSelector(PackageSelector.packageDetail);
+  const { details, channel } = useSelector(PackageSelector.packageDetail);
   return details
     .filter((d) => {
       if (filters.version !== "All" && d.version !== filters.version)
@@ -92,10 +92,10 @@ const useDataSource = () => {
       (d, i) =>
         ({
           key: i,
-          name: `${d.channel}/${d.platform}/${d.package}-${d.version}-${d.buildString}_${d.buildNumber}.tar.bz2`,
+          name: `${channel}/${d.platform}/${d.package}-${d.version}-${d.buildString}_${d.buildNumber}.tar.bz2`,
           uploaded: timeSinceUpload(d.uploadDate),
           downloads: d.count,
-          channel: d.channel,
+          channel,
           package: {
             name: d.package,
             version: d.version,

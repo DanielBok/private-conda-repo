@@ -112,5 +112,6 @@ export const removePackage = (
 
   if (status === 200) {
     dispatch(PackageAction.removePackageDetail.success(payload.package));
+    dispatch(push("/"));
   }
 };

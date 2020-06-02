@@ -42,7 +42,7 @@ export type PackageDetail<T extends string | Moment> = {
 };
 
 export type PackageCountInfo<T extends string | Moment> = {
-  channel: string;
+  channelId: number;
   package: string;
   buildString: string;
   buildNumber: number;

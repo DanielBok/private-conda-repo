@@ -17,7 +17,7 @@ type ChannelDto struct {
 	Channel   string    `json:"channel"`
 	Password  string    `json:"password,omitempty"`
 	Email     string    `json:"email"`
-	CreatedOn time.Time `json:"created_on"`
+	CreatedOn time.Time `json:"createdOn"`
 }
 
 func (c *ChannelDto) IsValid() error {

@@ -99,15 +99,15 @@ export default (state = defaultState, action: AllActions) =>
         break;
       }
 
-      case getType(Action.fetchUserPackages.request):
+      case getType(Action.fetchChannelPackages.request):
         draft.loading.channelPackages = "REQUEST";
         break;
 
-      case getType(Action.fetchUserPackages.failure):
+      case getType(Action.fetchChannelPackages.failure):
         draft.loading.channelPackages = "FAILURE";
         break;
 
-      case getType(Action.fetchUserPackages.success): {
+      case getType(Action.fetchChannelPackages.success): {
         draft.loading.channelPackages = "SUCCESS";
         const { joinDate, ...rest } = action.payload;
         draft.channelPackages = {

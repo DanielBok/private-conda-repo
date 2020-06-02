@@ -1,5 +1,6 @@
 import api, { ThunkFunctionAsync } from "@/infrastructure/api";
 import { notification } from "antd";
+import { push } from "connected-react-router";
 import * as PackageAction from "./actions";
 import * as PackageType from "./types";
 
@@ -31,7 +32,7 @@ export const fetchAllPackages = (): ThunkFunctionAsync => async (
 /**
  * From the specified channel, fetch all details about the package
  *
- * @param channel channel/user name
+ * @param channel channel name
  * @param pkg package name
  */
 export const fetchPackageDetail = (
@@ -51,8 +52,8 @@ export const fetchPackageDetail = (
 };
 
 /**
- * Fetches all packages by user/channel
- * @param channel channel/user name
+ * Fetches all packages in channel
+ * @param channel channel name
  */
 export const fetchChannelPackages = (
   channel: string
@@ -62,20 +63,20 @@ export const fetchChannelPackages = (
   const { status: status1, data: packages } = await api.Get<
     PackageType.PackageMetaInfo[]
   >(`p/${channel}`, {
-    beforeRequest: () => dispatch(PackageAction.fetchUserPackages.request()),
+    beforeRequest: () => dispatch(PackageAction.fetchChannelPackages.request()),
   });
 
   if (status1 !== 200) return;
 
   const { status: status2, data: userData } = await api.Get<
     Omit<PackageType.ChannelPackages<string>, "packages">
-  >(`user/${channel}`, {
-    onError: () => dispatch(PackageAction.fetchUserPackages.failure()),
+  >(`channel/${channel}`, {
+    onError: () => dispatch(PackageAction.fetchChannelPackages.failure()),
   });
 
   if (status2 === 200) {
     dispatch(
-      PackageAction.fetchUserPackages.success({ ...userData, packages })
+      PackageAction.fetchChannelPackages.success({ ...userData, packages })
     );
   }
 };

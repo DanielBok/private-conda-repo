@@ -13,7 +13,7 @@ export const fetchPackageDetail = createAsyncAction(
   "FETCH_PACKAGE_DETAIL_FAILURE"
 )<void, PackageType.PackageDetail<string>, void>();
 
-export const fetchUserPackages = createAsyncAction(
+export const fetchChannelPackages = createAsyncAction(
   "FETCH_USER_PACKAGES_REQUEST",
   "FETCH_USER_PACKAGES_SUCCESS",
   "FETCH_USER_PACKAGES_FAILURE"

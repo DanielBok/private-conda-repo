@@ -4,7 +4,6 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -43,7 +42,6 @@ func New() (*AppConfig, error) {
 	viper.SetConfigType("yaml")
 
 	viper.SetEnvPrefix(prefix)
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {

@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   web:
-    image: danielbok/pcr-web
+    image: danielbok/pcr-web:3.0
     ports:
       - "80:80"
     depends_on: 
@@ -19,12 +19,10 @@ services:
       - pcrdb:/var/lib/postgresql/data
   
   server:
-    image: danielbok/pcr-server
+    image: danielbok/pcr-server:3.0
     ports:
       - "5050:5050"
       - "5060:5060"
-    environment: 
-      - PCR_CONDA.USE=shell
     volumes: 
       - C:/temp/condapkg:/var/condapkg
       # if overriding default config file

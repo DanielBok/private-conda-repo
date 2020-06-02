@@ -11,4 +11,3 @@ start-ssl: stop-ssl
 
 stop-ssl:
 	docker-compose -p $(PROJECT_NAME) -f docker-compose.ssl.yml down
-

@@ -32,4 +32,4 @@ docker-compose -p PCR -f docker-compose.ssl.yml up -d
 ## Things to Note
 
 Note that if you run the server in a dockerized environment, you must 
-set the environment variable `PCR_CONDA.USE` to `conda`. 
+set the environment variable `pcr_indexer_type` to `shell`. 

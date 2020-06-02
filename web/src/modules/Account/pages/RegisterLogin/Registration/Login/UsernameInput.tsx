@@ -1,43 +1,38 @@
+import Errors from "./Errors";
 import { Form, Input } from "antd";
-import React from "react";
-import * as CONST from "./constants";
-import { useLoginContext } from "./hooks";
+import React, { FC } from "react";
+import { useLoginContext, useStatus, useSubmit } from "./hooks";
 
-export default () => {
+const UsernameInput: FC = () => {
   const {
-    form: { getFieldError, isFieldTouched },
-    submit,
-    valid,
+    state: { username, disabled },
+    dispatch,
   } = useLoginContext();
+  const submit = useSubmit();
+  const status = useStatus("username");
 
   return (
     <Form.Item
-      name={CONST.USERNAME}
       hasFeedback
-      validateStatus={status()}
-      rules={[
-        {
-          required: true,
-          message: "username is required",
-        },
-        {
-          min: 2,
-          message: "username must be at least 2 characters long",
-        },
-      ]}
+      validateStatus={status}
+      help={<Errors field="username" />}
     >
       <Input
+        autoFocus
+        value={username}
         placeholder="Username / Channel"
+        onChange={(e) =>
+          dispatch({
+            type: "SET_USERNAME",
+            payload: { username: e.target.value },
+          })
+        }
         onKeyPress={(e) => {
-          if (e.key === "Enter") submit();
+          if (e.key === "Enter" && !disabled) submit();
         }}
       />
     </Form.Item>
   );
-
-  function status() {
-    if (!isFieldTouched(CONST.USERNAME)) return "";
-    if (!valid || getFieldError(CONST.USERNAME) !== undefined) return "error";
-    return "success";
-  }
 };
+
+export default UsernameInput;

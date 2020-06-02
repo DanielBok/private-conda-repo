@@ -27,7 +27,8 @@
     "ts-optchain": "^0.1.8",
     "typesafe-actions": "^5.1.0",
     "typescript": "^3.9.3",
-    "use-debounce": "^3.4.2"
+    "use-debounce": "^3.4.2",
+    "use-immer": "^0.4.0"
   },
   "devDependencies": {
     "@baristalabs/craco-raw-loader": "^1.2.0",

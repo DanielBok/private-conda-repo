@@ -8,7 +8,7 @@ indexer:
   # to index the channels. Use 'shell' when running the server application in a dockerized
   # container, like in docker-compose. This is because it is not easy to have a docker container
   # run another docker container whilst setting up the volumes for the second docker container.
-  type: docker
+  type: shell
   # if using docker, the image name and mount folder options can be specified
   image_name: danielbok/conda-repo-mgr
   # This is the folder path on the host where the conda channels and packages are stored

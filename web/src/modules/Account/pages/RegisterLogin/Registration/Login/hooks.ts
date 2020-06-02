@@ -16,9 +16,9 @@ export const LoginContext = React.createContext<{
 export const useLoginContext = () => useContext(LoginContext);
 
 export const useStatus = (field: keyof Credential) => {
-  const { touched, errors, valid } = useLoginContext().state;
+  const { pristine, errors, valid } = useLoginContext().state;
 
-  if (!touched[field]) return "";
+  if (pristine[field]) return "";
   if (!valid || errors[field].length > 0) return "error";
   return "success";
 };

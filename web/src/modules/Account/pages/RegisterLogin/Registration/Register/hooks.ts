@@ -1,10 +1,36 @@
+import { UserApi } from "@/features/user";
+import { ThunkDispatchAsync } from "@/infrastructure/api";
+import { push } from "connected-react-router";
 import React, { useContext } from "react";
-import { RegistrationForm } from "./types";
+import { useDispatch } from "react-redux";
+import { Fields, State, useRegistrationReducer } from "./reducer";
 
-export const FormContext = React.createContext<RegistrationForm>({
-  form: {} as any,
-  validateStatus: "",
-  setValidateStatus: () => {},
+export const RegistrationContext = React.createContext<{
+  state: State;
+  dispatch: ReturnType<typeof useRegistrationReducer>[1];
+}>({
+  state: {} as any,
+  dispatch: (_) => {},
 });
 
-export const useFormContext = () => useContext(FormContext);
+export const useRegistrationContext = () => useContext(RegistrationContext);
+
+export const useStatus = (field: keyof Fields) => {
+  const { pristine, errors, confirm } = useRegistrationContext().state;
+
+  if (pristine[field]) return "";
+  if (field === "confirm" && confirm === "") return "";
+
+  if (errors[field].length > 0) return "error";
+  return "success";
+};
+
+export const useSubmit = () => {
+  const dispatch = useDispatch() as ThunkDispatchAsync;
+  const { username, password, email } = useRegistrationContext().state;
+
+  return async () => {
+    await dispatch(UserApi.createUser(username, password, email));
+    dispatch(push("/"));
+  };
+};

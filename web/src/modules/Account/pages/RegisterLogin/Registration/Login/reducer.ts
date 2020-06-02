@@ -1,5 +1,5 @@
+import { some } from "lodash";
 import { useImmerReducer } from "use-immer";
-import { reduce } from "lodash";
 
 export type Credential = {
   username: string;
@@ -8,7 +8,7 @@ export type Credential = {
 
 export type State = Credential & {
   valid: boolean;
-  touched: Record<keyof Credential, boolean>;
+  pristine: Record<keyof Credential, boolean>;
   errors: Record<keyof Credential, string[]>;
   disabled: boolean;
 };
@@ -37,9 +37,9 @@ const initialState: State = {
   username: "",
   password: "",
   valid: true,
-  touched: {
-    username: false,
-    password: false,
+  pristine: {
+    username: true,
+    password: true,
   },
   errors: {
     username: [],
@@ -54,7 +54,7 @@ export const useLoginReducer = () => {
       case "SET_USERNAME": {
         const { username } = action.payload;
         draft.username = action.payload.username;
-        draft.touched.username = true;
+        draft.pristine.username = false;
 
         draft.errors.username = hasError({ username }).username;
         break;
@@ -62,7 +62,7 @@ export const useLoginReducer = () => {
       case "SET_PASSWORD": {
         const { password } = action.payload;
         draft.password = password;
-        draft.touched.password = true;
+        draft.pristine.password = false;
 
         draft.errors.password = hasError({ password }).password;
         break;
@@ -72,12 +72,8 @@ export const useLoginReducer = () => {
         break;
     }
 
-    const allTouched = reduce(draft.touched, (a, x) => a && x, true as boolean);
-    draft.disabled = reduce(
-      draft.errors,
-      (a, x) => a || x.length > 0,
-      !allTouched
-    );
+    const pristine = some(draft.pristine);
+    draft.disabled = pristine || some(draft.errors, (e) => e.length > 0);
   }, initialState);
 };
 

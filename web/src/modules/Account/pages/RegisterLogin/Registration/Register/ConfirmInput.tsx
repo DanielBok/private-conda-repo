@@ -3,29 +3,28 @@ import React from "react";
 import Errors from "./Errors";
 import { useRegistrationContext, useStatus, useSubmit } from "./hooks";
 
-export default () => {
+const ConfirmInput = () => {
   const {
-    state: { email, disabled },
+    state: { confirm, disabled },
     dispatch,
   } = useRegistrationContext();
 
-  const status = useStatus("email");
+  const status = useStatus("confirm");
   const submit = useSubmit();
-
   return (
     <Form.Item
       validateStatus={status}
       hasFeedback
-      help={<Errors field="email" />}
+      help={<Errors field="confirm" />}
     >
       <Input
-        value={email}
-        placeholder="Email"
-        type="email"
+        value={confirm}
+        placeholder="Confirm Password"
+        type="password"
         onChange={(e) =>
           dispatch({
-            type: "SET_EMAIL",
-            payload: { email: e.target.value },
+            type: "SET_CONFIRM",
+            payload: { confirm: e.target.value },
           })
         }
         onKeyPress={(e) => {
@@ -35,3 +34,5 @@ export default () => {
     </Form.Item>
   );
 };
+
+export default ConfirmInput;

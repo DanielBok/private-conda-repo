@@ -45,6 +45,17 @@ module.exports = {
           "@primary-color-light": "#46d42a",
           "@primary-color-dark": "#025c02",
         },
+        lessLoaderOptions: {
+          lessOptions: {
+            modifyVars: {
+              "@footer-height": "140px",
+              "@header-height": "64px",
+              "@header-margin": "5px",
+              "@min-height":
+                "calc(100vh - @header-height - @footer-height - @header-margin)",
+            },
+          },
+        },
         cssLoaderOptions: {
           modules: {
             localIdentName: isDev ? "[path][name]_[local]" : "[hash:base64]",

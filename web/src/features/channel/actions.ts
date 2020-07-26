@@ -13,4 +13,10 @@ export const fetchChannelCredentialsAsync = createAsyncAction(
   "FETCH_CHANNEL_CREDENTIALS_FAILURE"
 )<void, T.Channel, void>();
 
+export const updateForm = createAction("UPDATE_CHANNEL_FORM")<
+  DeepPartial<T.RegistrationForm>
+>();
+
+export const resetForm = createAction("RESET_CHANNEL_FORM")<void>();
+
 export const logout = createAction("LOGOUT_CHANNEL")<void>();

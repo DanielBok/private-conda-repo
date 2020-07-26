@@ -1,35 +1,31 @@
+import { ChnAction, ChnApi } from "@/features/channel";
 import { Form, Input } from "antd";
 import React from "react";
+import { useDispatch } from "react-redux";
 import Errors from "./Errors";
-import { useRegistrationContext, useStatus, useSubmit } from "./hooks";
+import { useDetails, useDisabled } from "./utils";
 
 const PasswordInput = () => {
-  const {
-    state: { password, disabled },
-    dispatch,
-  } = useRegistrationContext();
-
-  const status = useStatus("password");
-  const submit = useSubmit();
+  const dispatch = useDispatch();
+  const disabled = useDisabled();
+  const [password, errors, status] = useDetails("password");
 
   return (
     <Form.Item
       validateStatus={status}
       hasFeedback
-      help={<Errors field="password" />}
+      help={<Errors errors={errors} />}
     >
       <Input
         value={password}
         placeholder="Password"
         type="password"
-        onChange={(e) =>
-          dispatch({
-            type: "SET_PASSWORD",
-            payload: { password: e.target.value },
-          })
-        }
+        onChange={(e) => {
+          const password = e.target.value.trim().toLowerCase();
+          dispatch(ChnAction.updateForm({ password }));
+        }}
         onKeyPress={(e) => {
-          if (e.key === "Enter" && !disabled) submit();
+          if (e.key === "Enter" && !disabled) dispatch(ChnApi.createChannel());
         }}
       />
     </Form.Item>

@@ -1,17 +1,13 @@
 import React, { FC } from "react";
-import { useRegistrationContext } from "./hooks";
-import { Fields } from "./reducer";
 
 type Props = {
-  field: keyof Fields;
+  errors: string;
 };
 
-const Errors: FC<Props> = ({ field }) => {
-  const { errors } = useRegistrationContext().state;
-  if (errors[field].length === 0) return null;
+const Errors: FC<Props> = ({ errors }) => {
+  if (errors === "") return null;
 
-  const messages = errors[field].join(" ");
-  return <span>{messages}</span>;
+  return <span>{errors}</span>;
 };
 
 export default Errors;

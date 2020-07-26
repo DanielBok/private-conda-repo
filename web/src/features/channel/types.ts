@@ -18,4 +18,14 @@ export type RegistrationForm = {
   channel: string;
   password: string;
   confirm: string;
+  email: string;
+
+  errors: Record<
+    Exclude<keyof RegistrationForm, "errors" | "pristine">,
+    string
+  >;
+  pristine: Record<
+    Exclude<keyof RegistrationForm, "errors" | "pristine">,
+    boolean
+  >;
 };

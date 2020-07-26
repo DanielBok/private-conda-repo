@@ -7,12 +7,20 @@ import * as T from "./types";
 /**
  * Creates channel in the backend server
  */
-export const createChannel = (
-  channel: string,
-  password: string,
-  email: string
-): ThunkFunctionAsync => async (dispatch, getState) => {
-  if (getState().channel.loading.validation === "REQUEST") return;
+export const createChannel = (): ThunkFunctionAsync => async (
+  dispatch,
+  getState
+) => {
+  const {
+    form: { errors, pristine, channel, password, confirm, email },
+    loading: { validation },
+  } = getState().channel;
+
+  const invalid =
+    confirm !== password ||
+    Object.values(pristine).some((e) => e) ||
+    Object.values(errors).some((e) => e.length > 0);
+  if (validation === "REQUEST" || invalid) return;
 
   const payload: T.Channel = { channel, password };
 
@@ -80,13 +88,19 @@ export const logout = (): ThunkFunction => (dispatch) => {
 
 /**
  * Checks if channel is available from the backend
- * @param username name to check
+ * @param channel name to check
  */
-export const isChannelAvailable = async (username: string) => {
+export const isChannelAvailable = (
+  channel: string
+): ThunkFunctionAsync => async (dispatch) => {
   const { status, data } = await api.Post<string>("/channel/check", {
-    channel: username,
+    channel,
     password: "",
   });
 
-  return status === 400 && data.trim() === "record not found";
+  const available = status === 400 && data.trim() === "record not found";
+  if (!available) {
+    dispatch(A.updateForm({ errors: { channel: "channel is not available" } }));
+  } else {
+  }
 };

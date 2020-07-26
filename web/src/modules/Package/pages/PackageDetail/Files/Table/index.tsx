@@ -1,5 +1,5 @@
 import { MetaSelector } from "@/features/meta";
-import { PackageSelector } from "@/features/package";
+import { PkgSelector } from "@/features/package";
 import { timeSinceUpload } from "@/libs/date";
 import CalendarOutlined from "@ant-design/icons/CalendarOutlined";
 import { Table } from "antd";
@@ -81,7 +81,7 @@ const useColumns = (): ColumnProps<DataRow>[] => {
 
 const useDataSource = () => {
   const { filters } = useFileContext();
-  const { details, channel } = useSelector(PackageSelector.packageDetail);
+  const { details, channel } = useSelector(PkgSelector.packageDetail);
   return details
     .filter((d) => {
       if (filters.version !== "All" && d.version !== filters.version)

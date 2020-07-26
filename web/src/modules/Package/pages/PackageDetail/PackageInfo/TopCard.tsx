@@ -1,4 +1,4 @@
-import { PackageSelector } from "@/features/package";
+import { PkgSelector } from "@/features/package";
 import { timeSinceUpload } from "@/libs/date";
 import { Card } from "antd";
 import ProfileOutlined from "@ant-design/icons/ProfileOutlined";
@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 import styles from "./styles.less";
 
 export default () => {
-  const details = useSelector(PackageSelector.packageDetail);
+  const details = useSelector(PkgSelector.packageDetail);
   const { devUrl, docUrl, home, license, timestamp } = details.latest;
   const downloads = details.details.reduce((acc, e) => acc + e.count, 0);
 

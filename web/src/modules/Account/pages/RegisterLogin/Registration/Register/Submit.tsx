@@ -1,12 +1,13 @@
-import { UserSelector } from "@/features/user";
+import { useRootSelector } from "@/infrastructure/hooks";
 import { Button } from "antd";
 import React from "react";
-import { useSelector } from "react-redux";
 import { useRegistrationContext, useSubmit } from "./hooks";
 import styles from "./styles.less";
 
 export default () => {
-  const isLoading = useSelector(UserSelector.userInfo).loading === "REQUEST";
+  const isLoading = useRootSelector(
+    (s) => s.channel.loading.validation === "REQUEST"
+  );
 
   const { disabled } = useRegistrationContext().state;
   const submit = useSubmit();

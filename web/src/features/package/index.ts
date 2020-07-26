@@ -1,6 +1,6 @@
-import * as PackageAction from "./actions";
-import * as PackageApi from "./api";
-import * as PackageSelector from "./selectors";
-import * as PackageType from "./types";
+import * as PkgAction from "./actions";
+import * as PkgApi from "./api";
+import * as PkgSelector from "./selectors";
+import * as PkgType from "./types";
 
-export { PackageAction, PackageApi, PackageSelector, PackageType };
+export { PkgAction, PkgApi, PkgSelector, PkgType };

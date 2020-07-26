@@ -1,4 +1,4 @@
-import { PackageType } from "@/features/package";
+import { PkgType } from "@/features/package";
 
 export type DataRow = {
   key: number;
@@ -6,5 +6,5 @@ export type DataRow = {
   uploaded: string;
   downloads: number;
   channel: string;
-  package: PackageType.RemovePackagePayload["package"];
+  package: PkgType.RemovePackagePayload["package"];
 };

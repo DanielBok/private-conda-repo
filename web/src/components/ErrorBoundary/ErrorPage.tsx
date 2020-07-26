@@ -1,4 +1,4 @@
-import { PackageAction } from "@/features/package";
+import { PkgAction } from "@/features/package";
 import { Button, Typography } from "antd";
 import { push } from "connected-react-router";
 import React, { useEffect } from "react";
@@ -31,7 +31,7 @@ const ErrorPage = () => {
   }
 
   function resets() {
-    dispatch(PackageAction.resetLoadingStore());
+    dispatch(PkgAction.resetLoadingStore());
   }
 };
 

@@ -1,4 +1,4 @@
-import { UserSelector } from "@/features/user";
+import { ChnSelector } from "@/features/channel";
 import { Col, Row } from "antd";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -9,7 +9,7 @@ import Registration from "./Registration";
 import styles from "./styles.less";
 
 export default () => {
-  if (useSelector(UserSelector.userValidated)) {
+  if (useSelector(ChnSelector.channelValidated)) {
     return <Redirect to="/" />;
   }
 

@@ -1,4 +1,4 @@
-import { PackageSelector } from "@/features/package";
+import { PkgSelector } from "@/features/package";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import Filters from "./Filters";
@@ -11,7 +11,7 @@ export default () => {
     platform: "All",
     version: "All",
   });
-  const isAdmin = useSelector(PackageSelector.isUserChannelAdmin);
+  const isAdmin = useSelector(PkgSelector.isAdmin);
 
   return (
     <FileContext.Provider

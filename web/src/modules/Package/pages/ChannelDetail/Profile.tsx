@@ -1,4 +1,4 @@
-import { PackageSelector } from "@/features/package";
+import { PkgSelector } from "@/features/package";
 import { Card } from "antd";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -6,7 +6,7 @@ import styles from "./styles.less";
 
 export default () => {
   const { channel, email, joinDate } = useSelector(
-    PackageSelector.channelPackages
+    PkgSelector.channelPackages
   );
 
   const subject = encodeURI(`Hello ${channel}`);

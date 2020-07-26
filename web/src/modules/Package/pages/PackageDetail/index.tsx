@@ -1,4 +1,4 @@
-import { PackageApi } from "@/features/package";
+import { PkgApi } from "@/features/package";
 import { RootState } from "@/infrastructure/rootState";
 import { Tabs } from "antd";
 import React, { useEffect, useState } from "react";
@@ -24,11 +24,11 @@ const PackageDetail = ({
   const [tab, setTab] = useState<"conda" | "files">("conda");
 
   useEffect(() => {
-    dispatch(PackageApi.fetchPackageDetail(channel, pkg));
+    dispatch(PkgApi.fetchPackageDetail(channel, pkg));
   }, [channel, pkg, dispatch]);
 
   const failure = useSelector(
-    (s: RootState) => s.package.loading.details === "FAILURE"
+    (s: RootState) => s.pkg.loading.details === "FAILURE"
   );
 
   if (failure) {

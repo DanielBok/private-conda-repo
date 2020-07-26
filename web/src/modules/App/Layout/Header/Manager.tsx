@@ -1,4 +1,4 @@
-import { UserApi, UserSelector } from "@/features/user";
+import { ChnApi, ChnSelector } from "@/features/channel";
 import UserOutlined from "@ant-design/icons/UserOutlined";
 import { Menu } from "antd";
 import { push } from "connected-react-router";
@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styles from "./styles.less";
 
 export default () => {
-  const user = useSelector(UserSelector.userInfo);
+  const user = useSelector(ChnSelector.channelInfo);
   const dispatch = useDispatch();
   const validated = user.validated;
 
@@ -26,14 +26,14 @@ export default () => {
           title={
             <span className={styles.user}>
               <UserOutlined />
-              {user.username}
+              {user.channel}
             </span>
           }
         >
           <Menu.Item
             key="logout"
             onClick={() => {
-              dispatch(UserApi.logout());
+              dispatch(ChnApi.logout());
               dispatch(push("/"));
             }}
           >

@@ -1,4 +1,4 @@
-import { PackageSelector } from "@/features/package";
+import { PkgSelector } from "@/features/package";
 import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -7,7 +7,7 @@ import styles from "./styles.less";
 
 export default () => {
   const { channel, pkg } = usePackageContext();
-  const { summary } = useSelector(PackageSelector.packageDetail).latest;
+  const { summary } = useSelector(PkgSelector.packageDetail).latest;
 
   return (
     <div className={styles.title}>

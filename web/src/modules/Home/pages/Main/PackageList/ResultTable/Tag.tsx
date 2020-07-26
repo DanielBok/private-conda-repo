@@ -1,9 +1,9 @@
-import { PackageType } from "@/features/package";
+import { PkgType } from "@/features/package";
 import { Tag } from "antd";
 import React from "react";
 
 type Props = {
-  platform: PackageType.Platform;
+  platform: PkgType.Platform;
 };
 
 export default ({ platform }: Props) => {

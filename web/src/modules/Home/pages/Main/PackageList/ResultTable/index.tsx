@@ -1,4 +1,4 @@
-import { PackageSelector, PackageType } from "@/features/package";
+import { PkgSelector, PkgType } from "@/features/package";
 import { Col, List, Row } from "antd";
 import Fuse from "fuse.js";
 import sortBy from "lodash/sortBy";
@@ -62,7 +62,7 @@ const Header = () => (
 
 const useResultList = () => {
   const { search } = useSearchContext();
-  const packages = useSelector(PackageSelector.packageMeta);
+  const packages = useSelector(PkgSelector.packageMeta);
   const fuse = useFuse(packages);
 
   if (search.length > 0) {
@@ -72,9 +72,9 @@ const useResultList = () => {
   }
 };
 
-const useFuse = (packages: PackageType.PackageMetaInfo[]) => {
+const useFuse = (packages: PkgType.PackageMetaInfo[]) => {
   const keys: {
-    name: keyof PackageType.PackageMetaInfo;
+    name: keyof PkgType.PackageMetaInfo;
     weight: number;
   }[] = [
     { name: "name", weight: 0.6 },

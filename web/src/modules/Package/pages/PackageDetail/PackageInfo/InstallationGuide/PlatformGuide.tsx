@@ -1,4 +1,4 @@
-import { PackageSelector } from "@/features/package";
+import { PkgSelector } from "@/features/package";
 import AndroidOutlined from "@ant-design/icons/AndroidOutlined";
 import AppleOutlined from "@ant-design/icons/AppleOutlined";
 import WindowsOutlined from "@ant-design/icons/WindowsOutlined";
@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import styles from "./styles.less";
 
 export default () => {
-  const { latest } = useSelector(PackageSelector.packageDetail);
+  const { latest } = useSelector(PkgSelector.packageDetail);
 
   return (
     <div className={styles.platform}>
@@ -56,7 +56,7 @@ const PlatformTags = () => {
 };
 
 const usePlatforms = () => {
-  const { details, latest } = useSelector(PackageSelector.packageDetail);
+  const { details, latest } = useSelector(PkgSelector.packageDetail);
   const platforms = details
     .filter((d) => d.version === latest.version)
     .map((e) => e.platform);

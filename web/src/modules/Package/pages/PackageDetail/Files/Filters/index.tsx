@@ -1,4 +1,4 @@
-import { PackageSelector } from "@/features/package";
+import { PkgSelector } from "@/features/package";
 import FilterOutlined from "@ant-design/icons/FilterOutlined";
 import { Col, Form, Row, Select } from "antd";
 import React from "react";
@@ -10,7 +10,7 @@ const { Option } = Select;
 
 export default () => {
   const { filters, setFilters } = useFileContext();
-  const { details } = useSelector(PackageSelector.packageDetail);
+  const { details } = useSelector(PkgSelector.packageDetail);
 
   const versions = ["All", ...new Set(details.map((e) => e.version))];
   const platforms = ["All", ...new Set(details.map((e) => e.platform))];

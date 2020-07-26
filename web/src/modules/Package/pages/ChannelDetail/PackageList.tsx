@@ -1,4 +1,4 @@
-import { PackageSelector } from "@/features/package";
+import { PkgSelector } from "@/features/package";
 import { timeSinceUpload } from "@/libs/date";
 import Logo from "@/resource/conda.svg";
 import QuestionCircleOutlined from "@ant-design/icons/QuestionCircleOutlined";
@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import styles from "./styles.less";
 
 export default () => {
-  const { channel, packages } = useSelector(PackageSelector.channelPackages);
+  const { channel, packages } = useSelector(PkgSelector.channelPackages);
 
   return (
     <Card

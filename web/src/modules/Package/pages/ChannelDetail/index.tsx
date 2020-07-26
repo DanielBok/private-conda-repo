@@ -1,4 +1,4 @@
-import { PackageApi } from "@/features/package";
+import { PkgApi } from "@/features/package";
 import { RootState } from "@/infrastructure/rootState";
 import { Col, Row } from "antd";
 import React, { useEffect } from "react";
@@ -18,11 +18,11 @@ const ChannelDetail = ({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(PackageApi.fetchChannelPackages(channel));
+    dispatch(PkgApi.fetchChannelPackages(channel));
   }, [channel, dispatch]);
 
   const failure = useSelector(
-    (s: RootState) => s.package.loading.channelPackages === "FAILURE"
+    (s: RootState) => s.pkg.loading.channelPackages === "FAILURE"
   );
 
   if (failure) {

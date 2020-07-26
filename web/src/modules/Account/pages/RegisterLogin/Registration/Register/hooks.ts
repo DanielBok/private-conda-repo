@@ -1,4 +1,4 @@
-import { UserApi } from "@/features/user";
+import { ChnApi } from "@/features/channel";
 import { ThunkDispatchAsync } from "@/infrastructure/api";
 import { push } from "connected-react-router";
 import React, { useContext } from "react";
@@ -30,7 +30,7 @@ export const useSubmit = () => {
   const { username, password, email } = useRegistrationContext().state;
 
   return async () => {
-    await dispatch(UserApi.createUser(username, password, email));
+    await dispatch(ChnApi.createChannel(username, password, email));
     dispatch(push("/"));
   };
 };

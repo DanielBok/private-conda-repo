@@ -1,4 +1,4 @@
-import { PackageApi } from "@/features/package";
+import { PkgApi } from "@/features/package";
 import { Popconfirm } from "antd";
 import React from "react";
 import { useDispatch } from "react-redux";
@@ -15,7 +15,7 @@ export default ({ channel, package: detail }: Props) => {
       placement="topLeft"
       title="Are you sure you want to delete this package?"
       trigger="click"
-      onConfirm={() => dispatch(PackageApi.removePackage(channel, detail))}
+      onConfirm={() => dispatch(PkgApi.removePackage(channel, detail))}
     >
       <span className={styles.removeButton}>Remove</span>
     </Popconfirm>

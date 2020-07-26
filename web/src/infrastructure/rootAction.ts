@@ -1,12 +1,12 @@
 import { MetaAction } from "@/features/meta";
-import { PackageAction } from "@/features/package";
-import { UserAction } from "@/features/user";
+import { PkgAction } from "@/features/package";
+import { ChnAction } from "@/features/channel";
 
 import { ActionType } from "typesafe-actions";
 
 type AllActions =
   | ActionType<typeof MetaAction>
-  | ActionType<typeof UserAction>
-  | ActionType<typeof PackageAction>;
+  | ActionType<typeof ChnAction>
+  | ActionType<typeof PkgAction>;
 
 export default AllActions;

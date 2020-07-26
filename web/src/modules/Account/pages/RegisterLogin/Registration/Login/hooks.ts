@@ -1,4 +1,4 @@
-import { UserApi } from "@/features/user";
+import { ChnApi } from "@/features/channel";
 import { ThunkDispatchAsync } from "@/infrastructure/api";
 import { push } from "connected-react-router";
 import React, { useContext } from "react";
@@ -31,7 +31,7 @@ export const useSubmit = () => {
   } = useLoginContext();
 
   return async () => {
-    const valid = await thunkDispatch(UserApi.validateUser(username, password));
+    const valid = await thunkDispatch(ChnApi.validateChannel(username, password));
     if (valid) {
       thunkDispatch(push("/"));
     } else {

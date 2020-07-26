@@ -1,6 +1,6 @@
 import { MetaApi } from "@/features/meta";
-import { PackageApi } from "@/features/package";
-import { UserApi } from "@/features/user";
+import { PkgApi } from "@/features/package";
+import { ChnApi } from "@/features/channel";
 import { routerMiddleware } from "connected-react-router";
 import { createBrowserHistory } from "history";
 import { applyMiddleware, createStore, Store } from "redux";
@@ -17,7 +17,7 @@ function configureStore() {
   );
 
   const store = createStore(createReducer(history), middleware);
-  initializeStore(store);
+  initializeStore(store).catch((e) => console.error(e));
 
   return store;
 }
@@ -26,8 +26,8 @@ async function initializeStore(store: Store) {
   const dispatch = (action: any) => store.dispatch(action);
 
   await Promise.all([
-    dispatch(PackageApi.fetchAllPackages()),
-    dispatch(UserApi.loadUser()),
+    dispatch(PkgApi.fetchAllPackages()),
+    dispatch(ChnApi.loadChannel()),
     dispatch(MetaApi.fetchMetaInfo()),
   ]);
 }

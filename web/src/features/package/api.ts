@@ -1,8 +1,8 @@
 import api, { ThunkFunctionAsync } from "@/infrastructure/api";
 import { notification } from "antd";
 import { push } from "connected-react-router";
-import * as PackageAction from "./actions";
-import * as PackageType from "./types";
+import * as A from "./actions";
+import * as T from "./types";
 
 /**
  * Fetches all package meta information
@@ -11,11 +11,10 @@ export const fetchAllPackages = (): ThunkFunctionAsync => async (
   dispatch,
   getState
 ) => {
-  if (getState().package.loading.packages === "REQUEST") return;
+  if (getState().pkg.loading.packages === "REQUEST") return;
 
-  const { data, status } = await api.Get<PackageType.PackageMetaInfo[]>("p", {
-    beforeRequest: () =>
-      dispatch(PackageAction.fetchAllPackagesAsync.request()),
+  const { data, status } = await api.Get<T.PackageMetaInfo[]>("p", {
+    beforeRequest: () => dispatch(A.fetchAllPackagesAsync.request()),
     onError: (e) => {
       notification.error({
         message: `Could not retrieve package data. Reason: ${e.data}`,
@@ -25,7 +24,7 @@ export const fetchAllPackages = (): ThunkFunctionAsync => async (
   });
 
   if (status === 200) {
-    dispatch(PackageAction.fetchAllPackagesAsync.success(data));
+    dispatch(A.fetchAllPackagesAsync.success(data));
   }
 };
 
@@ -39,16 +38,16 @@ export const fetchPackageDetail = (
   channel: string,
   pkg: string
 ): ThunkFunctionAsync => async (dispatch, getState) => {
-  if (getState().package.loading.details === "REQUEST") return;
+  if (getState().pkg.loading.details === "REQUEST") return;
 
-  const { data, status } = await api.Get<PackageType.PackageDetail<string>>(
+  const { data, status } = await api.Get<T.PackageDetail<string>>(
     `p/${channel}/${pkg}`,
     {
-      beforeRequest: () => dispatch(PackageAction.fetchPackageDetail.request()),
-      onError: () => dispatch(PackageAction.fetchPackageDetail.failure()),
+      beforeRequest: () => dispatch(A.fetchPackageDetail.request()),
+      onError: () => dispatch(A.fetchPackageDetail.failure()),
     }
   );
-  if (status === 200) dispatch(PackageAction.fetchPackageDetail.success(data));
+  if (status === 200) dispatch(A.fetchPackageDetail.success(data));
 };
 
 /**
@@ -58,31 +57,29 @@ export const fetchPackageDetail = (
 export const fetchChannelPackages = (
   channel: string
 ): ThunkFunctionAsync => async (dispatch, getState) => {
-  if (getState().package.loading.channelPackages === "REQUEST") return;
+  if (getState().pkg.loading.channelPackages === "REQUEST") return;
 
   const { status: status1, data: packages } = await api.Get<
-    PackageType.PackageMetaInfo[]
+    T.PackageMetaInfo[]
   >(`p/${channel}`, {
-    beforeRequest: () => dispatch(PackageAction.fetchChannelPackages.request()),
+    beforeRequest: () => dispatch(A.fetchChannelPackages.request()),
   });
 
   if (status1 !== 200) return;
 
-  const { status: status2, data: userData } = await api.Get<
-    Omit<PackageType.ChannelPackages<string>, "packages">
+  const { status: status2, data: channelData } = await api.Get<
+    Omit<T.ChannelPackages<string>, "packages">
   >(`channel/${channel}`, {
-    onError: () => dispatch(PackageAction.fetchChannelPackages.failure()),
+    onError: () => dispatch(A.fetchChannelPackages.failure()),
   });
 
   if (status2 === 200) {
-    dispatch(
-      PackageAction.fetchChannelPackages.success({ ...userData, packages })
-    );
+    dispatch(A.fetchChannelPackages.success({ ...channelData, packages }));
   }
 };
 
 /**
- * Removes the package from the channel. The user must be signed in and must be the owner of the channel
+ * Removes the package from the channel. The channel must be signed in and must be the owner of the channel
  * for operation to succeed
  *
  * @param channel name of the channel
@@ -90,28 +87,29 @@ export const fetchChannelPackages = (
  */
 export const removePackage = (
   channel: string,
-  detail: PackageType.RemovePackagePayload["package"]
+  detail: T.RemovePackagePayload["package"]
 ): ThunkFunctionAsync => async (dispatch, getState) => {
   const {
-    user,
-    package: { loading },
+    channel: chn,
+    pkg: { loading },
   } = getState();
+
   if (loading.details === "REQUEST") return;
+  if (!chn.validated || chn.channel !== channel) return;
 
-  if (!user.validated || user.username !== channel) return;
-
-  const payload: PackageType.RemovePackagePayload = {
+  const payload: T.RemovePackagePayload = {
     channel,
-    password: user.password,
+    password: chn.password,
     package: detail,
   };
+
   const { status } = await api.Delete<void>("p", payload, {
-    beforeRequest: () => dispatch(PackageAction.removePackageDetail.request()),
-    onError: () => dispatch(PackageAction.removePackageDetail.failure()),
+    beforeRequest: () => dispatch(A.removePackageDetail.request()),
+    onError: () => dispatch(A.removePackageDetail.failure()),
   });
 
   if (status === 200) {
-    dispatch(PackageAction.removePackageDetail.success(payload.package));
+    dispatch(A.removePackageDetail.success(payload.package));
     dispatch(push("/"));
   }
 };

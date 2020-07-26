@@ -1,4 +1,4 @@
-import { UserApi } from "@/features/user";
+import { ChnApi } from "@/features/channel";
 import { Form, Input } from "antd";
 import React, { useEffect } from "react";
 import { useDebouncedCallback } from "use-debounce";
@@ -48,7 +48,7 @@ const useUsernameAvailableCheck = () => {
   const [cb] = useDebouncedCallback(async (username: string) => {
     if (username.length < 2) return;
 
-    const available = await UserApi.isUsernameAvailable(username);
+    const available = await ChnApi.isChannelAvailable(username);
     dispatch({ type: "USERNAME_AVAILABILITY", payload: { available } });
   }, 500);
 

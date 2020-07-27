@@ -1,9 +1,9 @@
 import { ChnApi, ChnSelector } from "@/features/channel";
 import UserOutlined from "@ant-design/icons/UserOutlined";
 import { Menu } from "antd";
-import { push } from "connected-react-router";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import styles from "./styles.less";
 
 export default () => {
@@ -13,13 +13,8 @@ export default () => {
 
   return (
     <Menu mode="horizontal" selectedKeys={[""]}>
-      <Menu.Item
-        key="help"
-        onClick={() => {
-          dispatch(push("/help"));
-        }}
-      >
-        Help
+      <Menu.Item key="help">
+        <Link to="/help">Help</Link>
       </Menu.Item>
       {validated ? (
         <Menu.SubMenu
@@ -30,22 +25,16 @@ export default () => {
             </span>
           }
         >
-          <Menu.Item
-            key="logout"
-            onClick={() => {
-              dispatch(ChnApi.logout());
-              dispatch(push("/"));
-            }}
-          >
-            Logout
+          <Menu.Item key="Upload">
+            <Link to="/upload">Upload Package</Link>
+          </Menu.Item>
+          <Menu.Item key="logout" onClick={() => dispatch(ChnApi.logout())}>
+            <Link to="/">Logout</Link>
           </Menu.Item>
         </Menu.SubMenu>
       ) : (
-        <Menu.Item
-          key="login-register"
-          onClick={() => dispatch(push("/account"))}
-        >
-          Login / Register
+        <Menu.Item key="login-register">
+          <Link to="/account">Login / Register</Link>
         </Menu.Item>
       )}
     </Menu>

@@ -2,6 +2,7 @@ import accountRoutes from "@/modules/Account";
 import helpRoutes from "@/modules/Help";
 import homeRoutes from "@/modules/Home";
 import packageRoutes from "@/modules/Package";
+import uploadRoutes from "@/modules/UploadPage";
 
 const routeMap: Record<string, ModuleRoutes> = {
   "/": {
@@ -19,6 +20,10 @@ const routeMap: Record<string, ModuleRoutes> = {
   "/p": {
     clusterName: "Package",
     routes: packageRoutes,
+  },
+  "/upload": {
+    clusterName: "Upload",
+    routes: uploadRoutes,
   },
 };
 

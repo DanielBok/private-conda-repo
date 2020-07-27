@@ -63,35 +63,32 @@ const Header = () => (
 const useResultList = () => {
   const { search } = useSearchContext();
   const packages = useSelector(PkgSelector.packageMeta);
-  const fuse = useFuse(packages);
 
   if (search.length > 0) {
-    return fuse.search(search).map((e) => e.item);
+    const keys: {
+      name: keyof PkgType.PackageMetaInfo;
+      weight: number;
+    }[] = [
+      { name: "name", weight: 0.6 },
+      { name: "description", weight: 0.25 },
+      { name: "channel", weight: 0.1 },
+      { name: "summary", weight: 0.05 },
+    ];
+
+    return new Fuse(packages, {
+      shouldSort: true,
+      includeScore: true,
+      threshold: 0.2,
+      tokenize: true,
+      location: 0,
+      distance: 100,
+      maxPatternLength: 32,
+      minMatchCharLength: 1,
+      keys,
+    })
+      .search(search)
+      .map((e) => e.item);
   } else {
     return sortBy(packages, (e) => [e.channel, e.name]);
   }
-};
-
-const useFuse = (packages: PkgType.PackageMetaInfo[]) => {
-  const keys: {
-    name: keyof PkgType.PackageMetaInfo;
-    weight: number;
-  }[] = [
-    { name: "name", weight: 0.6 },
-    { name: "description", weight: 0.25 },
-    { name: "channel", weight: 0.1 },
-    { name: "summary", weight: 0.05 },
-  ];
-
-  return new Fuse(packages, {
-    shouldSort: true,
-    includeScore: true,
-    threshold: 0.2,
-    tokenize: true,
-    location: 0,
-    distance: 100,
-    maxPatternLength: 32,
-    minMatchCharLength: 1,
-    keys,
-  });
 };

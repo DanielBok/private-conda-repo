@@ -1,26 +1,18 @@
 import Markdown from "@/components/Markdown";
-import { metaInfo } from "@/features/meta/selectors";
-import { Typography } from "antd";
+import { useRootSelector } from "@/infrastructure/hooks";
+import Layout from "@/modules/Help/Layout";
 import React from "react";
-import { useSelector } from "react-redux";
-import Layout from "../../Layout";
+import Content from "./overview.md";
 
-import Overview from "./overview.md";
+const Overview = () => {
+  const registry = useRootSelector((s) => s.meta.registry);
+  const content = Content.replace("@registry", registry);
 
-export default () => {
-  const { registry } = useSelector(metaInfo);
   return (
     <Layout>
-      <Markdown
-        children={Overview}
-        overrides={{
-          RegistryInfo: () => (
-            <Typography.Paragraph code={true}>
-              pcr registry set {registry}
-            </Typography.Paragraph>
-          ),
-        }}
-      />
+      <Markdown children={content} />
     </Layout>
   );
 };
+
+export default Overview;

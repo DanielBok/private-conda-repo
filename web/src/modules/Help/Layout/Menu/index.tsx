@@ -8,28 +8,35 @@ import styles from "./styles.less";
 const routes = {
   "Getting Started": {
     Overview: "/",
+    Upload: "/upload",
   },
 };
 
-export default () => {
+const Menu = () => {
   const pathname = useRouter().location.pathname.replace(/^\/help/, "");
 
   return (
-    <>
+    <div className={styles.groupContainer}>
       {Object.entries(routes).map(([title, links], i) => (
         <div key={i}>
           <div className={styles.title}>{title}</div>
           {Object.entries(links).map(([name, link], j) => (
-            <Link
-              key={j}
-              to={"/help" + link}
-              className={cx(styles.link, pathname === link && styles.selected)}
-            >
-              {name}
-            </Link>
+            <div key={j} className={styles.linkContainer}>
+              <Link
+                to={"/help" + link}
+                className={cx(
+                  styles.link,
+                  pathname === link && styles.selected
+                )}
+              >
+                {name}
+              </Link>
+            </div>
           ))}
         </div>
       ))}
-    </>
+    </div>
   );
 };
+
+export default Menu;

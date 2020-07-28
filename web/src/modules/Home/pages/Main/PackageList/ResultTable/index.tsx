@@ -75,17 +75,7 @@ const useResultList = () => {
       { name: "summary", weight: 0.05 },
     ];
 
-    return new Fuse(packages, {
-      shouldSort: true,
-      includeScore: true,
-      threshold: 0.2,
-      tokenize: true,
-      location: 0,
-      distance: 100,
-      maxPatternLength: 32,
-      minMatchCharLength: 1,
-      keys,
-    })
+    return new Fuse(packages, { threshold: 0.2, keys })
       .search(search)
       .map((e) => e.item);
   } else {

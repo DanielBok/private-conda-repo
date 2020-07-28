@@ -19,7 +19,9 @@ Assuming you saved your tool as `PCR` in your path
 To start using the CLI tool, you must first set the registry and login.
 To register your console with the API server:
 
-<RegistryInfo/>
+```sh
+pcr registry set @registry
+```
 
 Subsequently, login to your console via
 

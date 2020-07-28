@@ -24,13 +24,13 @@ export const useUpload = () => {
   ]);
 
   return async (
-    file: UploadFile,
+    { originFileObj: file }: UploadFile,
     noAbi: boolean
   ): Promise<AxiosResponse<Response>> => {
     const data = new FormData();
     data.append("channel", channel);
     data.append("password", password);
-    data.append("file", file.originFileObj as File);
+    data.append("file", file as File);
 
     const fixes = [noAbi && "no-abi"].filter((e) => e).join(",");
     if (fixes) data.append("fixes", fixes);

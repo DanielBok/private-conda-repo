@@ -5,7 +5,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.2.1",
     "antd": "^4.5.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "camelcase-keys": "^6.2.2",
     "classnames": "^2.2.6",
     "connected-react-router": "^6.8.0",

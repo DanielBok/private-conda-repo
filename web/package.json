@@ -11,7 +11,7 @@
     "connected-react-router": "^6.8.0",
     "fuse.js": "^6.4.1",
     "history": "^4.10.1",
-    "immer": "^8.0.1",
+    "immer": "^9.0.6",
     "lodash": "^4.17.19",
     "markdown-to-jsx": "^6.11.4",
     "moment": "^2.27.0",
